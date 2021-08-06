@@ -1,0 +1,25 @@
+<html>
+<body>
+<input type="date" id="selectedDate" onchange="dateChanged()"><br><br>
+<a id="output"></a>
+</body>
+<script>
+function dateChanged(){
+ output  = document.getElementById("output");
+  dateSelected = new Date(document.getElementById("selectedDate").value);
+  dateSelected.setDate(dateSelected.getDate() + 1);
+  baseDate = new Date("Mon Aug 02 2021 19:00:00 GMT-0500 (Central Daylight Time)");
+  weekInSeconds = 86400000 * 7;
+  twoWeeksInSeconds = 86400000 * 14;
+  difference = dateSelected - baseDate;
+
+  if(Math.abs(difference) % twoWeeksInSeconds >= weekInSeconds){
+	output.innerHTML = "PODENY AND JESSICA";
+  }
+  else{
+	output.innerHTML = "CHARLOTTE AND CORY";
+  }
+} 
+</script>
+</body>
+</html>
