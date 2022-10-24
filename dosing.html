@@ -1,0 +1,94 @@
+<html>
+<head>
+	<style>
+
+
+
+		.column {
+		  float: left;
+		  width: 46%;
+		  HEIGHT: 50%;
+		  padding-left: 3%;
+
+		}
+
+		/* Clear floats after the columns */
+		.row:after {
+		  content: "";
+		  display: table;
+		  clear: both;
+		}
+		body {
+			font-size: 24px;
+			font-weight: bold;
+		}
+	</style>
+	<title>PEDIATRIC DOSING</title>
+</head>
+<body>
+<h1 style="text-align: center; COLOR: GREEN">NOT FOR PUBLIC USE. DO NOT RELY ON THIS PAGE FOR DOSING INFO (OR ANYTHING).</H1>
+	<br><br><br><br>
+	WEIGHT&nbsp;
+	<input type="number" id="weightField" style="font-size: 20px;">
+	<button id="weightToggleButton" style="font-size: 16px;">POUNDS</button>
+	<br><br>
+	<button id="calculateButton" style="font-size: 20px;">CALCULATE</button>
+	<br><br><Br>
+	 <div class="row">
+
+	  <!-- LEFT COLUMN (MOTRIN) -->
+	  <div class="column" style="background-color: #929EEB;">
+	  		<H1 align="center">MOTRIN</H1>
+	 		<a id="motrinText"></a>
+	  </div>
+
+	  <!-- RIGHT COLUMN (TYLENOL) -->
+	  <div class="column" style="background-color: #EB9292;">
+	  		<H1 align="center">TYLENOL</H1>
+	  		<a id="tylenolText"></a>
+	  		<H3 style="text-align: center; COLOR: GREEN">NOT FOR PUBLIC USE. DO NOT RELY ON THIS PAGE FOR DOSING INFO (OR ANYTHING)</H3>
+	  </div>
+</div> 
+</body>
+
+<script>
+	// WEIGHT TOGGLE BUTTON -->
+	document.getElementById("weightToggleButton").addEventListener('click', weightToggle);
+	function weightToggle(){
+		button = document.getElementById("weightToggleButton");
+		if (button.innerHTML == "POUNDS")
+			button.innerHTML = "KILOGRAMS";
+		else
+			button.innerHTML = "POUNDS";
+	}
+
+	// CALCULATE BUTTON
+	document.getElementById("calculateButton").addEventListener('click', calculate);
+	function calculate(){
+		button = document.getElementById("weightToggleButton");
+		
+		// FIGURES OUT POUNSD AND KILOGRAMS
+		if (button.innerHTML == "POUNDS"){
+			pounds = document.getElementById("weightField").value - 0;
+			kilograms = pounds / 2.2;
+		}
+		else{
+			kilograms = document.getElementById("weightField").value - 0;
+			pounds = kilograms * 2.2;
+		}
+
+		pounds = Math.round(pounds * 10) / 10;
+		kilograms = Math.round(kilograms * 10) / 10;
+		tylenolDose = kilograms * 15;
+		tylenolDose = Math.round(tylenolDose * 10) / 10;
+
+		// TYLENOL
+		document.getElementById("tylenolText").innerHTML = pounds + " pounds = " + kilograms + " kilograms.";
+		document.getElementById("tylenolText").innerHTML = document.getElementById("tylenolText").innerHTML + "<br><br>" + kilograms + " kg * 15mg/kg = <u>" + tylenolDose + "mg every 4 hours</u><br><Br><br>";
+		tylenolLiquidDosing = tylenolDose / 160 * 5;
+		tylenolLiquidDosing = Math.round(tylenolLiquidDosing * 10) / 10;
+		document.getElementById("tylenolText").innerHTML = document.getElementById("tylenolText").innerHTML + "Tylenol 160mg/mL dosing: " + tylenolLiquidDosing + "mL every 4 hours";
+		
+	}
+</script>
+</html>
