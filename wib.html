@@ -1,0 +1,211 @@
+<html>
+<head>
+  <title>WIB ASSISTANT</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<!-- FILE UPLOAD DIV -->
+<div id="uploadFileDiv">
+
+<!-- UPLOAD BUTTON -->
+<BR><BR>
+ <label for="inputfile">Upload:</label>
+ <input type="file" name="inputfile"
+            id="inputfile" >
+
+<!-- BUTTONS FOR CONVERTING AND DOWNLOADING FORMATTED RESULTS (NOT RESULTS OF REPORTS RAN) -->
+<br><br><br>
+<!-- <button  onclick="identifyAsterickPatients()" disabled="true">CONVERT</button> -->
+<br><br><br>
+<button id="regularOrder" onClick="identifyAsterickPatients()">Display In Order of WIB</button>
+<button id="alphabetically" onClick="alphabetizePatients()">Display Alphabetically</button><br><br>
+<a id="output" style="font-size: 18px;"></a>
+
+</body>
+
+<!-- UPLOADS -->
+<script>
+let texts = [];
+document.getElementById("alphabetically").disabled = true;
+document.getElementById("regularOrder").disabled = true;
+
+let fileName = "";
+document.getElementById('inputfile')
+            .addEventListener('change',function(){
+
+   var fileReader=new FileReader();
+
+   fileReader.onload=function(){
+      texts = [];
+      texts.push(fileReader.result);
+      doTheRestOfUpload(fileName);
+   }
+   fileName = this.files[0].name;
+   fileReader.readAsText(this.files[0]);
+   
+});
+
+
+wibBool = false;
+assistantBool = false;
+ function doTheRestOfUpload(passedFile){
+              // console.log("passedFile: " + passedFile);
+            if (passedFile.includes("Waiting"))
+                for (aa = 0; aa < texts.length; aa++){
+              texts[aa] = removeCommas(texts[aa]);
+            }
+            console.log("commas removed");
+            // Clean up Data
+            tempText = [];//texts.map((x) => x);;
+
+            percent = 0;
+            for (a = 0; a < texts.length; a++){
+              if( Math.floor(a / texts.length) * 100 > percent){
+                percent = percent + 1;
+                console.log("a: " + percent);
+              }
+              texts[a] = texts[a].replaceAll("\r","");
+              tempText.push([]);
+              tempText[tempText.length-1] = texts[a].split('\n');
+              for (b = 0; b < tempText[a].length; b++){
+                // console.log(a);
+                tempText[a][b] = tempText[a][b].split(",");
+              }
+            }
+           
+            texts = [].concat(tempText);
+            texts = texts[0];
+            console.log("upload finished");
+            if(passedFile.includes("Waiting")){
+              waitingInBin = texts.slice();
+              assistantBool = true;
+            }
+            else if(passedFile.includes("WIB")){
+              assistant = texts.slice();
+              wibBool = true;
+            }
+            if (wibBool && assistantBool){
+              document.getElementById("alphabetically").disabled = false;
+              document.getElementById("regularOrder").disabled = false;
+            }
+ }
+
+
+
+  function removeCommas(input){
+    numCommas = 0;
+    found = false;
+    percent2 = 1;
+  for (z = 0; z < input.length; z++){
+
+    if( Math.floor(z / input.length * 1000) > percent2){
+                percent2 = percent2 + 1;
+                console.log("z: " + percent2);
+              }
+
+
+    // console.log(z);
+    if(input.substring(z,z+1) ==  "\""){
+      // console.log("found " + z);
+      end = input.indexOf("\"",z+1);
+      // console.log("---found , " + input.substring(z+1).indexOf(",") + " comma " + input.substring(z+1).indexOf("\""));
+
+      while (input.substring(z+1).indexOf(",") < input.substring(z+1).indexOf("\"") && input.substring(z+1).indexOf(",") >= 0){
+        // console.log("if ran");
+        index = input.substring(z).indexOf(",");
+        input = input.substring(0,index+z) + input.substring(index+1+z);
+        found = true;
+        numCommas++;
+      }
+      z = input.indexOf("\"",z+1);
+    }
+  }
+  input = input.replaceAll("\"","");
+  
+  return input;
+}
+
+var glassPatients = [];
+function identifyAsterickPatients(){
+
+  for (a = 0; a < assistant.length; a++){
+    while (assistant[a].length < 4){
+      assistant[a].push("jibber jabber");
+    }
+  }
+  for (a = 1; a > 0 && a < waitingInBin.length; a++){
+    if (waitingInBin[a][0].includes("********")){
+      glassPatients.push([waitingInBin[a][0]]);
+      for (b = 0; b < assistant.length; b++){
+        if (waitingInBin[a][3] == assistant[b][1]) {
+          glassPatients[glassPatients.length-1].push(assistant[b][2].substring(1,assistant[b][2].length) + ", " + assistant[b][3].substring(1,assistant[b][3].length-1));
+          tab = 20-glassPatients[glassPatients.length-1][0].length;
+          tabs = "";
+          for (c = 0; c < tab; c++) tabs += "&nbsp;";
+          glassPatients[glassPatients.length-1][0] = glassPatients[glassPatients.length-1][0] + tabs;
+          break;
+        }
+      }
+      if (glassPatients[glassPatients.length-1].length != 2){
+        glassPatients[glassPatients.length-1].push ("<u><I>NO PATIENT FOUND</I></u>")
+      }
+      if (waitingInBin[a][3].substring(0,1) == "2"){
+        glassPatients[glassPatients.length-1][0] = "<font color = \"red\">" + glassPatients[glassPatients.length-1][0]; 
+        glassPatients[glassPatients.length-1][1] =  glassPatients[glassPatients.length-1][1] +  "</font>"; 
+      }
+    }
+    else{
+      break;
+    }
+  }
+
+  newString = "";
+  for (a = 0; a < glassPatients.length; a++){
+    newString += glassPatients[a][0] + "\t" + glassPatients[a][1] + "<br>";
+  }
+  newString = "<tt>" + newString;
+  newString = newString + "<tt>";
+  document.getElementById("output").innerHTML = newString;
+  document.getElementById("alphabetically").disabled = true;
+  document.getElementById("regularOrder").disabled = true;
+  
+
+}
+
+function alphabetizePatients(){
+  identifyAsterickPatients();
+  done = false;
+  temp = ["",""];
+  while (done == false){
+    done = true;
+    for (a = 0; a < glassPatients.length-1; a++){
+        if (glassPatients[a][1] > glassPatients[a+1][1]){
+          done = false;
+          
+          temp[1] = glassPatients[a+1][1];
+          temp[0] = glassPatients[a+1][0];
+
+          glassPatients[a+1][0] = glassPatients[a][0];
+          glassPatients[a+1][1] = glassPatients[a][1];
+
+          glassPatients[a][0] = temp[0];
+          glassPatients[a][1] = temp[1];
+
+        }
+    }
+  }
+  newString = "";
+  for (a = 0; a < glassPatients.length; a++){
+    newString += glassPatients[a][0] + "\t" + glassPatients[a][1] + "<br>";
+  }
+  newString = "<tt>" + newString;
+  newString = newString + "<tt>";
+  document.getElementById("output").innerHTML = newString;
+  console.log("done alphabetizing");
+}
+
+
+</script>
+
+</html>
