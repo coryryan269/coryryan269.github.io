@@ -1,25 +1,94 @@
-body {
-    height: 2000px;
-    font-family: sans-serif;
-    overflow-x: hidden;
+.pageHeader {
+    align-items: center;
+    position: fixed;
+    height: 45px;
+    background-color: rgba(21, 16, 139,0.83);
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
 }
 
-.blueBonnetPictureDiv{
-    width: 100%;
-    height: 200px;
+.contactHeaderInfo {
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    justify-content: right; /* Horizontally center the content */
+    right: 0px;
+    top: 0px;
     position: absolute;
-    top: 225px;
-    left: 0px;
-    margin-left: 0px;
-    margin-right: : 0px;
+    height: 100%;
+    width: 50%;
+    border-style: none;
+    margin: 0;
+    overflow: hidden;
+    
 }
 
-.blueBonnetPic{
-    width: 100%;
-    height: 330px;
-    object-fit: cover;
-/*    object-position: 50% 70%;*/
-    margin-left: 0px;
-    margin-right: : 0px;    
+.facebook-logo {
+    height: 85%;
+    padding: 0;
+    vertical-align: middle;
+    border-style: none;
+    margin-right: 31px;
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    justify-content: center; /* Horizontally center the content */
+
+}
+
+.phoneNumber {
+    color: white;
+    font-family: Sans-serif;
+    margin-right: 32px;
+    vertical-align: middle;
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    justify-content: center; /* Horizontally center the content */
     
+}
+
+.callByPhoneText{
+    color: white;
+    font-family: Sans-serif;
+    margin-right: 8px;
+    vertical-align: middle;
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    justify-content: center; /* Horizontally center the content */
+}
+
+.scheduleButton {
+    
+    height: 100%;
+    text-align: center;
+    background-color: rgb(51,51,51);
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    justify-content: center; /* Horizontally center the content */
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    
+    
+}
+
+.phoneSVG {
+    margin-right: 5px;
+}
+
+.logoAndMenuDiv {
+    display: flex;
+    position: absolute;
+    top: 65px;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+  
+}
+
+.spaRifficMenuLogo {
+    margin-left: 15px;
 }
