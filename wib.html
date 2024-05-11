@@ -1,211 +1,461 @@
 <html>
-<head>
-  <title>WIB ASSISTANT</title>
-  <link rel="stylesheet" href="index.css">
-</head>
+<head><title>WIB</title></head>
+
+<style>
+@media print {
+  /* Apply styles for print mode */
+  .no-print {
+    display: none;
+  }
+  br {
+    display: none;
+  }
+   @page {
+    margin: 1cm; /* Adjust as needed */
+  }
+}
+
+  caption {
+    font-weight: bold;
+    font-size: 20px;
+  }
+  /* CSS for table styling */
+  #dataTable {
+    border-collapse: collapse;
+    margin: 20px; /* Add margin around the table */
+  }
+  #dataTable th, #dataTable td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    max-width: 200px; /* Limit the width of cells */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Display ellipsis for overflow */
+  }
+  #dataTable th {
+    background-color: #f2f2f2;
+  }
+</style>
 <body>
+		<input class="no-print" type="file" id="fileInput">
+	  	<button class="no-print"  id="upload" onclick="uploadFile()">Upload</button><br><br>
+	  	<button class="no-print"  onclick="showAllDataOnTable()">WIB Report</button><br><br>
 
-<!-- FILE UPLOAD DIV -->
-<div id="uploadFileDiv">
+      <!-- <label class="no-print"  for="option1">Single Entry</label> -->
+    <!-- <input class="no-print"  type="radio" id="singleEntry" name="entryType" value="singleEntry" checked="True">
 
-<!-- UPLOAD BUTTON -->
-<BR><BR>
- <label for="inputfile">Upload:</label>
- <input type="file" name="inputfile"
-            id="inputfile" >
-
-<!-- BUTTONS FOR CONVERTING AND DOWNLOADING FORMATTED RESULTS (NOT RESULTS OF REPORTS RAN) -->
-<br><br><br>
-<!-- <button  onclick="identifyAsterickPatients()" disabled="true">CONVERT</button> -->
-<br><br><br>
-<button id="regularOrder" onClick="identifyAsterickPatients()">Display In Order of WIB</button>
-<button id="alphabetically" onClick="alphabetizePatients()">Display Alphabetically</button><br><br>
-<a id="output" style="font-size: 18px;"></a>
+    <label class="no-print"  for="option2">Multiple Entry</label>
+    <input class="no-print"  type="radio" id="multipleEntry" name="entryType" value="multipleEntry"> -->
+    <br><br>
+	  	<textarea class="no-print"  id="scannedItemsBox"></textarea>
+      <br><br><br>
+      <button class="no-print"  id="extraItemsButton">Extra Scripts</button><br><br>
+      <button class="no-print"  id="exportButton">EXPORT ITEMS</button>
+      <br><br>
+      <table id="dataTable"></table>
 
 </body>
 
-<!-- UPLOADS -->
-<script>
-let texts = [];
-document.getElementById("alphabetically").disabled = true;
-document.getElementById("regularOrder").disabled = true;
+ <script>
+  const sound = new Audio('src/notFound.wav');
+  const sound2 = new Audio('src/scanned.wav');
+ 	var contents;
+  var entireReport;
+  var scannedItems = [];
+  var extraItems = [];
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+  function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = function(event) {
+           contents = event.target.result;
+           contents = removeCommasWithinQuotes(contents);
+           entireReport2 = parseCSV(contents);
+           contents = parseCSV(contents);
+           
+           entireReport = [];
+           for (a = 0; a < entireReport2.length; a++){
+            entireReport.push(entireReport2[a][0].substring(0,9));
+           }
+           contents.splice(0,1);
+          // Now you can assign the contents to a variable or process it further
+          console.log('File contents:', contents);
+          // For demonstration, let's assign it to a variable
+          window.fileContents = contents;
+          fileInputButton = document.getElementById("fileInput");
+          uploadButton = document.getElementById("upload");
+          document.body.removeChild(fileInputButton);
+          document.body.removeChild(uploadButton);
+        };
+        reader.onerror = function(event) {
+          console.error('File could not be read! Code ' + event.target.error.code);
+        };
+      } else {
+        console.error('No file selected!');
+      }
+    }
 
-let fileName = "";
-document.getElementById('inputfile')
-            .addEventListener('change',function(){
+    
+    document.getElementById("scannedItemsBox").addEventListener('keypress', async function(event) {
+    // Check if the pressed key is the pipe character (|), which has keyCode 124
+    // if (document.getElementById("singleEntry").checked)
+    if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
+        // Call your function here
+        compare();
 
-   var fileReader=new FileReader();
+        await sleep(100);
+        document.getElementById("scannedItemsBox").value = "";
+    }
+});
 
-   fileReader.onload=function(){
-      texts = [];
-      texts.push(fileReader.result);
-      doTheRestOfUpload(fileName);
-   }
-   fileName = this.files[0].name;
-   fileReader.readAsText(this.files[0]);
-   
+ document.getElementById("exportButton").addEventListener('click',  function(event){
+    exportScannedItems();
+ });
+
+
+    // EXTRA ITEMS
+    document.getElementById("extraItemsButton").addEventListener('click',  function(event) {
+      console.log("making table");
+      dataTable = document.getElementById('dataTable');
+     dataTable = document.getElementById('dataTable');
+     dataTable.innerHTML = ''; // Clear existing table content
+      caption = document.createElement('caption');
+      caption.textContent = 'Extra Items'; // Set the title text
+      dataTable.appendChild(caption);
+
+    // Populate the table with extraItems array values
+         row = dataTable.insertRow();
+         cell = row.insertCell();
+        cell.textContent = "NOT ON BIN AUDIT";
+    extraItems.forEach(item => {
+        const row = dataTable.insertRow();
+        const cell = row.insertCell();
+        cell.textContent = item;
+    });
 });
 
 
-wibBool = false;
-assistantBool = false;
- function doTheRestOfUpload(passedFile){
-              // console.log("passedFile: " + passedFile);
-            if (passedFile.includes("Waiting"))
-                for (aa = 0; aa < texts.length; aa++){
-              texts[aa] = removeCommas(texts[aa]);
-            }
-            console.log("commas removed");
-            // Clean up Data
-            tempText = [];//texts.map((x) => x);;
 
-            percent = 0;
-            for (a = 0; a < texts.length; a++){
-              if( Math.floor(a / texts.length) * 100 > percent){
-                percent = percent + 1;
-                console.log("a: " + percent);
+
+    var scannedItemsArray;
+    // Will compare scans and file contents and show discrepancies
+    function compare() {
+      console.log("started Compare");
+
+      // Create array from text in textarea
+      scannedItemsArray = extractTextBetweenRXAnd228(document.getElementById("scannedItemsBox").value);
+      scannedItemsArray = removeDuplicatesFromArray(scannedItemsArray);
+
+      firstRound = true;
+
+      for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
+    	for (x = 0; x < scannedItemsArray.length; x++){
+            inReport = false;
+            for (a = 0; a < entireReport.length; a++){
+                if (scannedItemsArray[x] + "-228" == entireReport2[a][0]){
+                    allScannedItems.push(entireReport2[a]);
+                    inReport = true;
+                    console.log("pushed first");
+                }
+                
+            }
+            if (!inReport){
+                    allScannedItems.push([scannedItemsArray[x],"","","",""]);
+                    console.log("pushed second");
+                }
+            if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
+                  console.log(scannedItemsArray[0]);
+                  sound.play();
               }
-              texts[a] = texts[a].replaceAll("\r","");
-              tempText.push([]);
-              tempText[tempText.length-1] = texts[a].split('\n');
-              for (b = 0; b < tempText[a].length; b++){
-                // console.log(a);
-                tempText[a][b] = tempText[a][b].split(",");
-              }
-            }
-           
-            texts = [].concat(tempText);
-            texts = texts[0];
-            console.log("upload finished");
-            if(passedFile.includes("Waiting")){
-              waitingInBin = texts.slice();
-              assistantBool = true;
-            }
-            else if(passedFile.includes("WIB")){
-              assistant = texts.slice();
-              wibBool = true;
-            }
-            if (wibBool && assistantBool){
-              document.getElementById("alphabetically").disabled = false;
-              document.getElementById("regularOrder").disabled = false;
-            }
- }
+              else if (firstRound == true)
+                sound2.play();
+              if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
+                  extraItems.push(scannedItemsArray[x]);
+        		for (y = 0; y < contents.length; y++){
+        			if ((scannedItemsArray[x] + "-228") == contents[y][0]){
+                console.log(x);
+        				scannedItemsArray.splice(x,1);
+        				contents.splice(y,1);
+        				x--;
+        				y--;
+                if (scannedItemsArray.length == 0 || contents.length == 0)
+                  break;
+        			}
+              if (scannedItemsArray.length == 0 || contents.length == 0)
+                  break;
 
+    		}
 
-
-  function removeCommas(input){
-    numCommas = 0;
-    found = false;
-    percent2 = 1;
-  for (z = 0; z < input.length; z++){
-
-    if( Math.floor(z / input.length * 1000) > percent2){
-                percent2 = percent2 + 1;
-                console.log("z: " + percent2);
-              }
-
-
-    // console.log(z);
-    if(input.substring(z,z+1) ==  "\""){
-      // console.log("found " + z);
-      end = input.indexOf("\"",z+1);
-      // console.log("---found , " + input.substring(z+1).indexOf(",") + " comma " + input.substring(z+1).indexOf("\""));
-
-      while (input.substring(z+1).indexOf(",") < input.substring(z+1).indexOf("\"") && input.substring(z+1).indexOf(",") >= 0){
-        // console.log("if ran");
-        index = input.substring(z).indexOf(",");
-        input = input.substring(0,index+z) + input.substring(index+1+z);
-        found = true;
-        numCommas++;
-      }
-      z = input.indexOf("\"",z+1);
+            firstRound = false;
+    	}
+      console.log("done with compare");
+      document.getElementById("scannedItemsBox").value = "";
     }
-  }
-  input = input.replaceAll("\"","");
-  
-  return input;
-}
 
-var glassPatients = [];
-function identifyAsterickPatients(){
-
-  for (a = 0; a < assistant.length; a++){
-    while (assistant[a].length < 4){
-      assistant[a].push("jibber jabber");
-    }
-  }
-  for (a = 1; a > 0 && a < waitingInBin.length; a++){
-    if (waitingInBin[a][0].includes("********")){
-      glassPatients.push([waitingInBin[a][0]]);
-      for (b = 0; b < assistant.length; b++){
-        if (waitingInBin[a][3] == assistant[b][1]) {
-          glassPatients[glassPatients.length-1].push(assistant[b][2].substring(1,assistant[b][2].length) + ", " + assistant[b][3].substring(1,assistant[b][3].length-1));
-          tab = 20-glassPatients[glassPatients.length-1][0].length;
-          tabs = "";
-          for (c = 0; c < tab; c++) tabs += "&nbsp;";
-          glassPatients[glassPatients.length-1][0] = glassPatients[glassPatients.length-1][0] + tabs;
-          break;
+// precursor for parsingCSV file
+function removeCommasWithinQuotes(inputString) {
+    // Regular expression to match quoted substrings
+    const regex = /"[^"]*"|[^,]+/g;
+    
+    // Replace commas within quoted substrings with an empty string
+    return inputString.replace(regex, function(match) {
+        // If the match is a quoted substring, remove commas within it
+        if (match.startsWith('"') && match.endsWith('"')) {
+            return match.replace(/,/g, '');
         }
-      }
-      if (glassPatients[glassPatients.length-1].length != 2){
-        glassPatients[glassPatients.length-1].push ("<u><I>NO PATIENT FOUND</I></u>")
-      }
-      if (waitingInBin[a][3].substring(0,1) == "2"){
-        glassPatients[glassPatients.length-1][0] = "<font color = \"red\">" + glassPatients[glassPatients.length-1][0]; 
-        glassPatients[glassPatients.length-1][1] =  glassPatients[glassPatients.length-1][1] +  "</font>"; 
-      }
-    }
-    else{
-      break;
-    }
-  }
-
-  newString = "";
-  for (a = 0; a < glassPatients.length; a++){
-    newString += glassPatients[a][0] + "\t" + glassPatients[a][1] + "<br>";
-  }
-  newString = "<tt>" + newString;
-  newString = newString + "<tt>";
-  document.getElementById("output").innerHTML = newString;
-  document.getElementById("alphabetically").disabled = true;
-  document.getElementById("regularOrder").disabled = true;
-  
-
+        // Otherwise, return the match unchanged
+        return match;
+    });
 }
 
-function alphabetizePatients(){
-  identifyAsterickPatients();
-  done = false;
-  temp = ["",""];
-  while (done == false){
-    done = true;
-    for (a = 0; a < glassPatients.length-1; a++){
-        if (glassPatients[a][1] > glassPatients[a+1][1]){
-          done = false;
+// Used for the file to turn into array
+function parseCSV(inputString) {
+    // Regular expression to match CSV fields (including quoted values)
+    const regex = /("[^"]*"|[^,]+)(?=,|$)/g;
+    
+    // Split the input string into lines
+    const lines = inputString.split('\n');
+    
+    // Initialize an empty array to store the result
+    const result = [];
+    
+    // Iterate over each line
+    for (let line of lines) {
+        // Initialize an array to store the fields in this line
+        const fields = [];
+        
+        // Match fields in the line using the regular expression
+        let match;
+        while (match = regex.exec(line)) {
+            // Extract the matched field, removing any surrounding quotation marks
+            const field = match[1].replace(/^"(.*)"$/, '$1');
+            fields.push(field);
+        }
+        
+        // Check if the line has at least 4 fields
+        if (fields.length >= 4) {
+            // Extract the 4th and 1st fields
+            const fourthField = fields[3];
+            const firstField = fields[0];
           
-          temp[1] = glassPatients[a+1][1];
-          temp[0] = glassPatients[a+1][0];
-
-          glassPatients[a+1][0] = glassPatients[a][0];
-          glassPatients[a+1][1] = glassPatients[a][1];
-
-          glassPatients[a][0] = temp[0];
-          glassPatients[a][1] = temp[1];
-
+            
+            // Push the extracted fields into the result array as a nested array
+            result.push([fourthField, firstField, fields[1],fields[2],Number(fields[4])]);
         }
     }
-  }
-  newString = "";
-  for (a = 0; a < glassPatients.length; a++){
-    newString += glassPatients[a][0] + "\t" + glassPatients[a][1] + "<br>";
-  }
-  newString = "<tt>" + newString;
-  newString = newString + "<tt>";
-  document.getElementById("output").innerHTML = newString;
-  console.log("done alphabetizing");
+    
+    return result;
+}
+
+// Extract text from Field
+function extractTextBetweenRXAnd228(inputString) {
+    // Regular expression to match "RX" followed by any characters until "-228"
+    const regex = /\\RX(.*?)\-228/g;
+    
+    // Array to store extracted strings
+    const extractedStrings = [];
+    
+    // Match all occurrences of the pattern in the input string
+    let match;
+    while ((match = regex.exec(inputString)) !== null) {
+        // Add the matched text (excluding "RX" and "-228") to the array
+        extractedStrings.push(match[1]);
+    }
+    
+    return extractedStrings;
 }
 
 
-</script>
+function removeDuplicatesFromArray(array) {
+    const uniqueArray = [];
+    for (let value of array) {
+        if (!uniqueArray.includes(value)) {
+            uniqueArray.push(value);
+        }
+    }
+    return uniqueArray;
+}
 
+
+function populateTableWithTitleAndData(data) {
+    const table = document.getElementById('dataTable');
+    const caption = document.createElement('caption');
+    caption.textContent = 'Leftover WIB Items'; // Set the title text
+    table.innerHTML = ''; // Clear existing table content
+    table.appendChild(caption);
+
+    // Create table header row
+    const headerRow = table.insertRow();
+    const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY"];
+    headers.forEach(headerText => {
+        const headerCell = document.createElement('th');
+        headerCell.textContent = headerText;
+        headerRow.appendChild(headerCell);
+    });
+
+    // Populate the table with data from the array of arrays
+    data.forEach(rowData => {
+        const row = table.insertRow();
+        rowData.forEach(cellData => {
+            const cell = row.insertCell();
+            cell.textContent = cellData;
+        });
+    });
+}
+ 
+
+
+ function showAllDataOnTable(data) {
+    const table = document.getElementById('dataTable');
+    const caption = document.createElement('caption');
+    caption.textContent = 'WAITING IN BIN'; // Set the title text
+    table.innerHTML = ''; // Clear existing table content
+    table.appendChild(caption);
+
+    report  = entireReport2.slice();
+    report.shift();
+    for (a = 0; a < report.length; a++){
+        // entireReport2[a].push(0);
+        found = false;
+        for (b = 0; b < contents.length; b++){
+            if (report[a][0] == contents[b][0]){
+                found = true;
+            }
+        }
+        if (found == true){
+            report[a][5] = "NOT FOUND"
+        }
+        else
+            report[a][5] = "FOUND"
+    }
+
+    tempNotFound = [];
+    tempFound = [];
+    for (i = 0; i < report.length; i++){
+        if (report[i][5] == "NOT FOUND")
+            tempNotFound.push(report[i]);
+        else
+            tempFound.push(report[i]);
+    }
+    report = [];
+    for (i = 0; i < tempNotFound.length; i++){
+        report.push(tempNotFound[i]);
+    }
+    for (i = 0; i < tempFound.length; i++){
+        report.push(tempFound[i]);
+    }
+    // Create table header row
+    const headerRow = table.insertRow();
+    const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY","SCANNED?"];
+    headers.forEach(headerText => {
+        const headerCell = document.createElement('th');
+        headerCell.textContent = headerText;
+        headerRow.appendChild(headerCell);
+    });
+
+    // Populate the table with data from the array of arrays
+    report.forEach(rowData => {
+        const row = table.insertRow();
+        rowData.forEach(cellData => {
+            const cell = row.insertCell();
+            cell.textContent = cellData;
+            if (cellData == "NOT FOUND"){
+                row.style.backgroundColor = "#ed908a";
+            }
+
+        });
+    });
+}
+
+allScannedItems = [];
+exportItems = "";
+
+function exportScannedItems(){
+    exportItems = "";
+    for (a = 0; a < allScannedItems.length; a++){
+        exportItems = exportItems + "\\RX" + allScannedItems[a][0] + "-228";
+    }
+    copyToClipboard(exportItems);
+}
+
+
+function copyToClipboard(text) {
+  // Check if the Clipboard API is available
+  if (navigator.clipboard) {
+    // Use the Clipboard API
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log('Text copied to clipboard successfully');
+      })
+      .catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+  } else {
+    // Fallback to execCommand method for older browsers
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      var success = document.execCommand('copy');
+      if (success) {
+        console.log('Text copied to clipboard successfully');
+      } else {
+        console.error('Unable to copy text to clipboard');
+      }
+    } catch (err) {
+      console.error('Unable to copy text to clipboard: ', err);
+    }
+    document.body.removeChild(textarea);
+  }
+}
+
+function store(cookieName, arrayToStore) {
+    // Convert the array to a JSON string
+    var arrayAsString = JSON.stringify(arrayToStore);
+
+    // Set the expiration time for 24 hours from now
+    var expirationDate = new Date();
+    expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+
+    // Format the expiration date for the cookie
+    var expires = "expires=" + expirationDate.toUTCString();
+
+    // Set the cookie
+    document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
+}
+
+
+function load(cookieName) {
+    var nameEQ = cookieName + "=";
+    var cookies = document.cookie.split(';');
+    for(var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(nameEQ) == 0) {
+            var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+            return JSON.parse(arrayAsString);
+        }
+    }
+    return null;
+}
+
+
+
+
+  </script>
 </html>
+
+
