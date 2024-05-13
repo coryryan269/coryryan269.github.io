@@ -41,7 +41,11 @@
 		<input class="no-print" type="file" id="fileInput">
 	  	<button class="no-print"  id="upload" onclick="uploadFile()">Upload</button><br><br>
 	  	<button class="no-print"  onclick="showAllDataOnTable()">WIB Report</button><br><br>
+        <input class="no-print" type="radio" id="defaultRadio" name="style" value="default" checked>
+      <label class="no-print" for="defaultRadio">Default</label><br>
 
+      <input class="no-print" type="radio" id="alternativeRadio" name="style" value="alternative">
+      <label class="no-print" for="alternativeRadio">CLICK ME IF SCANS AREN'T WORKING</label><br>
       <!-- <label class="no-print"  for="option1">Single Entry</label> -->
     <!-- <input class="no-print"  type="radio" id="singleEntry" name="entryType" value="singleEntry" checked="True">
 
@@ -60,7 +64,7 @@
  <script>
   const sound = new Audio('src/notFound.wav');
   const sound2 = new Audio('src/scanned.wav');
- 	var contents;
+  var contents;
   var entireReport;
   var scannedItems = [];
   var extraItems = [];
@@ -93,6 +97,7 @@
           uploadButton = document.getElementById("upload");
           document.body.removeChild(fileInputButton);
           document.body.removeChild(uploadButton);
+          loadProgress();
         };
         reader.onerror = function(event) {
           console.error('File could not be read! Code ' + event.target.error.code);
@@ -197,6 +202,7 @@
     	}
       console.log("done with compare");
       document.getElementById("scannedItemsBox").value = "";
+      saveProgress();
     }
 
 // precursor for parsingCSV file
@@ -254,10 +260,16 @@ function parseCSV(inputString) {
     return result;
 }
 
+
+
+
 // Extract text from Field
 function extractTextBetweenRXAnd228(inputString) {
     // Regular expression to match "RX" followed by any characters until "-228"
-    const regex = /\\RX(.*?)\-228/g;
+    if (document.getElementById("defaultRadio").checked)
+      var regex = /\\RX(.*?)\-228/g;
+    else
+      var regex = /RX(.*?)\-228/g;
     
     // Array to store extracted strings
     const extractedStrings = [];
@@ -452,8 +464,94 @@ function load(cookieName) {
     return null;
 }
 
+function setArrayCookie(cookieName, arrayToStore) {
+    // Convert the array to a JSON string
+    var arrayAsString = JSON.stringify(arrayToStore);
+
+    // Set the expiration time for 24 hours from now
+    var expirationDate = new Date();
+    expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+
+    // Format the expiration date for the cookie
+    var expires = "expires=" + expirationDate.toUTCString();
+
+    // Set the cookie
+    document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
+}
 
 
+function getArrayFromCookie(cookieName) {
+    var nameEQ = cookieName + "=";
+    var cookies = document.cookie.split(';');
+    for(var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(nameEQ) == 0) {
+            var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+            return JSON.parse(arrayAsString);
+        }
+    }
+    return null;
+}
+
+function saveProgress(){
+    store("scannedItems", scannedItems.slice());
+}
+
+function loadProgress(){
+    loadedItems = load("scannedItems");
+    if (loadedItems == null){
+        return;
+    }
+    scannedItemsArray = loadedItems.slice();
+
+      firstRound = true;
+
+      for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
+        for (x = 0; x < scannedItemsArray.length; x++){
+            inReport = false;
+            for (a = 0; a < entireReport.length; a++){
+                if (scannedItemsArray[x] + "-228" == entireReport2[a][0]){
+                    allScannedItems.push(entireReport2[a]);
+                    inReport = true;
+                    console.log("pushed first");
+                }
+                
+            }
+            if (!inReport){
+                    allScannedItems.push([scannedItemsArray[x],"","","",""]);
+                    console.log("pushed second");
+                }
+            if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
+                  console.log(scannedItemsArray[0]);
+                  sound.play();
+              }
+              else if (firstRound == true)
+                sound2.play();
+              if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
+                  extraItems.push(scannedItemsArray[x]);
+                for (y = 0; y < contents.length; y++){
+                    if ((scannedItemsArray[x] + "-228") == contents[y][0]){
+                console.log(x);
+                        scannedItemsArray.splice(x,1);
+                        contents.splice(y,1);
+                        x--;
+                        y--;
+                if (scannedItemsArray.length == 0 || contents.length == 0)
+                  break;
+                    }
+              if (scannedItemsArray.length == 0 || contents.length == 0)
+                  break;
+
+            }
+
+            firstRound = false;
+        }
+      console.log("done with compare");
+      document.getElementById("scannedItemsBox").value = "";
+}
 
   </script>
 </html>
