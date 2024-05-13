@@ -41,7 +41,11 @@
 		<input class="no-print" type="file" id="fileInput">
 	  	<button class="no-print"  id="upload" onclick="uploadFile()">Upload</button><br><br>
 	  	<button class="no-print"  onclick="showAllDataOnTable()">WIB Report</button><br><br>
+        <input class="no-print" type="radio" id="defaultRadio" name="style" value="default" checked>
+      <label class="no-print" for="defaultRadio">Default</label><br>
 
+      <input class="no-print" type="radio" id="alternativeRadio" name="style" value="alternative">
+      <label class="no-print" for="alternativeRadio">CLICK ME IF SCANS AREN'T WORKING</label><br>
       <!-- <label class="no-print"  for="option1">Single Entry</label> -->
     <!-- <input class="no-print"  type="radio" id="singleEntry" name="entryType" value="singleEntry" checked="True">
 
@@ -256,10 +260,16 @@ function parseCSV(inputString) {
     return result;
 }
 
+
+
+
 // Extract text from Field
 function extractTextBetweenRXAnd228(inputString) {
     // Regular expression to match "RX" followed by any characters until "-228"
-    const regex = /\\RX(.*?)\-228/g;
+    if (document.getElementById("defaultRadio").checked)
+      var regex = /\\RX(.*?)\-228/g;
+    else
+      var regex = /RX(.*?)\-228/g;
     
     // Array to store extracted strings
     const extractedStrings = [];
