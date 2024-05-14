@@ -2,7 +2,63 @@
 <head><title>WIB</title></head>
 
 <style>
+
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px; /* Adjust as needed */
+    align-items: flex-start; /* Align items at the top */
+    width: 50%; /* Set container width to 50% of the screen */
+    margin: 0 auto; /* Center the container horizontally */
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align buttons at the top */
+    width: 100%; /* Make sure buttons take full width of their column */
+}
+
+
+  table:hover {
+    cursor: pointer;
+
+}
+
+/* CSS for the table */
+#recentScannedItemsTable {
+/*    display: inline;*/
+    border-collapse: collapse;
+/*    width: 100%;*/
+    cursor: default;
+    height: 100px;
+}
+
+/* CSS for the table headers */
+#recentScannedItemsTable th {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+
+/* CSS for the table cells */
+#recentScannedItemsTable td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+/*    height: 40px;*/
+    font-size: 16px;
+}
+
+
+
 @media print {
+
+    body{
+    -webkit-print-color-adjust: exact; /* Chrome, Safari */
+    color-adjust: exact; /* Firefox */
+    }
   /* Apply styles for print mode */
   .no-print {
     display: none;
@@ -39,521 +95,835 @@
 </style>
 <body>
 		<input class="no-print" type="file" id="fileInput">
-	  	<button class="no-print"  id="upload" onclick="uploadFile()">Upload</button><br><br>
-	  	<button class="no-print"  onclick="showAllDataOnTable()">WIB Report</button><br><br>
-        <input class="no-print" type="radio" id="defaultRadio" name="style" value="default" checked>
+	  	<button class="no-print"  id="upload" onclick="uploadFile()">Upload</button><br class="disappear"><br class="disappear">
+        <table id="recentScannedItemsTable" class="no-print">
+            <caption>Recent Scanned Items</caption>
+    <thead><tr><th>RX#</th><th>Name</th><th>Drug</th><th>Action</th></tr></thead>
+    <tbody>
+        <tr><td>|</td><td></td><td></td><td></td></tr>
+        <tr><td>|</td><td></td><td></td><td></td></tr>
+        <tr><td>|</td><td></td><td></td><td></td></tr>
+        <tr><td>|</td><td></td><td></td><td></td></tr>
+        <tr><td>|</td><td></td><td></td><td></td></tr>
+    </tbody>
+</table>
+
+	  	
+        
+
+      <!--   <input class="no-print" type="radio" id="defaultRadio" name="style" value="default" checked>
       <label class="no-print" for="defaultRadio">Default</label><br>
 
       <input class="no-print" type="radio" id="alternativeRadio" name="style" value="alternative">
-      <label class="no-print" for="alternativeRadio">CLICK ME IF SCANS AREN'T WORKING</label><br>
-      <!-- <label class="no-print"  for="option1">Single Entry</label> -->
-    <!-- <input class="no-print"  type="radio" id="singleEntry" name="entryType" value="singleEntry" checked="True">
-
-    <label class="no-print"  for="option2">Multiple Entry</label>
-    <input class="no-print"  type="radio" id="multipleEntry" name="entryType" value="multipleEntry"> -->
-    <br><br>
-	  	<textarea class="no-print"  id="scannedItemsBox"></textarea>
-      <br><br><br>
-      <button class="no-print"  id="extraItemsButton">Extra Scripts</button><br><br>
-      <button class="no-print"  id="exportButton">EXPORT ITEMS</button>
+      <label class="no-print" for="alternativeRadio">CLICK ME IF SCANS AREN'T WORKING</label><br> -->
+      <Br><br>
+    
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b class="no-print">SCAN ITEMS HERE</b></label><br>
+        <textarea class="no-print" id="scannedItemsBox" style="width: 300px; height: 8em; resize: none;"></textarea>
+        <br><br>
+        <button class="no-print" onclick="showAllDataOnTable()">WIB Report</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="no-print" id="extraItemsButton">Extra Scripts</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="no-print" id="exportButton">EXPORT ITEMS</button>
+   
       <br><br>
       <table id="dataTable"></table>
 
 </body>
 
  <script>
-  const sound = new Audio('src/notFound.wav');
-  const sound2 = new Audio('src/scanned.wav');
-  var contents;
-  var entireReport;
-  var scannedItems = [];
-  var extraItems = [];
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-  function uploadFile() {
-      const fileInput = document.getElementById('fileInput');
-      const file = fileInput.files[0];
-      
-      if (file) {
-        const reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-        reader.onload = function(event) {
-           contents = event.target.result;
-           contents = removeCommasWithinQuotes(contents);
-           entireReport2 = parseCSV(contents);
-           contents = parseCSV(contents);
-           
-           entireReport = [];
-           for (a = 0; a < entireReport2.length; a++){
-            entireReport.push(entireReport2[a][0].substring(0,9));
-           }
-           contents.splice(0,1);
-          // Now you can assign the contents to a variable or process it further
-          console.log('File contents:', contents);
-          // For demonstration, let's assign it to a variable
-          window.fileContents = contents;
-          fileInputButton = document.getElementById("fileInput");
-          uploadButton = document.getElementById("upload");
-          document.body.removeChild(fileInputButton);
-          document.body.removeChild(uploadButton);
-          loadProgress();
-        };
-        reader.onerror = function(event) {
-          console.error('File could not be read! Code ' + event.target.error.code);
-        };
-      } else {
-        console.error('No file selected!');
-      }
-    }
-
-    
-    document.getElementById("scannedItemsBox").addEventListener('keypress', async function(event) {
-    // Check if the pressed key is the pipe character (|), which has keyCode 124
-    // if (document.getElementById("singleEntry").checked)
-    if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
-        // Call your function here
-        compare();
-
-        await sleep(100);
-        document.getElementById("scannedItemsBox").value = "";
-    }
-});
-
- document.getElementById("exportButton").addEventListener('click',  function(event){
-    exportScannedItems();
- });
+      const sound = new Audio('src/notFound.wav');
+      const sound2 = new Audio('src/scanned.wav');
+      var contents;
+      var entireReport;
+      var scannedItems = [];
+      var extraItems = [];
 
 
-    // EXTRA ITEMS
-    document.getElementById("extraItemsButton").addEventListener('click',  function(event) {
-      console.log("making table");
-      dataTable = document.getElementById('dataTable');
-     dataTable = document.getElementById('dataTable');
-     dataTable.innerHTML = ''; // Clear existing table content
-      caption = document.createElement('caption');
-      caption.textContent = 'Extra Items'; // Set the title text
-      dataTable.appendChild(caption);
+      recentScansAndRemoves = [];
+      populateTable();
+    function populateTable() {
+    // Get the table element
+    const table = document.getElementById("recentScannedItemsTable");
 
-    // Populate the table with extraItems array values
-         row = dataTable.insertRow();
-         cell = row.insertCell();
-        cell.textContent = "NOT ON BIN AUDIT";
-    extraItems.forEach(item => {
-        const row = dataTable.insertRow();
-        const cell = row.insertCell();
-        cell.textContent = item;
-    });
-});
+    // Clear previous content
+    table.innerHTML = '<caption>Recent Scanned Items</caption>';
 
-
-
-
-    var scannedItemsArray;
-    // Will compare scans and file contents and show discrepancies
-    function compare() {
-      console.log("started Compare");
-
-      // Create array from text in textarea
-      scannedItemsArray = extractTextBetweenRXAnd228(document.getElementById("scannedItemsBox").value);
-      scannedItemsArray = removeDuplicatesFromArray(scannedItemsArray);
-
-      firstRound = true;
-
-      for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
-    	for (x = 0; x < scannedItemsArray.length; x++){
-            inReport = false;
-            for (a = 0; a < entireReport.length; a++){
-                if (scannedItemsArray[x] + "-228" == entireReport2[a][0]){
-                    allScannedItems.push(entireReport2[a]);
-                    inReport = true;
-                    console.log("pushed first");
-                }
-                
-            }
-            if (!inReport){
-                    allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                    console.log("pushed second");
-                }
-            if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                  console.log(scannedItemsArray[0]);
-                  sound.play();
-              }
-              else if (firstRound == true)
-                sound2.play();
-              if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
-                  extraItems.push(scannedItemsArray[x]);
-        		for (y = 0; y < contents.length; y++){
-        			if ((scannedItemsArray[x] + "-228") == contents[y][0]){
-                console.log(x);
-        				scannedItemsArray.splice(x,1);
-        				contents.splice(y,1);
-        				x--;
-        				y--;
-                if (scannedItemsArray.length == 0 || contents.length == 0)
-                  break;
-        			}
-              if (scannedItemsArray.length == 0 || contents.length == 0)
-                  break;
-
-    		}
-
-            firstRound = false;
-    	}
-      console.log("done with compare");
-      document.getElementById("scannedItemsBox").value = "";
-      saveProgress();
-    }
-
-// precursor for parsingCSV file
-function removeCommasWithinQuotes(inputString) {
-    // Regular expression to match quoted substrings
-    const regex = /"[^"]*"|[^,]+/g;
-    
-    // Replace commas within quoted substrings with an empty string
-    return inputString.replace(regex, function(match) {
-        // If the match is a quoted substring, remove commas within it
-        if (match.startsWith('"') && match.endsWith('"')) {
-            return match.replace(/,/g, '');
-        }
-        // Otherwise, return the match unchanged
-        return match;
-    });
-}
-
-// Used for the file to turn into array
-function parseCSV(inputString) {
-    // Regular expression to match CSV fields (including quoted values)
-    const regex = /("[^"]*"|[^,]+)(?=,|$)/g;
-    
-    // Split the input string into lines
-    const lines = inputString.split('\n');
-    
-    // Initialize an empty array to store the result
-    const result = [];
-    
-    // Iterate over each line
-    for (let line of lines) {
-        // Initialize an array to store the fields in this line
-        const fields = [];
-        
-        // Match fields in the line using the regular expression
-        let match;
-        while (match = regex.exec(line)) {
-            // Extract the matched field, removing any surrounding quotation marks
-            const field = match[1].replace(/^"(.*)"$/, '$1');
-            fields.push(field);
-        }
-        
-        // Check if the line has at least 4 fields
-        if (fields.length >= 4) {
-            // Extract the 4th and 1st fields
-            const fourthField = fields[3];
-            const firstField = fields[0];
-          
-            
-            // Push the extracted fields into the result array as a nested array
-            result.push([fourthField, firstField, fields[1],fields[2],Number(fields[4])]);
-        }
-    }
-    
-    return result;
-}
-
-
-
-
-// Extract text from Field
-function extractTextBetweenRXAnd228(inputString) {
-    // Regular expression to match "RX" followed by any characters until "-228"
-    if (document.getElementById("defaultRadio").checked)
-      var regex = /\\RX(.*?)\-228/g;
-    else
-      var regex = /RX(.*?)\-228/g;
-    
-    // Array to store extracted strings
-    const extractedStrings = [];
-    
-    // Match all occurrences of the pattern in the input string
-    let match;
-    while ((match = regex.exec(inputString)) !== null) {
-        // Add the matched text (excluding "RX" and "-228") to the array
-        extractedStrings.push(match[1]);
-    }
-    
-    return extractedStrings;
-}
-
-
-function removeDuplicatesFromArray(array) {
-    const uniqueArray = [];
-    for (let value of array) {
-        if (!uniqueArray.includes(value)) {
-            uniqueArray.push(value);
-        }
-    }
-    return uniqueArray;
-}
-
-
-function populateTableWithTitleAndData(data) {
-    const table = document.getElementById('dataTable');
-    const caption = document.createElement('caption');
-    caption.textContent = 'Leftover WIB Items'; // Set the title text
-    table.innerHTML = ''; // Clear existing table content
-    table.appendChild(caption);
-
-    // Create table header row
+    // Create table headers
+    const headers = ["RX#", "Name", "Drug", "Action"];
     const headerRow = table.insertRow();
-    const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY"];
     headers.forEach(headerText => {
-        const headerCell = document.createElement('th');
-        headerCell.textContent = headerText;
-        headerRow.appendChild(headerCell);
+        const th = document.createElement("th");
+        th.textContent = headerText;
+        headerRow.appendChild(th);
     });
 
-    // Populate the table with data from the array of arrays
-    data.forEach(rowData => {
+    // Get the last 5 arrays from recentScansAndRemoves
+    recentScansAndRemoves = recentScansAndRemoves.slice(-5);
+
+    // Populate the table rows
+    recentScansAndRemoves.forEach(array => {
         const row = table.insertRow();
-        rowData.forEach(cellData => {
+        [0, 1, 3, 6].forEach(index => {
             const cell = row.insertCell();
-            cell.textContent = cellData;
+            cell.textContent = array[index];
         });
     });
+
+    // Add blank rows to fill up to 5 rows
+    const numRowsToAdd = 5 - recentScansAndRemoves.length;
+    for (let i = 0; i < numRowsToAdd; i++) {
+        const row = table.insertRow();
+        for (let j = 0; j < headers.length; j++) {
+            const cell = row.insertCell();
+            cell.textContent = "|"; // Blank cell
+        }
+    }
+
+    // Update recentScansAndRemoves to contain only the last 5 arrays
+    recentScansAndRemoves.splice(0, Math.max(recentScansAndRemoves.length - 5, 0));
 }
- 
 
 
- function showAllDataOnTable(data) {
-    const table = document.getElementById('dataTable');
-    const caption = document.createElement('caption');
-    caption.textContent = 'WAITING IN BIN'; // Set the title text
-    table.innerHTML = ''; // Clear existing table content
-    table.appendChild(caption);
 
-    report  = entireReport2.slice();
-    report.shift();
-    for (a = 0; a < report.length; a++){
-        // entireReport2[a].push(0);
-        found = false;
-        for (b = 0; b < contents.length; b++){
-            if (report[a][0] == contents[b][0]){
-                found = true;
-            }
+
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+      function uploadFile() {
+          const fileInput = document.getElementById('fileInput');
+          const file = fileInput.files[0];
+          
+          if (file) {
+            const reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+            reader.onload = function(event) {
+               contents = event.target.result;
+               contents = removeCommasWithinQuotes(contents);
+               entireReport2 = parseCSV(contents);
+               contents = parseCSV(contents);
+               
+               entireReport = [];
+               for (a = 0; a < entireReport2.length; a++){
+                entireReport.push(entireReport2[a][0].substring(0,9));
+               }
+               contents.splice(0,1);
+              // Now you can assign the contents to a variable or process it further
+              console.log('File contents:', contents);
+              // For demonstration, let's assign it to a variable
+              window.fileContents = contents;
+              fileInputButton = document.getElementById("fileInput");
+              uploadButton = document.getElementById("upload");
+              document.body.removeChild(fileInputButton);
+              document.body.removeChild(uploadButton);
+              // Get all elements with the class "disappear"
+                const elementsToRemove = document.querySelectorAll('.disappear');
+
+                // Remove each element
+                elementsToRemove.forEach(element => {
+                    element.remove();
+                });
+              loadProgress();
+            };
+            reader.onerror = function(event) {
+              console.error('File could not be read! Code ' + event.target.error.code);
+            };
+          } else {
+            console.error('No file selected!');
+          }
         }
-        if (found == true){
-            report[a][5] = "NOT FOUND"
-        }
-        else
-            report[a][5] = "FOUND"
-    }
 
-    tempNotFound = [];
-    tempFound = [];
-    for (i = 0; i < report.length; i++){
-        if (report[i][5] == "NOT FOUND")
-            tempNotFound.push(report[i]);
-        else
-            tempFound.push(report[i]);
+    function measureTime(func) {
+        const start = performance.now();
+        func();
+        const end = performance.now();
+        return end - start;
     }
-    report = [];
-    for (i = 0; i < tempNotFound.length; i++){
-        report.push(tempNotFound[i]);
-    }
-    for (i = 0; i < tempFound.length; i++){
-        report.push(tempFound[i]);
-    }
-    // Create table header row
-    const headerRow = table.insertRow();
-    const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY","SCANNED?"];
-    headers.forEach(headerText => {
-        const headerCell = document.createElement('th');
-        headerCell.textContent = headerText;
-        headerRow.appendChild(headerCell);
+        
+        document.getElementById("scannedItemsBox").addEventListener('keypress', async function(event) {
+        // Check if the pressed key is the pipe character (|), which has keyCode 124
+        // if (document.getElementById("singleEntry").checked)
+        if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
+            // Call your function here
+            execTime = measureTime(compare);
+            console.log(execTime);
+            await sleep(20);
+            document.getElementById("scannedItemsBox").value = "";
+        }
     });
 
-    // Populate the table with data from the array of arrays
-    report.forEach(rowData => {
+     document.getElementById("exportButton").addEventListener('click',  function(event){
+        exportScannedItems();
+     });
+
+
+        // EXTRA ITEMS
+        document.getElementById("extraItemsButton").addEventListener('click',  function(event) {
+          console.log("making table");
+          dataTable = document.getElementById('dataTable');
+         dataTable = document.getElementById('dataTable');
+         dataTable.innerHTML = ''; // Clear existing table content
+          caption = document.createElement('caption');
+          caption.textContent = 'Extra Items'; // Set the title text
+          dataTable.appendChild(caption);
+
+        // Populate the table with extraItems array values
+             row = dataTable.insertRow();
+             cell = row.insertCell();
+            cell.textContent = "NOT ON BIN AUDIT";
+        extraItems.forEach(item => {
+            const row = dataTable.insertRow();
+            const cell = row.insertCell();
+            cell.textContent = item;
+        });
+    });
+
+
+
+
+        var scannedItemsArray;
+        // Will compare scans and file contents and show discrepancies
+        function compare() {
+          console.log("started Compare");
+
+          // Create array from text in textarea
+          scannedItemsArray = extractTextBetweenRXAnd228(document.getElementById("scannedItemsBox").value);
+          scannedItemsArray = removeDuplicatesFromArray(scannedItemsArray);
+
+          firstRound = true;
+
+          for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
+        	for (x = 0; x < scannedItemsArray.length; x++){
+                inReport = false;
+                for (a = 0; a < entireReport.length; a++){
+                    if (entireReport2[a][0].includes(scannedItemsArray[x])){
+                        allScannedItems.push(entireReport2[a]);
+                        recentScansAndRemoves.push([...entireReport2[a], "SCANNED"]);
+                        inReport = true;
+                        console.log("pushed first");
+                    }
+                    
+                }
+                if (!inReport){
+                        allScannedItems.push([scannedItemsArray[x],"","","",""]);
+                        console.log("pushed second");
+                    }
+                if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
+                      console.log(scannedItemsArray[0]);
+                      sound.play();
+                  }
+                  else if (firstRound == true)
+                    sound2.play();
+                  if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
+                      extraItems.push(scannedItemsArray[x]);
+            		for (y = 0; y < contents.length; y++){
+            			if (contents[y][0].includes(scannedItemsArray[x])){
+                    console.log(x);
+            				scannedItemsArray.splice(x,1);
+            				contents.splice(y,1);
+            				x--;
+            				y--;
+                    if (scannedItemsArray.length == 0 || contents.length == 0)
+                      break;
+            			}
+                  if (scannedItemsArray.length == 0 || contents.length == 0)
+                      break;
+
+        		}
+
+                firstRound = false;
+        	}
+          console.log("done with compare");
+          document.getElementById("scannedItemsBox").value = "";
+          scannedItems = [...new Set(scannedItems)];
+          allScannedItems = [...new Set(allScannedItems)]; 
+          saveProgress();
+          showAllDataOnTable();
+          populateTable();
+        }
+
+
+        // Will compare scans and file contents and show discrepancies
+        function compare2(rxNumber) {
+          console.log("RX --" + rxNumber);
+
+          // Create array from text in textarea
+          substring = rxNumber.substring(0, rxNumber.indexOf("-"));
+          scannedItemsArray = [substring];
+
+          firstRound = true;
+
+          for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
+          for (x = 0; x < scannedItemsArray.length; x++){
+                inReport = false;
+                for (a = 0; a < entireReport.length; a++){
+                    if (entireReport2[a][0].includes(scannedItemsArray[x])){
+                        allScannedItems.push(entireReport2[a]);
+                        recentScansAndRemoves.push([...entireReport2[a], "CLICKED"]);
+                        inReport = true;
+                        console.log("pushed first");
+                    }
+                    
+                }
+                if (!inReport){
+                        allScannedItems.push([scannedItemsArray[x],"","","",""]);
+                        console.log("pushed second");
+                    }
+                // if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
+                //       console.log(scannedItemsArray[0]);
+                //       sound.play();
+                //   }
+                //   else if (firstRound == true)
+                //     sound2.play();
+                  if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x])){
+                        extraItems.push(scannedItemsArray[x]);
+                        recentScansAndRemoves.push([...scannedItemsArray[x], "SCANNED (EXTRA)"]);
+                    }
+                for (y = 0; y < contents.length; y++){
+                  if (contents[y][0].includes(scannedItemsArray[x])){
+                    console.log(x);
+                    scannedItemsArray.splice(x,1);
+                    contents.splice(y,1);
+                    x--;
+                    y--;
+                    if (scannedItemsArray.length == 0 || contents.length == 0)
+                      break;
+                  }
+                  if (scannedItemsArray.length == 0 || contents.length == 0)
+                      break;
+
+            }
+
+                firstRound = false;
+          }
+          console.log("done with compare");
+          document.getElementById("scannedItemsBox").value = "";
+          
+        }
+
+
+
+    // precursor for parsingCSV file
+    function removeCommasWithinQuotes(inputString) {
+        // Regular expression to match quoted substrings
+        const regex = /"[^"]*"|[^,]+/g;
+        
+        // Replace commas within quoted substrings with an empty string
+        return inputString.replace(regex, function(match) {
+            // If the match is a quoted substring, remove commas within it
+            if (match.startsWith('"') && match.endsWith('"')) {
+                return match.replace(/,/g, '');
+            }
+            // Otherwise, return the match unchanged
+            return match;
+        });
+    }
+
+    // Used for the file to turn into array
+    function parseCSV(inputString) {
+        // Regular expression to match CSV fields (including quoted values)
+        const regex = /("[^"]*"|[^,]+)(?=,|$)/g;
+        
+        // Split the input string into lines
+        const lines = inputString.split('\n');
+        
+        // Initialize an empty array to store the result
+        const result = [];
+        
+        // Iterate over each line
+        for (let line of lines) {
+            // Initialize an array to store the fields in this line
+            const fields = [];
+            
+            // Match fields in the line using the regular expression
+            let match;
+            while (match = regex.exec(line)) {
+                // Extract the matched field, removing any surrounding quotation marks
+                const field = match[1].replace(/^"(.*)"$/, '$1');
+                fields.push(field);
+            }
+            
+            // Check if the line has at least 4 fields
+            if (fields.length >= 4) {
+                // Extract the 4th and 1st fields
+                const fourthField = fields[3];
+                const firstField = fields[0];
+              
+                
+                // Push the extracted fields into the result array as a nested array
+                result.push([fourthField, firstField, fields[1],fields[2],Number(fields[4])]);
+            }
+        }
+        
+        return result;
+    }
+
+
+
+
+    // Extract text from Field
+
+
+    function extractTextBetweenRXAnd228(inputString) {
+        // Regular expressions
+        let regexDefault = /\\RX(.*?)\-/g;
+        let regexAlternate = /RX(.*?)\-/g;
+
+        // Check if there are any matches using the default regex
+        const defaultMatches = regexDefault.test(inputString);
+        console.log("inputString: " + inputString);
+
+
+        // Set the regex based on the result
+        let regex;
+        regex = defaultMatches ? new RegExp(regexDefault) : new RegExp(regexAlternate);
+        // regex = regexDefault;
+
+        console.log("matches: " + regex);
+
+        // Array to store extracted strings
+        var extractedStrings = [];
+
+        // Match all occurrences of the pattern in the input string
+        let match;
+        while ((match = regex.exec(inputString)) !== null) {
+            // Add the matched text (excluding "RX" and "-228") to the array
+            console.log("added");
+            extractedStrings.push(match[1]);
+        }
+        console.log("extracted: " + extractedStrings);
+        return extractedStrings;
+    }
+
+
+    // function extractTextBetweenRXAnd228(inputString) {
+    //     // Regular expression to match "RX" followed by any characters until "-"
+    //     if (document.getElementById("defaultRadio").checked)
+    //       var regex = /\\RX(.*?)\-/g;
+    //     else
+    //       var regex = /RX(.*?)\-/g;
+        
+    //     // Array to store extracted strings
+    //     const extractedStrings = [];
+        
+    //     // Match all occurrences of the pattern in the input string
+    //     let match;
+    //     while ((match = regex.exec(inputString)) !== null) {
+    //         // Add the matched text (excluding "RX" and "-228") to the array
+    //         extractedStrings.push(match[1]);
+    //     }
+        
+    //     return extractedStrings;
+    // }
+
+
+    function removeDuplicatesFromArray(array) {
+        const uniqueArray = [];
+        for (let value of array) {
+            if (!uniqueArray.includes(value)) {
+                uniqueArray.push(value);
+            }
+        }
+        return uniqueArray;
+    }
+
+
+    function populateTableWithTitleAndData(data) {
+        const table = document.getElementById('dataTable');
+        const caption = document.createElement('caption');
+        caption.textContent = 'Leftover WIB Items'; // Set the title text
+        table.innerHTML = ''; // Clear existing table content
+        table.appendChild(caption);
+
+        // Create table header row
+        const headerRow = table.insertRow();
+        const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY"];
+        headers.forEach(headerText => {
+            const headerCell = document.createElement('th');
+            headerCell.textContent = headerText;
+            headerRow.appendChild(headerCell);
+        });
+
+        // Populate the table with data from the array of arrays
+        data.forEach(rowData => {
+            const row = table.insertRow();
+            rowData.forEach(cellData => {
+                const cell = row.insertCell();
+                cell.textContent = cellData;
+            });
+        });
+    }
+     
+
+
+     function showAllDataOnTable(data) {
+        const table = document.getElementById('dataTable');
+        const caption = document.createElement('caption');
+        caption.textContent = 'WAITING IN BIN'; // Set the title text
+        table.innerHTML = ''; // Clear existing table content
+        table.appendChild(caption);
+
+        report  = entireReport2.slice();
+        report.shift();
+        for (a = 0; a < report.length; a++){
+            // entireReport2[a].push(0);
+            found = false;
+            for (b = 0; b < contents.length; b++){
+                if (report[a][0] == contents[b][0]){
+                    found = true;
+                }
+            }
+            if (found == true){
+                report[a][5] = "NOT FOUND"
+            }
+            else
+                report[a][5] = "FOUND"
+        }
+
+        tempNotFound = [];
+        tempFound = [];
+        for (i = 0; i < report.length; i++){
+            if (report[i][5] == "NOT FOUND")
+                tempNotFound.push(report[i]);
+            else
+                tempFound.push(report[i]);
+        }
+
+        tempNotFound = controlsFirst(tempNotFound);
+
+
+        report = [];
+        for (i = 0; i < tempNotFound.length; i++){
+            report.push(tempNotFound[i]);
+        }
+        for (i = 0; i < tempFound.length; i++){
+            report.push(tempFound[i]);
+        }
+        // Create table header row
+        const headerRow = table.insertRow();
+        const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY","SCANNED?"];
+        headers.forEach(headerText => {
+            const headerCell = document.createElement('th');
+            headerCell.textContent = headerText;
+            headerRow.appendChild(headerCell);
+        });
+
+        // Populate the table with data from the array of arrays
+        report.forEach(rowData => {
         const row = table.insertRow();
-        rowData.forEach(cellData => {
+        rowData.forEach((cellData, index) => {
             const cell = row.insertCell();
             cell.textContent = cellData;
-            if (cellData == "NOT FOUND"){
+            if (cellData === "NOT FOUND") {
                 row.style.backgroundColor = "#ed908a";
             }
-
+            // Add click event listener to each row except for header row
+            if (index === 0) {
+                row.addEventListener("click", function() {
+                    const rxNumber = rowData[0]; // Get text of the first cell in the row
+                    clickedItem(rxNumber); // Call compare function with rxNumber as argument
+                });
+            }
         });
     });
+     
+    }
+
+    function controlsFirst(tempNotFound) {
+    // Custom comparison function
+    function compareArrays(a, b) {
+        const firstCharA = a[0].charAt(0);
+        const firstCharB = b[0].charAt(0);
+
+        if (firstCharA === '2' || firstCharA === '4') {
+            if (firstCharB !== '2' && firstCharB !== '4') {
+                return -1; // a should come before b
+            }
+        } else if (firstCharB === '2' || firstCharB === '4') {
+            return 1; // b should come before a
+        }
+
+        return 0; // no change in order
+    }
+
+    // Sort the array using the custom comparison function
+    tempNotFound.sort(compareArrays);
+
+    return tempNotFound;
 }
 
-allScannedItems = [];
-exportItems = "";
+    function removeScan(){
+      
+      
+    }
 
-function exportScannedItems(){
+    allScannedItems = [];
     exportItems = "";
-    for (a = 0; a < allScannedItems.length; a++){
-        exportItems = exportItems + "\\RX" + allScannedItems[a][0] + "-228";
+
+    function exportScannedItems(){
+        exportItems = "";
+        for (a = 0; a < allScannedItems.length; a++){
+            exportItems = exportItems + "\\RX" + allScannedItems[a][0] + "-";
+        }
+        copyToClipboard(exportItems);
+        alert("Scanned items copied to clipboard.")
     }
-    copyToClipboard(exportItems);
-}
 
 
-function copyToClipboard(text) {
-  // Check if the Clipboard API is available
-  if (navigator.clipboard) {
-    // Use the Clipboard API
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        console.log('Text copied to clipboard successfully');
-      })
-      .catch(err => {
-        console.error('Could not copy text: ', err);
-      });
-  } else {
-    // Fallback to execCommand method for older browsers
-    var textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.setAttribute('readonly', '');
-    textarea.style.position = 'absolute';
-    textarea.style.left = '-9999px';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      var success = document.execCommand('copy');
-      if (success) {
-        console.log('Text copied to clipboard successfully');
+    function copyToClipboard(text) {
+      // Check if the Clipboard API is available
+      if (navigator.clipboard) {
+        // Use the Clipboard API
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            console.log('Text copied to clipboard successfully');
+          })
+          .catch(err => {
+            console.error('Could not copy text: ', err);
+          });
       } else {
-        console.error('Unable to copy text to clipboard');
+        // Fallback to execCommand method for older browsers
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          var success = document.execCommand('copy');
+          if (success) {
+            console.log('Text copied to clipboard successfully');
+          } else {
+            console.error('Unable to copy text to clipboard');
+          }
+        } catch (err) {
+          console.error('Unable to copy text to clipboard: ', err);
+        }
+        document.body.removeChild(textarea);
       }
-    } catch (err) {
-      console.error('Unable to copy text to clipboard: ', err);
     }
-    document.body.removeChild(textarea);
-  }
-}
 
-function store(cookieName, arrayToStore) {
-    // Convert the array to a JSON string
-    var arrayAsString = JSON.stringify(arrayToStore);
+    function store(cookieName, arrayToStore) {
+        // Convert the array to a JSON string
+        var arrayAsString = JSON.stringify(arrayToStore);
 
-    // Set the expiration time for 24 hours from now
-    var expirationDate = new Date();
-    expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+        // Set the expiration time for 24 hours from now
+        var expirationDate = new Date();
+        expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
 
-    // Format the expiration date for the cookie
-    var expires = "expires=" + expirationDate.toUTCString();
+        // Format the expiration date for the cookie
+        var expires = "expires=" + expirationDate.toUTCString();
 
-    // Set the cookie
-    document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
-}
-
-
-function load(cookieName) {
-    var nameEQ = cookieName + "=";
-    var cookies = document.cookie.split(';');
-    for(var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i];
-        while (cookie.charAt(0) == ' ') {
-            cookie = cookie.substring(1, cookie.length);
-        }
-        if (cookie.indexOf(nameEQ) == 0) {
-            var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
-            return JSON.parse(arrayAsString);
-        }
+        // Set the cookie
+        document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
     }
-    return null;
-}
-
-function setArrayCookie(cookieName, arrayToStore) {
-    // Convert the array to a JSON string
-    var arrayAsString = JSON.stringify(arrayToStore);
-
-    // Set the expiration time for 24 hours from now
-    var expirationDate = new Date();
-    expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
-
-    // Format the expiration date for the cookie
-    var expires = "expires=" + expirationDate.toUTCString();
-
-    // Set the cookie
-    document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
-}
 
 
-function getArrayFromCookie(cookieName) {
-    var nameEQ = cookieName + "=";
-    var cookies = document.cookie.split(';');
-    for(var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i];
-        while (cookie.charAt(0) == ' ') {
-            cookie = cookie.substring(1, cookie.length);
-        }
-        if (cookie.indexOf(nameEQ) == 0) {
-            var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
-            return JSON.parse(arrayAsString);
-        }
-    }
-    return null;
-}
-
-function saveProgress(){
-    store("scannedItems", scannedItems.slice());
-}
-
-function loadProgress(){
-    loadedItems = load("scannedItems");
-    if (loadedItems == null){
-        return;
-    }
-    scannedItemsArray = loadedItems.slice();
-
-      firstRound = true;
-
-      for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
-        for (x = 0; x < scannedItemsArray.length; x++){
-            inReport = false;
-            for (a = 0; a < entireReport.length; a++){
-                if (scannedItemsArray[x] + "-228" == entireReport2[a][0]){
-                    allScannedItems.push(entireReport2[a]);
-                    inReport = true;
-                    console.log("pushed first");
-                }
-                
+    function load(cookieName) {
+        var nameEQ = cookieName + "=";
+        var cookies = document.cookie.split(';');
+        for(var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            while (cookie.charAt(0) == ' ') {
+                cookie = cookie.substring(1, cookie.length);
             }
-            if (!inReport){
-                    allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                    console.log("pushed second");
-                }
-            if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                  console.log(scannedItemsArray[0]);
-                  sound.play();
-              }
-              else if (firstRound == true)
-                sound2.play();
-              if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
-                  extraItems.push(scannedItemsArray[x]);
-                for (y = 0; y < contents.length; y++){
-                    if ((scannedItemsArray[x] + "-228") == contents[y][0]){
-                console.log(x);
-                        scannedItemsArray.splice(x,1);
-                        contents.splice(y,1);
-                        x--;
-                        y--;
-                if (scannedItemsArray.length == 0 || contents.length == 0)
-                  break;
+            if (cookie.indexOf(nameEQ) == 0) {
+                var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                return JSON.parse(arrayAsString);
+            }
+        }
+        return null;
+    }
+
+    function setArrayCookie(cookieName, arrayToStore) {
+        // Convert the array to a JSON string
+        var arrayAsString = JSON.stringify(arrayToStore);
+
+        // Set the expiration time for 24 hours from now
+        var expirationDate = new Date();
+        expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+
+        // Format the expiration date for the cookie
+        var expires = "expires=" + expirationDate.toUTCString();
+
+        // Set the cookie
+        document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
+    }
+
+
+    function getArrayFromCookie(cookieName) {
+        var nameEQ = cookieName + "=";
+        var cookies = document.cookie.split(';');
+        for(var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            while (cookie.charAt(0) == ' ') {
+                cookie = cookie.substring(1, cookie.length);
+            }
+            if (cookie.indexOf(nameEQ) == 0) {
+                var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                return JSON.parse(arrayAsString);
+            }
+        }
+        return null;
+    }
+
+   
+
+    function unScanItem(rxNumber){
+
+        // Remove from scanned items
+        scannedItems = scannedItems.filter(item => !(typeof item === 'string' && item.includes(rxNumber)));
+
+        // Remove from allScannedItems
+        allScannedItems = allScannedItems.filter(innerArray => !innerArray.some(item => typeof item === 'string' && item.includes(rxNumber)));
+
+        // Add back to contents at appropriate spot
+        addBackToContents(rxNumber);
+
+        // Add to recent items
+        recentScansAndRemoves.push([...findArrayWithSubstring(rxNumber, entireReport2),"Removed"]);
+
+    }
+
+    function findArrayWithSubstring(rxNumber, arrayOfArrays) {
+    for (let i = 0; i < arrayOfArrays.length; i++) {
+        if (arrayOfArrays[i][0].includes(rxNumber)) {
+            return arrayOfArrays[i];
+        }
+    }
+    // Return null if no match is found
+    return null;
+}
+
+    function addBackToContents(rxNumber) {
+        
+        entireReport2.forEach(innerArray => {
+            if (innerArray[0].includes(rxNumber)) {
+                // Copy the inner array and push it to the contents array
+                addedArray = [...innerArray];
+                addedArray = addedArray.slice(0,-1);
+                console.log("pushed -- " + addedArray);
+                contents.push(addedArray);
+                // print(contents)
+            }
+        });
+
+        return contents;
+    }
+
+    function clickedItem(rxNumber){
+        if (isRxInContents(rxNumber)){
+            compare2(rxNumber);
+        }
+        else {
+            unScanItem(rxNumber);
+        }
+        showAllDataOnTable();
+        saveProgress();
+        populateTable();
+
+    }
+
+    // searches contents and returns bool of whether rx is in array (of arrays)
+    function isRxInContents(rxNumber) {
+        for (let i = 0; i < contents.length; i++) {
+            if (contents[i][0].includes(rxNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function reportIDFunc(){
+        reportID = 0;
+        for (x = 1; x < entireReport.length; x++){
+            reportID = reportID + parseInt(entireReport[x]);
+        }
+        return reportID.toString();
+    }
+
+    var indexesOfScannedItems = [];
+
+    function updatedIndexes(){
+        indexesOfScannedItems = [];
+        for (x = 0; x < scannedItems.length; x++){
+            if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
+                indexesOfScannedItems.push(rxIndex);
+            }
+        }
+    } 
+
+     function saveProgress(){
+        updatedIndexes();
+        store(reportNumber, indexesOfScannedItems.slice());
+    }
+
+    var reportNumber = 0;
+    function loadProgress(){
+        reportNumber = reportIDFunc();
+        loadedItems = load(reportNumber);
+        if (loadedItems == null){
+            return;
+        }
+        scannedItemsArray = loadedItems.slice();
+
+          firstRound = true;
+          tempScannedItems = [];
+
+          for (a = 0; a < scannedItemsArray.length; a++){
+            tempScannedItems.push(entireReport[scannedItemsArray[a]]);
+          }
+
+          scannedItemsArray = tempScannedItems.slice();
+
+
+          for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
+            for (x = 0; x < scannedItemsArray.length; x++){
+                inReport = false;
+                for (a = 0; a < entireReport.length; a++){
+                    if (entireReport2[a][0].includes(scannedItemsArray[x])){
+                        allScannedItems.push(entireReport2[a]);
+                        inReport = true;
+                        console.log("pushed first");
                     }
-              if (scannedItemsArray.length == 0 || contents.length == 0)
-                  break;
+                    
+                }
+                if (!inReport){
+                        allScannedItems.push([scannedItemsArray[x],"","","",""]);
+                        console.log("pushed second");
+                    }
+                if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
+                      console.log(scannedItemsArray[0]);
+                      sound.play();
+                  }
+                  else if (firstRound == true)
+                    sound2.play();
+                  if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
+                      extraItems.push(scannedItemsArray[x]);
+                    for (y = 0; y < contents.length; y++){
+                        if (contents[y][0].includes(scannedItemsArray[x])){
+                    console.log(x);
+                            scannedItemsArray.splice(x,1);
+                            contents.splice(y,1);
+                            x--;
+                            y--;
+                    if (scannedItemsArray.length == 0 || contents.length == 0)
+                      break;
+                        }
+                  if (scannedItemsArray.length == 0 || contents.length == 0)
+                      break;
 
+                }
+
+                firstRound = false;
             }
+          console.log("done with compare");
+          document.getElementById("scannedItemsBox").value = "";
+    }
 
-            firstRound = false;
-        }
-      console.log("done with compare");
-      document.getElementById("scannedItemsBox").value = "";
-}
 
-  </script>
+</script>
+
 </html>
 
 
