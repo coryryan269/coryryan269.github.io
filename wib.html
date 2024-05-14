@@ -1,5 +1,9 @@
 <html>
-<head><title>WIB</title></head>
+<head>
+    <title>WIB</title>
+    <link rel="icon" type="image/x-icon" href="/path/to/your/pharmIcon.ico">
+
+</head>
 
 <style>
 
@@ -252,7 +256,7 @@
     });
 
      document.getElementById("exportButton").addEventListener('click',  function(event){
-        exportScannedItems();
+        exportScannedItems2();
      });
 
 
@@ -278,12 +282,92 @@
     });
 
 
+        function importScannedItems(){
+            importedText = document.getElementById("scannedItemsBox").value;
+            document.getElementById("scannedItemsBox").value = "";
+            importedReportID = importedText.substring(importedText.indexOf(":")+1,importedText.indexOf("::"));
+            if (importedReportID == reportID){
+                importedText = importedText.substring(importedText.indexOf("::")+2);
+                importedText = importedText.split(","); 
+                importArray = importedText.map(Number); // Convert each element to an integer
+
+                scannedItemsArray = importArray.slice();
+
+                  firstRound = true;
+                  tempScannedItems = [];
+
+                  for (a = 0; a < scannedItemsArray.length; a++){
+                    tempScannedItems.push(entireReport[scannedItemsArray[a]]);
+                  }
+
+                  scannedItemsArray = tempScannedItems.slice();
+
+
+                  for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
+                    for (x = 0; x < scannedItemsArray.length; x++){
+                        inReport = false;
+                        for (a = 0; a < entireReport.length; a++){
+                            if (entireReport2[a][0].includes(scannedItemsArray[x])){
+                                allScannedItems.push(entireReport2[a]);
+                                inReport = true;
+                                console.log("pushed first");
+                            }
+                            
+                        }
+                        if (!inReport){
+                                allScannedItems.push([scannedItemsArray[x],"","","",""]);
+                                console.log("pushed second");
+                            }
+                        if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
+                              console.log(scannedItemsArray[0]);
+                              sound.play();
+                          }
+                          else if (firstRound == true)
+                            sound2.play();
+                          if (!entireReport.includes(scannedItemsArray[x]) && !extraItems.includes(scannedItemsArray[x]))
+                              extraItems.push(scannedItemsArray[x]);
+                            for (y = 0; y < contents.length; y++){
+                                if (contents[y][0].includes(scannedItemsArray[x])){
+                            console.log(x);
+                                    scannedItemsArray.splice(x,1);
+                                    contents.splice(y,1);
+                                    x--;
+                                    y--;
+                            if (scannedItemsArray.length == 0 || contents.length == 0)
+                              break;
+                                }
+                          if (scannedItemsArray.length == 0 || contents.length == 0)
+                              break;
+
+                        }
+
+                        firstRound = false;
+                    }
+                  console.log("done with compare");
+                  document.getElementById("scannedItemsBox").value = "";
+
+
+
+            }
+            else{
+                alert("Import invalid. Other browser was using a different WIB Report");
+                return;
+            }
+        }
 
 
         var scannedItemsArray;
         // Will compare scans and file contents and show discrepancies
         function compare() {
+
+
           console.log("started Compare");
+
+
+          if (document.getElementById("scannedItemsBox").value.includes("EXPORTED-ITEMS:")){
+            importScannedItems();
+            return;
+          }
 
           // Create array from text in textarea
           scannedItemsArray = extractTextBetweenRXAnd228(document.getElementById("scannedItemsBox").value);
@@ -668,6 +752,15 @@
         alert("Scanned items copied to clipboard.")
     }
 
+    function exportScannedItems2(){
+        exportItems = "EXPORTED-ITEMS:" + reportID + "::";
+        for (a = 0; a < scannedItems.length; a++){
+            exportItems = exportItems + entireReport.indexOf(scannedItems[a]) + ",";
+        }
+        exportItems = exportItems.slice(0, -1);
+        copyToClipboard(exportItems);
+        alert("Scanned items copied to clipboard.")
+    }
 
     function copyToClipboard(text) {
       // Check if the Clipboard API is available
@@ -772,7 +865,7 @@
     function unScanItem(rxNumber){
 
         // Remove from scanned items
-        scannedItems = scannedItems.filter(item => !(typeof item === 'string' && item.includes(rxNumber)));
+        scannedItems = scannedItems.filter(item => !(typeof item === 'string' && item.includes(rxNumber.substring(0,rxNumber.indexOf("-")))));
 
         // Remove from allScannedItems
         allScannedItems = allScannedItems.filter(innerArray => !innerArray.some(item => typeof item === 'string' && item.includes(rxNumber)));
@@ -816,6 +909,7 @@
             compare2(rxNumber);
         }
         else {
+            console.log("removing rx#: " + rxNumber)
             unScanItem(rxNumber);
         }
         showAllDataOnTable();
