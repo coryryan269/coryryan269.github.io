@@ -1015,9 +1015,22 @@
           document.getElementById("scannedItemsBox").value = "";
     }
 
+    function isIncognitoMode(callback) {
+        const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+        if (!fs) {
+            callback(false);
+            return;
+        }
+        fs(window.TEMPORARY, 100, () => callback(false), () => callback(true));
+    }
+
+    isIncognitoMode(function(isIncognito) {
+        if (isIncognito) {
+            alert("WARNING. Running this program in Incognito is risky. Progress will not be saved. It is better to run in a normal browser window. ")
+        } 
+    });
 
 </script>
 
 </html>
-
 
