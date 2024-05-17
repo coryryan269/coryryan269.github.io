@@ -1017,6 +1017,7 @@
 
     function isIncognitoMode(callback) {
         const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+	console.log("ran incognito check function.");
         if (!fs) {
             callback(false);
             return;
