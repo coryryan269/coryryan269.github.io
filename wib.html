@@ -1015,21 +1015,27 @@
           document.getElementById("scannedItemsBox").value = "";
     }
 
-    function isIncognitoMode(callback) {
-        const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-	console.log("ran incognito check function.");
-        if (!fs) {
-            callback(false);
-            return;
-        }
-        fs(window.TEMPORARY, 100, () => callback(false), () => callback(true));
-    }
+    function checkIndexedDB(callback) {
+    console.log("tested for incognito");
+    const dbName = 'test';
+    const req = indexedDB.open(dbName);
+    req.onsuccess = function() {
+        callback(false);
+    };
+    req.onerror = function() {
+        callback(true);
+    };
+}
 
-    isIncognitoMode(function(isIncognito) {
-        if (isIncognito) {
-            alert("WARNING. Running this program in Incognito is risky. Progress will not be saved. It is better to run in a normal browser window. ")
-        } 
-    });
+// Usage
+checkIndexedDB(function(isIncognito) {
+    if (isIncognito) {
+        alert("WARNING. Running this program in Incognito is risky. Progress will not be saved. It is better to run in a normal browser window. ");
+    } else {
+        console.log("User is not in incognito mode");
+    }
+});
+
 
 </script>
 
