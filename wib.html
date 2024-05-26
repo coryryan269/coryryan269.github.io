@@ -481,6 +481,9 @@
           }
           console.log("done with compare");
           document.getElementById("scannedItemsBox").value = "";
+          saveProgress();
+          showAllDataOnTable();
+          populateTable();
           
         }
 
@@ -579,25 +582,7 @@
     }
 
 
-    // function extractTextBetweenRXAnd228(inputString) {
-    //     // Regular expression to match "RX" followed by any characters until "-"
-    //     if (document.getElementById("defaultRadio").checked)
-    //       var regex = /\\RX(.*?)\-/g;
-    //     else
-    //       var regex = /RX(.*?)\-/g;
-        
-    //     // Array to store extracted strings
-    //     const extractedStrings = [];
-        
-    //     // Match all occurrences of the pattern in the input string
-    //     let match;
-    //     while ((match = regex.exec(inputString)) !== null) {
-    //         // Add the matched text (excluding "RX" and "-228") to the array
-    //         extractedStrings.push(match[1]);
-    //     }
-        
-    //     return extractedStrings;
-    // }
+   
 
 
     function removeDuplicatesFromArray(array) {
@@ -1021,4 +1006,3 @@
 </script>
 
 </html>
-
