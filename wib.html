@@ -310,7 +310,7 @@
                             if (entireReport2[a][0].includes(scannedItemsArray[x])){
                                 allScannedItems.push(entireReport2[a]);
                                 inReport = true;
-                                console.log("pushed first");
+                                
                             }
                             
                         }
@@ -328,7 +328,7 @@
                               extraItems.push(scannedItemsArray[x]);
                             for (y = 0; y < contents.length; y++){
                                 if (contents[y][0].includes(scannedItemsArray[x])){
-                            console.log(x);
+                            
                                     scannedItemsArray.splice(x,1);
                                     contents.splice(y,1);
                                     x--;
@@ -842,6 +842,7 @@
             }
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+		console.log("load: " + JSON.parse(arrayAsString).length);
                 return JSON.parse(arrayAsString);
             }
         }
