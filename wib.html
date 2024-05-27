@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB</title>
+    <title>WIB REPORT</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -795,6 +795,7 @@
         // Format the expiration date for the cookie
         var expires = "expires=" + expirationDate.toUTCString();
 
+	console.log("store function: " + arrayAsString);
         // Set the cookie
         document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
     }
