@@ -1010,7 +1010,44 @@
           document.getElementById("scannedItemsBox").value = "";
     }
 
-  
+     function presentBrokenOverlay() {
+    // Create overlay container
+    var overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    overlay.style.zIndex = "9999";
+    overlay.style.display = "flex";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+
+    // Create message container
+    var messageContainer = document.createElement("div");
+    messageContainer.style.textAlign = "center";
+    messageContainer.style.color = "white";
+    messageContainer.style.fontFamily = "Arial, sans-serif";
+
+    // Create sad face emoji
+    var sadFace = document.createElement("span");
+    sadFace.innerHTML = "&#128577;"; // Unicode for sad face emoji
+
+    // Create message text
+    var message = document.createElement("p");
+    message.textContent = "Don't use me. I'm broken";
+
+    // Append elements
+    messageContainer.appendChild(sadFace);
+    messageContainer.appendChild(message);
+    overlay.appendChild(messageContainer);
+
+    // Append overlay to body
+    document.body.appendChild(overlay);
+}
+
+presentBrokenOverlay();
 
 
 </script>
