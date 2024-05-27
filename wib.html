@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT</title>
+    <title>WIB</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -786,6 +786,8 @@
 
     function store(cookieName, arrayToStore) {
         // Convert the array to a JSON string
+        console.log(cookieName);
+        console.log(arrayToStore.slice());
         var arrayAsString = JSON.stringify(arrayToStore);
 
         // Set the expiration time for 24 hours from now
@@ -942,7 +944,8 @@
      function saveProgress(){
         console.log("saveProgress()");
         updatedIndexes();
-        console.log(reportNumber + indexesOfScannedItems.slice());
+        console.log(reportNumber)
+        console.log(indexesOfScannedItems.slice());
         store(reportNumber, indexesOfScannedItems.slice());
     }
 
