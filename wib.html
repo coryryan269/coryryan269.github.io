@@ -795,7 +795,7 @@
         // Format the expiration date for the cookie
         var expires = "expires=" + expirationDate.toUTCString();
 
-	console.log("store function: " + arrayAsString);
+	console.log("store()");
         // Set the cookie
         document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
     }
@@ -818,6 +818,7 @@
     }
 
     function setArrayCookie(cookieName, arrayToStore) {
+	consolelog("setArrayCookie()");
         // Convert the array to a JSON string
         var arrayAsString = JSON.stringify(arrayToStore);
 
@@ -929,6 +930,7 @@
     var indexesOfScannedItems = [];
 
     function updatedIndexes(){
+	console.log("updateIndexes()");
         indexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
             if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
@@ -938,8 +940,8 @@
     } 
 
      function saveProgress(){
+	console.log("saveProgress()");
         updatedIndexes();
-	console.log("length of save: " + indexesOfScannedItems.slice().length);
         store(reportNumber, indexesOfScannedItems.slice());
     }
 
