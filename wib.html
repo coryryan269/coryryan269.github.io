@@ -803,7 +803,7 @@ body {background-color: lightblue;}
 
     function convertObjectAttributes(obj) {
         const convertedObj = {};
-        
+        const convertedArray = [];
         // Iterate through each attribute of the input object
         for (const key in obj) {
             if (obj.hasOwnProperty(key)) {
@@ -811,9 +811,11 @@ body {background-color: lightblue;}
                 if (typeof obj[key] === 'string') {
                     // Convert the string to base 10
                     convertedObj[key] = parseInt(obj[key], 36).toString();
+                    convertedArray.push(parseInt(obj[key], 36).toString());
                 } else if (!isNaN(parseInt(obj[key], 36))) {
                     // If the value is a base 36 number represented as a string, convert to base 10
                     convertedObj[key] = parseInt(obj[key], 36).toString();
+                    convertedArray.push(parseInt(obj[key], 36).toString());
                 } else {
                     // If the value is neither a string nor a base 36 number, keep it as is
                     convertedObj[key] = obj[key];
@@ -821,7 +823,7 @@ body {background-color: lightblue;}
             }
         }
         
-        return convertedObj;
+        return convertedArray;
     }
 
     
