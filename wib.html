@@ -7,6 +7,19 @@
 
 <style>
 
+
+#warning {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 24px; /* Adjust size as needed */
+    font-weight: bold;
+    color: red;
+    padding: 10px 0;
+    margin-bottom: 20px; /* Margin underneath */
+    background-color: #f8f8f8; /* Light gray background */
+  }
+    
 /* body {background-color: lightblue;} */
 .container {
     display: grid;
@@ -803,7 +816,7 @@
             var warningSpan = document.createElement("span");
             warningSpan.style.backgroundColor = "lightcoral"; // Light Red
             warningSpan.id = "warning";
-            warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK<BR>";
+            warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK";
 
     // Insert the warning message at the top of the document
     document.body.insertBefore(warningSpan, document.body.firstChild);
