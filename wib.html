@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -801,7 +801,30 @@ body {background-color: lightblue;}
         document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
     }
 
+    function convertObjectAttributes(obj) {
+        const convertedObj = {};
+        
+        // Iterate through each attribute of the input object
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                // Check if the value is a string or a base 36 number
+                if (typeof obj[key] === 'string') {
+                    // Convert the string to base 10
+                    convertedObj[key] = parseInt(obj[key], 36);
+                } else if (!isNaN(parseInt(obj[key], 36))) {
+                    // If the value is a base 36 number represented as a string, convert to base 10
+                    convertedObj[key] = parseInt(obj[key], 36);
+                } else {
+                    // If the value is neither a string nor a base 36 number, keep it as is
+                    convertedObj[key] = obj[key];
+                }
+            }
+        }
+        
+        return convertedObj;
+    }
 
+     
     function load(cookieName) {
         var nameEQ = cookieName + "=";
         var cookies = document.cookie.split(';');
@@ -813,6 +836,7 @@ body {background-color: lightblue;}
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
+                arrayAsString = convertObjectAttributes(arrayAsString);
                 console.log(typeof arrayAsString[1]);
                 console.log(typeof arrayAsString);
                 return (arrayAsString);
