@@ -810,10 +810,10 @@
                 // Check if the value is a string or a base 36 number
                 if (typeof obj[key] === 'string') {
                     // Convert the string to base 10
-                    convertedObj[key] = parseInt(obj[key], 36);
+                    convertedObj[key] = parseInt(obj[key], 36).toString();
                 } else if (!isNaN(parseInt(obj[key], 36))) {
                     // If the value is a base 36 number represented as a string, convert to base 10
-                    convertedObj[key] = parseInt(obj[key], 36);
+                    convertedObj[key] = parseInt(obj[key], 36).toString();
                 } else {
                     // If the value is neither a string nor a base 36 number, keep it as is
                     convertedObj[key] = obj[key];
