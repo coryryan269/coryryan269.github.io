@@ -7,7 +7,7 @@
 
 <style>
 
-/* body {background-color: lightblue;} */
+body {background-color: lightblue;}
 
 .container {
     display: grid;
@@ -841,6 +841,7 @@
         for (let i = 0; i < array.length; i++) {
             // Convert the current string from base 36 to base 10 using parseInt()
             // Use radix 36 to indicate that the input string is in base 36
+            console.log(array[i]);
             let convertedNumber = parseInt(array[i], 36);
             
             // Push the converted number into the convertedArray
