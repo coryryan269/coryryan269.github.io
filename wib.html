@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -795,9 +795,7 @@ body {background-color: lightblue;}
         // Format the expiration date for the cookie
         var expires = "expires=" + expirationDate.toUTCString();
 
-        // console.log("store()");
-        // console.log(cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/");
-        // Set the cookie
+        arrayAsString = arrayAsString.replace(/["']/g, '');
         document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
     }
 
@@ -837,6 +835,9 @@ body {background-color: lightblue;}
             }
             if (cookie.indexOf(nameEQ) == 0) {
                 arrayAsString = cookie.substring(nameEQ.length);
+                arrayAsString = arrayAsString.replace(/,/g, '","');
+                arrayAsString = arrayAsString.replace(/\]/g, '"]');
+                arrayAsString = arrayAsString.replace(/\[/g, '["');
                 // arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
                 // console.log(arrayAsString);
@@ -988,6 +989,7 @@ body {background-color: lightblue;}
             return;
         }
         // console.log("type: " + typeof loadedItems);
+        
         scannedItemsArray = loadedItems.slice();
 
           firstRound = true;
