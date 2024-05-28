@@ -813,6 +813,8 @@ body {background-color: lightblue;}
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
+                console.log(arrayAsString);
+                console.log(typeof arrayAsString);
                 return (arrayAsString);
             }
         }
