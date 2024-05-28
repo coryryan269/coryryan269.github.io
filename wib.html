@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 
 .container {
     display: grid;
@@ -827,6 +827,8 @@ body {background-color: lightblue;}
     function base36ToBase10(array) {
        // Create an empty array to store the converted numbers
         array = array.split(",");
+        console.log((typeof array) + " " + array);
+        
         let convertedArray = [];
         
         // Iterate through each string in the input array
