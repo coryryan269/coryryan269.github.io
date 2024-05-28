@@ -249,7 +249,7 @@ body {background-color: lightblue;}
         if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
             // Call your function here
             execTime = measureTime(compare);
-            console.log(execTime);
+            // console.log(execTime);
             await sleep(20);
             document.getElementById("scannedItemsBox").value = "";
         }
@@ -343,7 +343,7 @@ body {background-color: lightblue;}
 
                         firstRound = false;
                     }
-                  console.log("done with compare");
+                  // console.log("done with compare");
                   document.getElementById("scannedItemsBox").value = "";
                   saveProgress();
                   showAllDataOnTable();
@@ -364,7 +364,7 @@ body {background-color: lightblue;}
         function compare() {
 
 
-          console.log("started Compare");
+          // console.log("started Compare");
 
 
           if (document.getElementById("scannedItemsBox").value.includes("EXPORTED-ITEMS:")){
@@ -404,7 +404,7 @@ body {background-color: lightblue;}
                       extraItems.push(scannedItemsArray[x]);
                     for (y = 0; y < contents.length; y++){
                         if (contents[y][0].includes(scannedItemsArray[x])){
-                    console.log(x);
+                    // console.log(x);
                             scannedItemsArray.splice(x,1);
                             contents.splice(y,1);
                             x--;
@@ -419,7 +419,7 @@ body {background-color: lightblue;}
 
                 firstRound = false;
             }
-          console.log("done with compare");
+          // console.log("done with compare");
           document.getElementById("scannedItemsBox").value = "";
           scannedItems = [...new Set(scannedItems)];
           allScannedItems = [...new Set(allScannedItems)]; 
@@ -560,7 +560,7 @@ body {background-color: lightblue;}
 
         // Check if there are any matches using the default regex
         const defaultMatches = regexDefault.test(inputString);
-        console.log("inputString: " + inputString);
+        // console.log("inputString: " + inputString);
 
 
         // Set the regex based on the result
@@ -568,7 +568,7 @@ body {background-color: lightblue;}
         regex = defaultMatches ? new RegExp(regexDefault) : new RegExp(regexAlternate);
         // regex = regexDefault;
 
-        console.log("matches: " + regex);
+        // console.log("matches: " + regex);
 
         // Array to store extracted strings
         var extractedStrings = [];
@@ -577,10 +577,10 @@ body {background-color: lightblue;}
         let match;
         while ((match = regex.exec(inputString)) !== null) {
             // Add the matched text (excluding "RX" and "-228") to the array
-            console.log("added");
+            // console.log("added");
             extractedStrings.push(match[1]);
         }
-        console.log("extracted: " + extractedStrings);
+        // console.log("extracted: " + extractedStrings);
         return extractedStrings;
     }
 
