@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 
 .container {
     display: grid;
@@ -827,6 +827,7 @@ body {background-color: lightblue;}
         const numbers = input.split(',');
         
         // Convert each number from base 36 to base 10
+        console.log("base 36 numbers: " + numbers);
         const base10Numbers = numbers.map(num => parseInt(num, 36));
         
         // Join the base 10 numbers with commas and return
