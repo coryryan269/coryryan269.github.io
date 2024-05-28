@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT</title>
+    <title>WIB</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -1009,6 +1009,14 @@
           console.log("done with compare");
           document.getElementById("scannedItemsBox").value = "";
     }
+
+     // I'm a debugging function for scanning lots of items at once
+     function debugScanItems(index){
+        for a = index; a < index + 100; a++{
+            if (index != 0)
+                compare2(entireReport2[index][0]);
+        }
+     }
 
      function presentBrokenOverlay() {
     // Create overlay container
