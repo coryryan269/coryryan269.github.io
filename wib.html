@@ -790,13 +790,23 @@
 
         // Set the expiration time for 24 hours from now
         var expirationDate = new Date();
-        expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+        expirationDate.setTime(expirationDate.getTime() + (48 * 60 * 60 * 1000)); // 24 hours
 
         // Format the expiration date for the cookie
         var expires = "expires=" + expirationDate.toUTCString();
 
         arrayAsString = arrayAsString.replace(/["']/g, '');
-        document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
+        if (arrayAsString.length < 2000)
+            document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
+        else{
+            document.body.style.backgroundColor = "lightcoral"; // Light Red
+            var warningSpan = document.createElement("span");
+            warningSpan.id = "warning";
+            warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK";
+
+    // Insert the warning message at the top of the document
+    document.body.insertBefore(warningSpan, document.body.firstChild);
+        }
     }
 
     function convertObjectAttributes(obj) {
