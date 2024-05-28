@@ -812,14 +812,16 @@
         if (arrayAsString.length < 2000)
             document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
         else{
-            
+            if (typeof warningSpan == 'undefined'){
             var warningSpan = document.createElement("span");
-            warningSpan.style.backgroundColor = "lightcoral"; // Light Red
-            warningSpan.id = "warning";
-            warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK";
+                warningSpan.style.backgroundColor = "lightcoral"; // Light Red
+                warningSpan.id = "warning";
+                warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK";
+            
 
-    // Insert the warning message at the top of the document
-    document.body.insertBefore(warningSpan, document.body.firstChild);
+                // Insert the warning message at the top of the document
+                document.body.insertBefore(warningSpan, document.body.firstChild);
+            }
         }
     }
 
