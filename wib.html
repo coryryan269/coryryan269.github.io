@@ -813,7 +813,7 @@
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
-                console.log(arrayAsString[1]);
+                console.log(typeof arrayAsString[1]);
                 console.log(typeof arrayAsString);
                 return (arrayAsString);
             }
