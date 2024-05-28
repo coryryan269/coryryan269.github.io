@@ -7,7 +7,7 @@
 
 <style>
 
-/* body {background-color: lightblue;} */
+body {background-color: lightblue;}
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -212,7 +212,7 @@
                }
                contents.splice(0,1);
               // Now you can assign the contents to a variable or process it further
-              console.log('File contents:', contents);
+              // console.log('File contents:', contents);
               // For demonstration, let's assign it to a variable
               window.fileContents = contents;
               fileInputButton = document.getElementById("fileInput");
@@ -482,7 +482,7 @@
 
                 firstRound = false;
           }
-          console.log("done with compare");
+          // console.log("done with compare");
           document.getElementById("scannedItemsBox").value = "";
           saveProgress();
           showAllDataOnTable();
@@ -839,11 +839,11 @@
                 arrayAsString = cookie.substring(nameEQ.length);
                 // arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
-                console.log(arrayAsString);
+                // console.log(arrayAsString);
                 arrayAsString = convertObjectAttributes(arrayAsString);
-                console.log(arrayAsString);
-                console.log(typeof arrayAsString[1]);
-                console.log(typeof arrayAsString);
+                // console.log(arrayAsString);
+                // console.log(typeof arrayAsString[1]);
+                // console.log(typeof arrayAsString);
                 return (arrayAsString);
             }
         }
@@ -974,9 +974,9 @@
     } 
 
      function saveProgress(){
-        console.log("saveProgress()");
+        // console.log("saveProgress()");
         updatedIndexes();
-        console.log(reportNumber + indexesOfScannedItems.slice());
+        // console.log(reportNumber + indexesOfScannedItems.slice());
         store(reportNumber, indexesOfScannedItems.slice());
     }
 
@@ -987,7 +987,7 @@
         if (loadedItems == null){
             return;
         }
-        console.log("type: " + typeof loadedItems);
+        // console.log("type: " + typeof loadedItems);
         scannedItemsArray = loadedItems.slice();
 
           firstRound = true;
@@ -1007,7 +1007,7 @@
                     if (entireReport2[a][0].includes(scannedItemsArray[x])){
                         allScannedItems.push(entireReport2[a]);
                         inReport = true;
-                        console.log("pushed first");
+                        // console.log("pushed first");
                     }
                     
                 }
@@ -1025,7 +1025,7 @@
                       extraItems.push(scannedItemsArray[x]);
                     for (y = 0; y < contents.length; y++){
                         if (contents[y][0].includes(scannedItemsArray[x])){
-                    console.log(x);
+                    // console.log(x);
                             scannedItemsArray.splice(x,1);
                             contents.splice(y,1);
                             x--;
@@ -1040,7 +1040,7 @@
 
                 firstRound = false;
             }
-          console.log("done with compare");
+          // console.log("done with compare");
           document.getElementById("scannedItemsBox").value = "";
     }
 
