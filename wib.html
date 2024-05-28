@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -796,9 +796,9 @@ body {background-color: lightblue;}
         var expires = "expires=" + expirationDate.toUTCString();
 
         console.log("store()");
-        console.log(cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/");
+        // console.log(cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/");
         // Set the cookie
-        document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
+        document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
     }
 
     function convertObjectAttributes(obj) {
@@ -836,7 +836,8 @@ body {background-color: lightblue;}
                 cookie = cookie.substring(1, cookie.length);
             }
             if (cookie.indexOf(nameEQ) == 0) {
-                arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                arrayAsString = cookie.substring(nameEQ.length);
+                // arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
                 console.log(arrayAsString);
                 arrayAsString = convertObjectAttributes(arrayAsString);
