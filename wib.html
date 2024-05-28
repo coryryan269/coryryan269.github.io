@@ -824,10 +824,16 @@ body {background-color: lightblue;}
         return null;
     }
 
+    function displayObjectProperties(obj) {
+    for (let prop in obj) {
+        console.log(prop + ": " + obj[prop]);
+    }
+}
+     
     function base36ToBase10(array) {
        // Create an empty array to store the converted numbers
         array = array.split(",");
-        console.log((typeof array) + " " + array[0]);
+        console.log((typeof array) + " " + displayObjectProperties(array));
         
         let convertedArray = [];
         
