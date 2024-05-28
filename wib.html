@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: green;}
+body {background-color: lightblue;}
 
 .container {
     display: grid;
@@ -813,7 +813,7 @@ body {background-color: green;}
             }
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
-                scannedItemsArray = base36ToBase10(scannedItemsArray);
+                arrayAsString = base36ToBase10(arrayAsString);
                 arrayAsString = JSON.parse(arrayAsString);
                 console.log("arrayAsString: " + arrayAsString);
                 return JSON.parse(arrayAsString);
