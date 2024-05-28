@@ -812,6 +812,8 @@
             }
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                arrayAsString = JSON.parse(arrayAsString);
+                console.log("arrayAsString: " + arrayAsString);
                 return JSON.parse(arrayAsString);
             }
         }
@@ -935,7 +937,7 @@
         indexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
             if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
-                indexesOfScannedItems.push(rxIndex);
+                indexesOfScannedItems.push(rxIndex.toString(36));
             }
         }
     } 
