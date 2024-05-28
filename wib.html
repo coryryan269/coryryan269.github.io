@@ -7,7 +7,7 @@
 
 <style>
 
-/* body {background-color: lightblue;} */
+body {background-color: lightblue;}
 
 .container {
     display: grid;
@@ -813,7 +813,9 @@
             }
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                console.log("before: " + arrayAsString);
                 arrayAsString = base36ToBase10(arrayAsString);
+                console.log("after: " + arrayAsString);
                 arrayAsString = JSON.parse(arrayAsString);
                 console.log("arrayAsString: " + arrayAsString);
                 return JSON.parse(arrayAsString);
