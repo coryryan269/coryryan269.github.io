@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 
 .container {
     display: grid;
@@ -825,15 +825,21 @@ body {background-color: lightblue;}
     }
 
     function base36ToBase10(input) {
-        // Split the input string by commas
-        const numbers = input.split(',');
+       // Create an empty array to store the converted numbers
+        let convertedArray = [];
         
-        // Convert each number from base 36 to base 10
-        console.log("base 36 numbers: " + numbers);
-        const base10Numbers = numbers.map(num => parseInt(num, 36));
+        // Iterate through each string in the input array
+        for (let i = 0; i < array.length; i++) {
+            // Convert the current string from base 36 to base 10 using parseInt()
+            // Use radix 36 to indicate that the input string is in base 36
+            let convertedNumber = parseInt(array[i], 36);
+            
+            // Push the converted number into the convertedArray
+            convertedArray.push(convertedNumber);
+        }
         
-        // Join the base 10 numbers with commas and return
-        return base10Numbers.join(',');
+        // Return the array of converted numbers
+        return convertedArray;
     }
 
 
