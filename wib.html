@@ -814,11 +814,24 @@
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
                 console.log("arrayAsString: " + arrayAsString);
-                return (arrayAsString);
+                arrayAsString = base36ToBase10(arrayAsString);
+                return JSON.parse(arrayAsString);
             }
         }
         return null;
     }
+
+    function base36ToBase10(input) {
+        // Split the input string by commas
+        const numbers = input.split(',');
+        
+        // Convert each number from base 36 to base 10
+        const base10Numbers = numbers.map(num => parseInt(num, 36));
+        
+        // Join the base 10 numbers with commas and return
+        return base10Numbers.join(',');
+    }
+
 
     function setArrayCookie(cookieName, arrayToStore) {
     console.log("setArrayCookie()");
