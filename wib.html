@@ -862,7 +862,7 @@
         var expires = "expires=" + expirationDate.toUTCString();
 
         // Set the cookie
-        document.cookie = cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/";
+        document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
     }
 
 
@@ -875,7 +875,8 @@
                 cookie = cookie.substring(1, cookie.length);
             }
             if (cookie.indexOf(nameEQ) == 0) {
-                var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                var arrayAsString = cookie.substring(nameEQ.length);
+                // var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
         console.log("load: " + JSON.parse(arrayAsString).length);
                 return JSON.parse(arrayAsString);
             }
