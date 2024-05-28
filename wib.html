@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT</title>
+    <title>WIB</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -812,9 +812,9 @@
             }
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                arrayAsString = base36ToBase10(arrayAsString);
                 arrayAsString = JSON.parse(arrayAsString);
                 console.log("arrayAsString: " + arrayAsString);
-                arrayAsString = base36ToBase10(arrayAsString);
                 return JSON.parse(arrayAsString);
             }
         }
