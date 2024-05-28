@@ -814,7 +814,7 @@ body {background-color: lightblue;}
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 console.log("before: " + (typeof arrayAsString) + " " + arrayAsString);
-                arrayAsString = base36ToBase10(arrayAsString);
+                // arrayAsString = base36ToBase10(arrayAsString);
                 console.log("after: " + arrayAsString);
                 arrayAsString = JSON.parse(arrayAsString);
                 console.log("arrayAsString: " + arrayAsString);
