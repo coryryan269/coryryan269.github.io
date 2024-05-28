@@ -799,10 +799,11 @@
         if (arrayAsString.length < 2000)
             document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
         else{
-            document.body.style.backgroundColor = "lightcoral"; // Light Red
+            
             var warningSpan = document.createElement("span");
+            warningSpan.style.backgroundColor = "lightcoral"; // Light Red
             warningSpan.id = "warning";
-            warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK";
+            warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK<BR>";
 
     // Insert the warning message at the top of the document
     document.body.insertBefore(warningSpan, document.body.firstChild);
