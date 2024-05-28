@@ -7,7 +7,7 @@
 
 <style>
 
-body {background-color: lightblue;}
+/* body {background-color: lightblue;} */
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -836,7 +836,7 @@ body {background-color: lightblue;}
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
                 arrayAsString = JSON.parse(arrayAsString);
-                // arrayAsString = convertObjectAttributes(arrayAsString);
+                arrayAsString = convertObjectAttributes(arrayAsString);
                 console.log(typeof arrayAsString[1]);
                 console.log(typeof arrayAsString);
                 return (arrayAsString);
