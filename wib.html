@@ -431,7 +431,7 @@ body {background-color: lightblue;}
 
         // Will compare scans and file contents and show discrepancies
         function compare2(rxNumber) {
-          console.log("RX --" + rxNumber);
+          // console.log("RX --" + rxNumber);
 
           // Create array from text in textarea
           substring = rxNumber.substring(0, rxNumber.indexOf("-"));
@@ -447,7 +447,7 @@ body {background-color: lightblue;}
                         allScannedItems.push(entireReport2[a]);
                         recentScansAndRemoves.push([...entireReport2[a], "CLICKED"]);
                         inReport = true;
-                        console.log("pushed first");
+                        // console.log("pushed first");
                     }
                     
                 }
@@ -467,7 +467,7 @@ body {background-color: lightblue;}
                     }
                 for (y = 0; y < contents.length; y++){
                   if (contents[y][0].includes(scannedItemsArray[x])){
-                    console.log(x);
+                    // console.log(x);
                     scannedItemsArray.splice(x,1);
                     contents.splice(y,1);
                     x--;
@@ -795,7 +795,7 @@ body {background-color: lightblue;}
         // Format the expiration date for the cookie
         var expires = "expires=" + expirationDate.toUTCString();
 
-        console.log("store()");
+        // console.log("store()");
         // console.log(cookieName + "=" + encodeURIComponent(arrayAsString) + ";" + expires + ";path=/");
         // Set the cookie
         document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
@@ -964,7 +964,7 @@ body {background-color: lightblue;}
     var indexesOfScannedItems = [];
 
     function updatedIndexes(){
-    console.log("updateIndexes()");
+    // console.log("updateIndexes()");
         indexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
             if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
