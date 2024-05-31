@@ -813,12 +813,12 @@
             document.cookie = cookieName + "=" + (arrayAsString) + ";" + expires + ";path=/";
         else{
             if (typeof warningSpan == 'undefined'){
-            warningSpan = document.createElement("span");
+                warningSpan = document.createElement("span");
                 warningSpan.style.backgroundColor = "lightcoral"; // Light Red
                 warningSpan.id = "warning";
+                warningSpan.className = "no-print"; // Adding the class "no-print"
                 warningSpan.textContent = "ANY SCANS BEYOND HERE WILL NOT BE SAVED BECAUSE BROWSERS SUCK";
-            
-
+                
                 // Insert the warning message at the top of the document
                 document.body.insertBefore(warningSpan, document.body.firstChild);
             }
