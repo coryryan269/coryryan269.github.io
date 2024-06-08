@@ -992,12 +992,21 @@
 
     function updatedIndexes(){
     // console.log("updateIndexes()");
-        indexesOfScannedItems = [];
+        indexOfScannedItems = [];
+        tempIndexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
             if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
-                indexesOfScannedItems.push(rxIndex.toString(36));
+                tempIndexesOfScannedItems.push(rxIndex);
             }
         }
+        for (x = 0; x < 4000; x++){
+            if (tempIndexesOfScannedItems.indexOf(x) >= 0){
+                indexOfScannedItems.push(String(1));
+            }
+            else
+                indexOfScannedItems.push(String(0));
+        }
+        
     } 
 
      function saveProgress(){
