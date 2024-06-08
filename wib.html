@@ -275,7 +275,7 @@
 
         // EXTRA ITEMS
         document.getElementById("extraItemsButton").addEventListener('click',  function(event) {
-          console.log("making table");
+          //console.log("making table");
           dataTable = document.getElementById('dataTable');
          dataTable = document.getElementById('dataTable');
          dataTable.innerHTML = ''; // Clear existing table content
@@ -329,10 +329,10 @@
                         }
                         if (!inReport){
                                 allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                                console.log("pushed second");
+                                //console.log("pushed second");
                             }
                         if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                              console.log(scannedItemsArray[0]);
+                              //console.log(scannedItemsArray[0]);
                               sound.play();
                           }
                           else if (firstRound == true)
@@ -399,16 +399,16 @@
                         allScannedItems.push(entireReport2[a]);
                         recentScansAndRemoves.push([...entireReport2[a], "SCANNED"]);
                         inReport = true;
-                        console.log("pushed first");
+                        //console.log("pushed first");
                     }
                     
                 }
                 if (!inReport){
                         allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                        console.log("pushed second");
+                        //console.log("pushed second");
                     }
                 if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                      console.log(scannedItemsArray[0]);
+                     // console.log(scannedItemsArray[0]);
                       sound.play();
                   }
                   else if (firstRound == true)
@@ -466,7 +466,7 @@
                 }
                 if (!inReport){
                         allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                        console.log("pushed second");
+                        //console.log("pushed second");
                     }
                 // if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
                 //       console.log(scannedItemsArray[0]);
@@ -798,8 +798,8 @@
     }
 
     function store(cookieName, arrayToStore) {
-        // Convert the array to a JSON string
-        console.log("arrayToStore: ", arrayToStore);
+        // Convert the array to a JSON stringh
+        // console.log("arrayToStore: ", arrayToStore);
         var arrayAsString = JSON.stringify(arrayToStore);
 
         // Set the expiration time for 24 hours from now
@@ -879,7 +879,7 @@
     }
 
     function setArrayCookie(cookieName, arrayToStore) {
-    console.log("setArrayCookie()");
+    //console.log("setArrayCookie()");
         // Convert the array to a JSON string
         var arrayAsString = JSON.stringify(arrayToStore);
 
@@ -906,7 +906,7 @@
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = cookie.substring(nameEQ.length);
                 // var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
-        console.log("load: " + JSON.parse(arrayAsString).length);
+        //console.log("load: " + JSON.parse(arrayAsString).length);
                 return JSON.parse(arrayAsString);
             }
         }
@@ -948,7 +948,7 @@
                 // Copy the inner array and push it to the contents array
                 addedArray = [...innerArray];
                 addedArray = addedArray.slice(0,-1);
-                console.log("pushed -- " + addedArray);
+                //console.log("pushed -- " + addedArray);
                 contents.push(addedArray);
                 // print(contents)
             }
@@ -962,7 +962,7 @@
             compare2(rxNumber);
         }
         else {
-            console.log("removing rx#: " + rxNumber)
+            //console.log("removing rx#: " + rxNumber)
             unScanItem(rxNumber);
         }
         showAllDataOnTable();
@@ -994,20 +994,40 @@
     function updatedIndexes(){
     // console.log("updateIndexes()");
         indexesOfScannedItems = [];
+        tempIndexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
-            if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
-                indexesOfScannedItems.push(rxIndex.toString(36));
+            if ((rxIndex = (entireReport.indexOf(scannedItems[x]))) > 0){
+                tempIndexesOfScannedItems.push((rxIndex));
             }
         }
+        for (x = 0; x < 2000; x++){
+            if (parseInt(tempIndexesOfScannedItems.indexOf(x)) >= 0){
+                //console.log("pusheddd");
+                indexesOfScannedItems.push(String(1));
+            }
+            else
+                indexesOfScannedItems.push(String(0));
+        }
+        
     } 
 
      function saveProgress(){
         // console.log("saveProgress()");
         updatedIndexes();
+        //console.log(indexesOfScannedItems);
         // console.log(reportNumber + indexesOfScannedItems.slice());
         store(reportNumber, indexesOfScannedItems.slice());
     }
 
+    function changeFromBinaryToIndex(arrayToChange){
+        returnArray = [];
+        for (z = 0; z < arrayToChange.length; z++){
+            if (arrayToChange[z] == 1 || arrayToChange[z] == '1')
+                returnArray.push(z)
+        }
+        return returnArray;
+    }
+     
     var reportNumber = 0;
     function loadProgress(){
         reportNumber = reportIDFunc();
@@ -1018,7 +1038,7 @@
         // console.log("type: " + typeof loadedItems);
         
         scannedItemsArray = loadedItems.slice();
-
+        scannedItemsArray = changeFromBinaryToIndex(scannedItemsArray);
           firstRound = true;
           tempScannedItems = [];
 
@@ -1027,7 +1047,7 @@
           }
 
           scannedItemsArray = tempScannedItems.slice();
-
+          
 
           for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
             for (x = 0; x < scannedItemsArray.length; x++){
@@ -1042,10 +1062,10 @@
                 }
                 if (!inReport){
                         allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                        console.log("pushed second");
+                        //console.log("pushed second");
                     }
                 if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                      console.log(scannedItemsArray[0]);
+                     // console.log(scannedItemsArray[0]);
                       sound.play();
                   }
                   else if (firstRound == true)
@@ -1075,7 +1095,7 @@
 
      // I'm a debugging function for scanning lots of items at once
      function debugScanItems(index){
-        for( ab = index; ab < index + 100; ab++){
+        for( ab = index; ab < index + 300; ab++){
             if (index != 0)
                 compare2(entireReport2[ab][0]);
         }
