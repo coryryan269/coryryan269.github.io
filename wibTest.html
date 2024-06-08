@@ -275,7 +275,7 @@
 
         // EXTRA ITEMS
         document.getElementById("extraItemsButton").addEventListener('click',  function(event) {
-          console.log("making table");
+          //console.log("making table");
           dataTable = document.getElementById('dataTable');
          dataTable = document.getElementById('dataTable');
          dataTable.innerHTML = ''; // Clear existing table content
@@ -329,10 +329,10 @@
                         }
                         if (!inReport){
                                 allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                                console.log("pushed second");
+                                //console.log("pushed second");
                             }
                         if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                              console.log(scannedItemsArray[0]);
+                              //console.log(scannedItemsArray[0]);
                               sound.play();
                           }
                           else if (firstRound == true)
@@ -399,16 +399,16 @@
                         allScannedItems.push(entireReport2[a]);
                         recentScansAndRemoves.push([...entireReport2[a], "SCANNED"]);
                         inReport = true;
-                        console.log("pushed first");
+                        //console.log("pushed first");
                     }
                     
                 }
                 if (!inReport){
                         allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                        console.log("pushed second");
+                        //console.log("pushed second");
                     }
                 if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                      console.log(scannedItemsArray[0]);
+                     // console.log(scannedItemsArray[0]);
                       sound.play();
                   }
                   else if (firstRound == true)
@@ -466,7 +466,7 @@
                 }
                 if (!inReport){
                         allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                        console.log("pushed second");
+                        //console.log("pushed second");
                     }
                 // if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
                 //       console.log(scannedItemsArray[0]);
@@ -879,7 +879,7 @@
     }
 
     function setArrayCookie(cookieName, arrayToStore) {
-    console.log("setArrayCookie()");
+    //console.log("setArrayCookie()");
         // Convert the array to a JSON string
         var arrayAsString = JSON.stringify(arrayToStore);
 
@@ -906,7 +906,7 @@
             if (cookie.indexOf(nameEQ) == 0) {
                 var arrayAsString = cookie.substring(nameEQ.length);
                 // var arrayAsString = decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
-        console.log("load: " + JSON.parse(arrayAsString).length);
+        //console.log("load: " + JSON.parse(arrayAsString).length);
                 return JSON.parse(arrayAsString);
             }
         }
@@ -948,7 +948,7 @@
                 // Copy the inner array and push it to the contents array
                 addedArray = [...innerArray];
                 addedArray = addedArray.slice(0,-1);
-                console.log("pushed -- " + addedArray);
+                //console.log("pushed -- " + addedArray);
                 contents.push(addedArray);
                 // print(contents)
             }
@@ -962,7 +962,7 @@
             compare2(rxNumber);
         }
         else {
-            console.log("removing rx#: " + rxNumber)
+            //console.log("removing rx#: " + rxNumber)
             unScanItem(rxNumber);
         }
         showAllDataOnTable();
@@ -1002,7 +1002,7 @@
         }
         for (x = 0; x < 2000; x++){
             if (parseInt(tempIndexesOfScannedItems.indexOf(x)) >= 0){
-                console.log("pusheddd");
+                //console.log("pusheddd");
                 indexesOfScannedItems.push(String(1));
             }
             else
@@ -1014,7 +1014,7 @@
      function saveProgress(){
         // console.log("saveProgress()");
         updatedIndexes();
-        console.log(indexesOfScannedItems);
+        //console.log(indexesOfScannedItems);
         // console.log(reportNumber + indexesOfScannedItems.slice());
         store(reportNumber, indexesOfScannedItems.slice());
     }
@@ -1062,10 +1062,10 @@
                 }
                 if (!inReport){
                         allScannedItems.push([scannedItemsArray[x],"","","",""]);
-                        console.log("pushed second");
+                        //console.log("pushed second");
                     }
                 if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                      console.log(scannedItemsArray[0]);
+                     // console.log(scannedItemsArray[0]);
                       sound.play();
                   }
                   else if (firstRound == true)
