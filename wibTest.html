@@ -1016,6 +1016,15 @@
         store(reportNumber, indexesOfScannedItems.slice());
     }
 
+    function changeFromBinaryToIndex(arrayToChange){
+        returnArray = [];
+        for (z = 0; z < arrayToChange.length; z++){
+            if (arrayToChange[z] == 1 || arrayToChange[z] == '1')
+                returnArray.push(z)
+        }
+        return returnArray;
+    }
+     
     var reportNumber = 0;
     function loadProgress(){
         reportNumber = reportIDFunc();
@@ -1026,7 +1035,7 @@
         // console.log("type: " + typeof loadedItems);
         
         scannedItemsArray = loadedItems.slice();
-
+        scannedItemsArray = changeFromBinaryToIndex(scannedItemsArray);
           firstRound = true;
           tempScannedItems = [];
 
@@ -1035,7 +1044,7 @@
           }
 
           scannedItemsArray = tempScannedItems.slice();
-
+          
 
           for (i = 0; i < scannedItemsArray.length; i++){scannedItems.push(scannedItemsArray[i]);}
             for (x = 0; x < scannedItemsArray.length; x++){
