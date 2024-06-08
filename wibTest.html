@@ -996,8 +996,8 @@
         indexOfScannedItems = [];
         tempIndexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
-            if ((rxIndex = entireReport.indexOf(scannedItems[x])) > 0){
-                tempIndexesOfScannedItems.push(rxIndex);
+            if ((rxIndex = parseInt(entireReport.indexOf(scannedItems[x]))) > 0){
+                tempIndexesOfScannedItems.push(String(rxIndex));
             }
         }
         for (x = 0; x < 4000; x++){
