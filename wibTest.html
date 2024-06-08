@@ -1008,12 +1008,13 @@
             else
                 indexOfScannedItems.push(String(0));
         }
-        console.log("indexOfScannedItems " + indexOfScannedItems);
+        
     } 
 
      function saveProgress(){
         // console.log("saveProgress()");
         updatedIndexes();
+        console.log(indexesOfScannedItems);
         // console.log(reportNumber + indexesOfScannedItems.slice());
         store(reportNumber, indexesOfScannedItems.slice());
     }
