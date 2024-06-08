@@ -993,7 +993,7 @@
 
     function updatedIndexes(){
     // console.log("updateIndexes()");
-        indexOfScannedItems = [];
+        indexesOfScannedItems = [];
         tempIndexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
             if ((rxIndex = (entireReport.indexOf(scannedItems[x]))) > 0){
@@ -1003,10 +1003,10 @@
         for (x = 0; x < 4000; x++){
             if (parseInt(tempIndexesOfScannedItems.indexOf(x)) >= 0){
                 console.log("pusheddd");
-                indexOfScannedItems.push(String(1));
+                indexesOfScannedItems.push(String(1));
             }
             else
-                indexOfScannedItems.push(String(0));
+                indexesOfScannedItems.push(String(0));
         }
         
     } 
