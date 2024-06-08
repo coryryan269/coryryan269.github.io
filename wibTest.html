@@ -996,12 +996,13 @@
         indexOfScannedItems = [];
         tempIndexesOfScannedItems = [];
         for (x = 0; x < scannedItems.length; x++){
-            if ((rxIndex = parseInt(entireReport.indexOf(scannedItems[x]))) > 0){
-                tempIndexesOfScannedItems.push(String(rxIndex));
+            if ((rxIndex = (entireReport.indexOf(scannedItems[x]))) > 0){
+                tempIndexesOfScannedItems.push((rxIndex));
             }
         }
         for (x = 0; x < 4000; x++){
-            if (tempIndexesOfScannedItems.indexOf(x) >= 0){
+            if (parseInt(tempIndexesOfScannedItems.indexOf(x)) >= 0){
+                console.log("pusheddd");
                 indexOfScannedItems.push(String(1));
             }
             else
