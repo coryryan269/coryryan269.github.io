@@ -158,6 +158,37 @@
 
       recentScansAndRemoves = [];
       populateTable();
+
+
+    
+     
+    function getAllScriptsWithSameName(rxNumber){
+        compare(rxNumber);
+        rxNumber = extractTextBetweenRXAnd228(rxNumber);
+        name = "";
+        rxNumbers = [];
+        // Get name
+        for (ad = 0; ad < entireReport2.length; ad++){
+            if (entireReport2[ad][0] == String(rxNumber){
+                name = entireReport2[ad][1];
+                break;
+            }
+        }
+        // Get all non-control Rxs
+        for (ad = 0; ad < entireReport2.length; ad++){
+            if (entireReport2[ad][1] == String(name) && entireReport2[ad][0].charAt(0) == "6" && Number(entireReport2[ad][4]) < 8){
+                rxNumbers.push(entireReport2[ad][0]);
+            }
+        }
+
+        // Compare all with same name
+        for (ad = 0; ad < rxNumbers.length; ad++){
+            compare2(rxNumbers[ad]);
+        }
+            
+        
+    }
+     
     function populateTable() {
     // Get the table element
     const table = document.getElementById("recentScannedItemsTable");
@@ -261,7 +292,7 @@
         // if (document.getElementById("singleEntry").checked)
         if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
             // Call your function here
-            execTime = measureTime(compare);
+            execTime = measureTime(getAllScriptsWithSameName(document.getElementById("scannedItemsBox").value));
             console.log(execTime);
             await sleep(20);
             document.getElementById("scannedItemsBox").value = "";
