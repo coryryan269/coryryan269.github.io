@@ -292,8 +292,8 @@
         // if (document.getElementById("singleEntry").checked)
         if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
             // Call your function here
-            execTime = measureTime(getAllScriptsWithSameName(document.getElementById("scannedItemsBox").value));
-            console.log(execTime);
+            getAllScriptsWithSameName(document.getElementById("scannedItemsBox").value);
+            
             await sleep(20);
             document.getElementById("scannedItemsBox").value = "";
         }
