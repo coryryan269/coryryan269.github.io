@@ -802,9 +802,9 @@
         // console.log("arrayToStore: ", arrayToStore);
         var arrayAsString = JSON.stringify(arrayToStore);
 
-        // Set the expiration time for 24 hours from now
+        // Set the expiration time for 2 weeks from now
         var expirationDate = new Date();
-        expirationDate.setTime(expirationDate.getTime() + (48 * 60 * 60 * 1000)); // 24 hours
+        expirationDate.setTime(expirationDate.getTime() + (336 * 60 * 60 * 1000)); // 2 Weeks
 
         // Format the expiration date for the cookie
         var expires = "expires=" + expirationDate.toUTCString();
