@@ -182,7 +182,7 @@
         
         // Get all non-control Rxs
         for (ad = 0; ad < entireReport2.length; ad++){
-            if (entireReport2[ad][1] == String(name) && entireReport2[ad][0].charAt(0) == "6" && Number(entireReport2[ad][4]) < 8){
+            if (entireReport2[ad][1] == String(name) && entireReport2[ad][0].charAt(0) == "6" && Number(entireReport2[ad][4]) < 11){
                 rxNumbers.push(entireReport2[ad][0]);
                 console.log("RX: ", rxNumbers[rxNumbers.length-1]);
             }
