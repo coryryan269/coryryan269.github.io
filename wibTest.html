@@ -171,6 +171,7 @@
         for (ad = 0; ad < entireReport2.length; ad++){
             if (entireReport2[ad][0] == String(rxNumber)){
                 name = entireReport2[ad][1];
+                console.log("name: ", name);
                 break;
             }
         }
@@ -178,6 +179,7 @@
         for (ad = 0; ad < entireReport2.length; ad++){
             if (entireReport2[ad][1] == String(name) && entireReport2[ad][0].charAt(0) == "6" && Number(entireReport2[ad][4]) < 8){
                 rxNumbers.push(entireReport2[ad][0]);
+                console.log("RX: ", rxNumbers[rxNumbers.length-1]);
             }
         }
 
