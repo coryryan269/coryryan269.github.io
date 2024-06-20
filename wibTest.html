@@ -164,10 +164,10 @@
      
     function getAllScriptsWithSameName(rxNumber){
         rxNumber = extractTextBetweenRXAnd228(rxNumber)[0] + "-228";
-        console.log(rxNumber);
         compare2(rxNumber);
         name = "";
         rxNumbers = [];
+        
         // Get name
         for (ad = 0; ad < entireReport2.length; ad++){
             if (entireReport2[ad][0] == String(rxNumber)){
@@ -176,6 +176,10 @@
                 break;
             }
         }
+
+        
+
+        
         // Get all non-control Rxs
         for (ad = 0; ad < entireReport2.length; ad++){
             if (entireReport2[ad][1] == String(name) && entireReport2[ad][0].charAt(0) == "6" && Number(entireReport2[ad][4]) < 8){
@@ -184,6 +188,10 @@
             }
         }
 
+        if (rxNumbers.length > 0){sound.play();}
+        else {sound2.play(); return;}
+
+        
         // Compare all with same name
         for (ad = 0; ad < rxNumbers.length; ad++){
             compare2(rxNumbers[ad]);
