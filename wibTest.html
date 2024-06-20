@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT (TEST)</title>
+    <title>WIB REPORT (TESTING)</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -163,8 +163,8 @@
     
      
     function getAllScriptsWithSameName(rxNumber){
+        rxNumber = extractTextBetweenRXAnd228(rxNumber)[0];
         compare2(rxNumber);
-        rxNumber = extractTextBetweenRXAnd228(rxNumber);
         name = "";
         rxNumbers = [];
         // Get name
