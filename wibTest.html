@@ -189,15 +189,17 @@
             }
         }
 
-        if (rxNumbers.length > 0){sound2.play(); }
-        else {sound.play();console.log("nothing there1"); console.log(rxNumbers); return;}
-
-        
-        // Compare all with same name
-        for (ad = 0; ad < rxNumbers.length; ad++){
-          console.log(rxNumbers[ad]);
-            compare2(rxNumbers[ad]);
+        if (rxNumbers.length > 0 && typeof(rxNumbers) == "object")
+        {
+          sound2.play();
+          // Compare all with same name
+          for (ad = 0; ad < rxNumbers.length; ad++){
+            console.log(rxNumbers[ad]);
+              compare2(rxNumbers[ad]);
+          }
         }
+        else if (rxNumbers.length == 0)
+          sound.play();
             
         
     }
@@ -303,7 +305,7 @@
         document.getElementById("scannedItemsBox").addEventListener('keypress', async function(event) {
         // Check if the pressed key is the pipe character (|), which has keyCode 124
         // if (document.getElementById("singleEntry").checked)
-        if (event.key === "^^" || event.key === "Enter") {
+        if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
             // Call your function here
             getAllScriptsWithSameName(document.getElementById("scannedItemsBox").value);
             console.log("eventListenerTriggered");
