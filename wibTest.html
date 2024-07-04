@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT (TESTING)</title>
+    <title>WIB REPORT (TESTING2)</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -188,8 +188,8 @@
             }
         }
 
-        if (rxNumbers.length > 0){sound2.play();}
-        else {sound.play(); return;}
+        if (rxNumbers.length > 0){sound2.play(); }
+        else {sound.play();console.log("nothing there1"); console.log(rxNumbers) return;}
 
         
         // Compare all with same name
@@ -375,6 +375,8 @@
                             }
                         if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
                               //console.log(scannedItemsArray[0]);
+                              console.log("not found ab");
+                              console.log(scannedItemsArray[0]);
                               sound.play();
                           }
                           else if (firstRound == true)
@@ -450,7 +452,8 @@
                         //console.log("pushed second");
                     }
                 if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
-                     // console.log(scannedItemsArray[0]);
+                     console.log(scannedItemsArray[0]);
+                     console.log("aa");
                       sound.play();
                   }
                   else if (firstRound == true)
@@ -1109,6 +1112,7 @@
                 if (firstRound == true && !entireReport.includes(scannedItemsArray[0])){
                      // console.log(scannedItemsArray[0]);
                       sound.play();
+                      console.log("nothing there3");
                   }
                   else if (firstRound == true)
                     sound2.play();
