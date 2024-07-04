@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT (TESTING3)</title>
+    <title>WIB REPORT (TESTING)</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -306,7 +306,7 @@
         if (event.keyCode === 124 || event.key === "|" || event.key === "Enter") {
             // Call your function here
             getAllScriptsWithSameName(document.getElementById("scannedItemsBox").value);
-            
+            console.log("eventListenerTriggered");
             await sleep(20);
             document.getElementById("scannedItemsBox").value = "";
         }
