@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT (TESTING)</title>
+    <title>WIB REPORT (TESTING 0704)</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -165,6 +165,8 @@
     function getAllScriptsWithSameName(rxNumber){
       console.log("string passed: " + rxNumber);
       console.log("ran getAllScripts");
+      if (!(rxNumber.includes("4581357")))
+        return;
         rxNumber = extractTextBetweenRXAnd228(rxNumber)[0] + "-228";
         compare2(rxNumber);
         name = "";
