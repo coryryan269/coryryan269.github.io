@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT (TESTING)</title>
+    <title>WIB REPORT (TESTING 0704)</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -303,7 +303,7 @@
         document.getElementById("scannedItemsBox").addEventListener('keypress', async function(event) {
         // Check if the pressed key is the pipe character (|), which has keyCode 124
         // if (document.getElementById("singleEntry").checked)
-        if (  event.key === "Enter") {
+        if (event.key === "^^" || event.key === "Enter") {
             // Call your function here
             getAllScriptsWithSameName(document.getElementById("scannedItemsBox").value);
             console.log("eventListenerTriggered");
