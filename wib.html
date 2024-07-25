@@ -140,7 +140,8 @@
         <br><br>
         <button class="no-print" onclick="showAllDataOnTable()">WIB Report</button>&nbsp;&nbsp;&nbsp;&nbsp;
         <button class="no-print" id="extraItemsButton">Extra Scripts</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="no-print" id="exportButton">EXPORT ITEMS</button>
+        <button class="no-print" id="exportButton">EXPORT ITEMS</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="no-print" onclick="createFridgeTable()">Fridge Items</button>&nbsp;&nbsp;&nbsp;&nbsp;
    
       <br><br>
       <table id="dataTable"></table>
@@ -201,7 +202,81 @@
 }
 
 
+    function createFridgeTable(){
 
+
+        fridgeItems = ["semaglutide", "ozempic", "lantus", "insulin", "latanoprost", "mounjaro", "wegovy", "tiirzepatide", "novolog", "novolin", "humalog","humulin", "glargine", "lispro", "aspart"];
+
+        const table = document.getElementById('dataTable');
+        const caption = document.createElement('caption');
+        caption.textContent = 'FRIDGE ITEMS'; // Set the title text
+        table.innerHTML = ''; // Clear existing table content
+        table.appendChild(caption);
+
+        report  = entireReport2.slice();
+        report.shift();
+        for (a = 0; a < report.length; a++){
+            // entireReport2[a].push(0);
+            found = false;
+            for (b = 0; b < contents.length; b++){
+                if (report[a][0] == contents[b][0]){
+                    found = true;
+                }
+            }
+            if (found == true){
+                report[a][5] = "NOT FOUND"
+            }
+            else
+                report[a][5] = "FOUND"
+        }
+
+        tempNotFound = [];
+        tempFound = [];
+        for (i = 0; i < report.length; i++){
+            if (report[i][5] == "NOT FOUND" &&  fridgeItems.some(word => report[i][3].toLowerCase().includes(word.toLowerCase())))
+                tempNotFound.push(report[i]);
+            else if (fridgeItems.some(word => report[i][3].toLowerCase().includes(word.toLowerCase())))
+                tempFound.push(report[i]);
+        }
+
+        tempNotFound = controlsFirst(tempNotFound);
+
+
+        report = [];
+        for (i = 0; i < tempNotFound.length; i++){
+            report.push(tempNotFound[i]);
+        }
+        for (i = 0; i < tempFound.length; i++){
+            report.push(tempFound[i]);
+        }
+        // Create table header row
+        const headerRow = table.insertRow();
+        const headers = ["RX #", "NAME", "DOB", "DRUG", "DAYS READY","SCANNED?"];
+        headers.forEach(headerText => {
+            const headerCell = document.createElement('th');
+            headerCell.textContent = headerText;
+            headerRow.appendChild(headerCell);
+        });
+
+        // Populate the table with data from the array of arrays
+        report.forEach(rowData => {
+        const row = table.insertRow();
+        rowData.forEach((cellData, index) => {
+            const cell = row.insertCell();
+            cell.textContent = cellData;
+            if (cellData === "NOT FOUND") {
+                row.style.backgroundColor = "#ed908a";
+            }
+            // Add click event listener to each row except for header row
+            if (index === 0) {
+                row.addEventListener("click", function() {
+                    const rxNumber = rowData[0]; // Get text of the first cell in the row
+                    clickedItem(rxNumber); // Call compare function with rxNumber as argument
+                });
+            }
+        });
+    });
+    }
 
       function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
