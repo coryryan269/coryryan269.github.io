@@ -271,7 +271,7 @@
             if (index === 0) {
                 row.addEventListener("click", function() {
                     const rxNumber = rowData[0]; // Get text of the first cell in the row
-                    clickedItem(rxNumber); // Call compare function with rxNumber as argument
+                    clickedItem2(rxNumber); // Call compare function with rxNumber as argument
                 });
             }
         });
@@ -1041,6 +1041,20 @@
             unScanItem(rxNumber);
         }
         showAllDataOnTable();
+        saveProgress();
+        populateTable();
+
+    }
+
+         function clickedItem2(rxNumber){
+        if (isRxInContents(rxNumber)){
+            compare2(rxNumber);
+        }
+        else {
+            //console.log("removing rx#: " + rxNumber)
+            unScanItem(rxNumber);
+        }
+        createFridgeTable();
         saveProgress();
         populateTable();
 
