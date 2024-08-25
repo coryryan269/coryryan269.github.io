@@ -1,27 +1,36 @@
 <html>
+
+<head>
+    <title>DO I WORK</title>
+    <style>
+        body {background-color: blue;}
+        input {height: 30%; width: 70%; position: absolute; top: 30%; font-size: 62px; left: 15%;}
+    </style>
+</head>
 <body>
-<input type="date" id="selectedDate" onchange="dateChanged()" style="height:30%; width:70%; position: absolute;
-  top: 30%;font-size: 62px;left: 15%;"><br><br>
-<a id="output" style="font-size: 52px; height:30%; width:70%; align: center;position: absolute;
-  top: 75%;left: 15%;"></a>
+
+    <input type="date" id="selectedDate" onchange="dateChanged()"><br><br>
+    <a id="output" style="font-size: 52px; height:30%; width:70%; align: center;position: absolute;
+    top: 75%;left: 15%;"></a>
+
 </body>
 <script>
-function dateChanged(){
- output  = document.getElementById("output");
-  dateSelected = new Date(document.getElementById("selectedDate").value);
-  dateSelected.setDate(dateSelected.getDate() + 1);
-  baseDate = new Date("Mon Aug 02 2021 19:00:00 GMT-0500 (Central Daylight Time)");
-  weekInSeconds = 86400000 * 7;
-  twoWeeksInSeconds = 86400000 * 14;
-  difference = dateSelected - baseDate;
+    function dateChanged(){
+        output  = document.getElementById("output");
+        dateSelected = new Date(document.getElementById("selectedDate").value);
+        dateSelected.setDate(dateSelected.getDate() + 1);
+        baseDate = new Date("Mon Aug 02 2021 19:00:00 GMT-0500 (Central Daylight Time)");
+        weekInSeconds = 86400000 * 7;
+        twoWeeksInSeconds = 86400000 * 14;
+        difference = dateSelected - baseDate;
 
-  if(Math.abs(difference) % twoWeeksInSeconds >= weekInSeconds){
-	output.innerHTML = "PODENY AND JOSH";
-  }
-  else{
-	output.innerHTML = "CHARLOTTE AND CORY";
-  }
-} 
+        if(Math.abs(difference) % twoWeeksInSeconds >= weekInSeconds){
+            output.innerHTML = "PODENY AND JOSH";
+        }
+        else{
+            output.innerHTML = "CHARLOTTE AND CORY";
+        }
+    } 
 </script>
 </body>
 </html>
