@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT </title>
+    <title>WIB REPORT</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -109,6 +109,41 @@
   #dataTable th {
     background-color: #f2f2f2;
   }
+
+  #quickAdd {
+    display: none;
+    position: absolute;
+    width: 30%;
+    height: 15%;
+    top: 30%;
+    left: 25%;
+    min-width: 300px;
+    overflow: hidden;
+    padding: 10px;
+    /* STYLING  */
+      background-color: rgba(0, 103, 181, 0.47); 
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+  }
+
+ #quickAddInput {
+    padding: 10px;
+      border: none;
+/*       background-color: transparent; */
+/*       color: #fff; */
+ }
+    
+  #quickAddTable {
+    width: 90%;
+  }
+
+  #quickAddRxNumber, #quickAddDrug, #quickAddPatient{
+    border: solid, black, 3px;
+    width: 32%;
+  }
+
 </style>
 <body>
         <input class="no-print" type="file" id="fileInput">
@@ -124,7 +159,17 @@
         <tr><td>|</td><td></td><td></td><td></td></tr>
     </tbody>
 </table>
-
+<div id="quickAdd" class="no-print">
+    <label class="no-print" for="quickAddInput"><strong>Type partial RX#</strong></label>
+    <input class="no-print" type="text" name="quickAddInput" id="quickAddInput"><br><br>
+    <table class="no-print" id="quickAddTable">
+            <tr class="no-print">
+                <td class="no-print" id="quickAddRxNumber">--</td>
+                <td class="no-print" id="quickAddDrug">--</td>
+                <td class="no-print" id="quickAddPatient">--</td>
+            </tr>
+    </table>
+</div>
         
         
 
@@ -1230,6 +1275,80 @@
 // presentBrokenOverlay();
 
 
+// Quick add stuff
+quickAdd = document.getElementById("quickAdd");
+quickAddInput = document.getElementById("quickAddInput");
+quickAddInput.addEventListener('keydown', (event) => {
+      // console.log("key pressed");
+      if (event.key == '-'){
+            // console.log("- pressed");
+            quickAddInput.value = "";
+            document.getElementById("quickAddRxNumber").innerHTML = "";
+            document.getElementById("quickAddPatient").innerHTML = "";
+            document.getElementById("quickAddDrug").innerHTML = "";
+            quickAdd.style.display = "none";
+            return;
+      }
+      else if(event.key == 'Enter') {
+            // console.log("enter");
+            if (document.getElementById("quickAddRxNumber").innerHTML != ""){
+                clickedItem2(document.getElementById("quickAddRxNumber").innerHTML);
+                document.getElementById("quickAddRxNumber").innerHTML = "";
+                document.getElementById("quickAddPatient").innerHTML = "";
+                document.getElementById("quickAddDrug").innerHTML = "";
+                document.getElementById("quickAddInput").value = "";
+                showAllDataOnTable();
+                saveProgress();
+                populateTable();
+
+            }
+            else{
+                quickAddInput.value = "";
+            }
+      }
+      else {
+            let matchingRxIndexes = [];
+            let valueToSearch = quickAddInput.value;
+            if (event.key != "Backspace" && event.key.length == 1)
+                valueToSearch = valueToSearch + event.key;
+            for (let a = 0; a < entireReport.length; a++){
+                if (entireReport[a].includes(valueToSearch)){
+                    matchingRxIndexes.push(a);
+                }
+            }
+            if (matchingRxIndexes.length == 1){
+                document.getElementById("quickAddRxNumber").innerHTML = entireReport2[matchingRxIndexes[0]][0];
+                document.getElementById("quickAddPatient").innerHTML = entireReport2[matchingRxIndexes[0]][1];
+                document.getElementById("quickAddDrug").innerHTML = entireReport2[matchingRxIndexes[0]][3];
+            }
+            else{
+                document.getElementById("quickAddRxNumber").innerHTML = "";
+                document.getElementById("quickAddPatient").innerHTML = "";
+                document.getElementById("quickAddDrug").innerHTML = "";
+            }
+            // console.log("matching: " + matchingRxIndexes);
+      }
+});
+
+
+document.addEventListener('keypress', (event) => {
+
+    if (event.key == "+")
+        document.getElementById("quickAdd").style.display = "block";
+
+});
+
+document.addEventListener('keydown', (event) => {
+if (event.key == "Escape")
+        document.getElementById("quickAdd").style.display = "none";
+
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Home') {
+    window.scrollTo(0, 0);
+  }
+});
 </script>
 
 </html>
