@@ -1292,8 +1292,11 @@ quickAddInput.addEventListener('keydown', (event) => {
       }
       else {
             let matchingRxIndexes = [];
+            let valueToSearch = quickAddInput.value;
+            if (event.key != "Backspace")
+                valueToSearch = valueToSearch + event.key;
             for (let a = 0; a < entireReport.length; a++){
-                if (entireReport[a].includes(quickAddInput.value)){
+                if (entireReport[a].includes(valueToSearch)){
                     matchingRxIndexes.push(a);
                 }
             }
