@@ -111,12 +111,13 @@
   }
 
   #quickAdd {
+    display: none;
     position: absolute;
     width: 30%;
     height: 30%;
     top: 15%;
     left: 35%;
-    background-color: green;
+    background-color: blue;
     min-width: 300px;
     overflow: hidden;
     padding: 10px;
@@ -1281,6 +1282,7 @@ quickAddInput.addEventListener('keydown', (event) => {
             if (document.getElementById("quickAddRxNumber").innerHTML != ""){
                 clickedItem2(document.getElementById("quickAddRxNumber").innerHTML);
                 document.getElementById("quickAddRxNumber").innerHTML = "";
+                document.getElementById("quickAddInput").value = "";
                 showAllDataOnTable();
                 saveProgress();
                 populateTable();
@@ -1293,7 +1295,7 @@ quickAddInput.addEventListener('keydown', (event) => {
       else {
             let matchingRxIndexes = [];
             let valueToSearch = quickAddInput.value;
-            if (event.key != "Backspace")
+            if (event.key != "Backspace" && event.key.length == 1)
                 valueToSearch = valueToSearch + event.key;
             for (let a = 0; a < entireReport.length; a++){
                 if (entireReport[a].includes(valueToSearch)){
