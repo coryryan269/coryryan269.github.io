@@ -1341,6 +1341,12 @@ if (event.key == "Escape")
         document.getElementById("quickAdd").style.display = "none";
 
 });
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Home') {
+    window.scrollTo(0, 0);
+  }
+});
 </script>
 
 </html>
