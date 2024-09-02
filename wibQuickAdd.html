@@ -116,7 +116,7 @@
     height: 30%;
     top: 15%;
     left: 35%;
-    background-color: green;
+    background-color: blue;
     min-width: 300px;
     overflow: hidden;
     padding: 10px;
@@ -1266,7 +1266,9 @@
 quickAdd = document.getElementById("quickAdd");
 quickAddInput = document.getElementById("quickAddInput");
 quickAddInput.addEventListener('keypress', (event) => {
+      console.log("key pressed");
       if (event.key == '-'){
+            console.log("- pressed");
             quickAddInput.value = "";
             document.getElementById("quickAddRxNumber").innerHTML = "";
             document.getElementById("quickAddPatient").innerHTML = "";
@@ -1305,6 +1307,7 @@ quickAddInput.addEventListener('keypress', (event) => {
                 document.getElementById("quickAddPatient").innerHTML = "";
                 document.getElementById("quickAddDrug").innerHTML = "";
             }
+            console.log("matching: " + matchingRxIndexes);
       }
 });
 
