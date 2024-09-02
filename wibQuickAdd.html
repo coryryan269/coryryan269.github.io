@@ -1323,6 +1323,12 @@ document.addEventListener('keypress', (event) => {
         document.getElementById("quickAdd").style.display = "block";
 
 });
+
+document.addEventListener('keydown', (event) => {
+if (event.key == "Escape")
+        document.getElementById("quickAdd").style.display = "none";
+
+});
 </script>
 
 </html>
