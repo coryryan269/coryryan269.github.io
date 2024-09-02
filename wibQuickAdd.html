@@ -1271,6 +1271,19 @@ quickAddInput.addEventListener('input', (event) => {
             // quickAdd.style.display = "none";
             return;
       }
+      else if(event.key === 'Enter') {
+            if (document.getElementById("quickAddRxNumber").innerHTML != ""){
+                clickedItem2(document.getElementById("quickAddRxNumber").innerHTML);
+                document.getElementById("quickAddRxNumber").innerHTML = "";
+                showAllDataOnTable();
+                saveProgress();
+                populateTable();
+
+            }
+            else{
+                quickAddInput.value = "";
+            }
+      }
       else {
             let matchingRxIndexes = [];
             for (let a = 0; a < entireReport.length; a++){
