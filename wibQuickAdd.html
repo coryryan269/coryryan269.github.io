@@ -1272,6 +1272,7 @@ quickAddInput.addEventListener('input', (event) => {
             return;
       }
       else if(event.key === 'Enter') {
+            console.log("enter");
             if (document.getElementById("quickAddRxNumber").innerHTML != ""){
                 clickedItem2(document.getElementById("quickAddRxNumber").innerHTML);
                 document.getElementById("quickAddRxNumber").innerHTML = "";
