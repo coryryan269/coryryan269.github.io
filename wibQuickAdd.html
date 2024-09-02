@@ -116,7 +116,7 @@
     height: 30%;
     top: 15%;
     left: 35%;
-    background-color: blue;
+    background-color: green;
     min-width: 300px;
     overflow: hidden;
     padding: 10px;
@@ -1266,15 +1266,15 @@
 quickAdd = document.getElementById("quickAdd");
 quickAddInput = document.getElementById("quickAddInput");
 quickAddInput.addEventListener('keypress', (event) => {
-      if (quickAddInput.value.includes("-")){
+      if (event.key == '-'){
             quickAddInput.value = "";
             document.getElementById("quickAddRxNumber").innerHTML = "";
             document.getElementById("quickAddPatient").innerHTML = "";
             document.getElementById("quickAddDrug").innerHTML = "";
-            // quickAdd.style.display = "none";
+            quickAdd.style.display = "none";
             return;
       }
-      else if(event.key === 'Enter') {
+      else if(event.key == 'Enter') {
             console.log("enter");
             if (document.getElementById("quickAddRxNumber").innerHTML != ""){
                 clickedItem2(document.getElementById("quickAddRxNumber").innerHTML);
@@ -1308,6 +1308,13 @@ quickAddInput.addEventListener('keypress', (event) => {
       }
 });
 
+
+quickAddInput.addEventListener('keypress', (event) => {
+
+    if (event.key == "+")
+        document.getElementById("quickAdd").style.display = "block";
+
+});
 </script>
 
 </html>
