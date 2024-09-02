@@ -116,7 +116,7 @@
     height: 30%;
     top: 15%;
     left: 35%;
-    background-color: green;
+    background-color: blue;
     min-width: 300px;
     overflow: hidden;
     padding: 10px;
@@ -1265,9 +1265,12 @@
 // Quick add stuff
 quickAdd = document.getElementById("quickAdd");
 quickAddInput = document.getElementById("quickAddInput");
-quickAddInput.addEventListener('input', (event) => {
+quickAddInput.addEventListener('keypress', (event) => {
       if (quickAddInput.value.includes("-")){
             quickAddInput.value = "";
+            document.getElementById("quickAddRxNumber").innerHTML = "";
+            document.getElementById("quickAddPatient").innerHTML = "";
+            document.getElementById("quickAddDrug").innerHTML = "";
             // quickAdd.style.display = "none";
             return;
       }
