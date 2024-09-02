@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>WIB REPORT </title>
+    <title>WIB REPORT QuickAdd</title>
     <link rel="icon" type="image/x-icon" href="pharmIcon.png">
 
 </head>
@@ -1267,9 +1267,9 @@
 quickAdd = document.getElementById("quickAdd");
 quickAddInput = document.getElementById("quickAddInput");
 quickAddInput.addEventListener('keydown', (event) => {
-      console.log("key pressed");
+      // console.log("key pressed");
       if (event.key == '-'){
-            console.log("- pressed");
+            // console.log("- pressed");
             quickAddInput.value = "";
             document.getElementById("quickAddRxNumber").innerHTML = "";
             document.getElementById("quickAddPatient").innerHTML = "";
@@ -1278,7 +1278,7 @@ quickAddInput.addEventListener('keydown', (event) => {
             return;
       }
       else if(event.key == 'Enter') {
-            console.log("enter");
+            // console.log("enter");
             if (document.getElementById("quickAddRxNumber").innerHTML != ""){
                 clickedItem2(document.getElementById("quickAddRxNumber").innerHTML);
                 document.getElementById("quickAddRxNumber").innerHTML = "";
@@ -1312,7 +1312,7 @@ quickAddInput.addEventListener('keydown', (event) => {
                 document.getElementById("quickAddPatient").innerHTML = "";
                 document.getElementById("quickAddDrug").innerHTML = "";
             }
-            console.log("matching: " + matchingRxIndexes);
+            // console.log("matching: " + matchingRxIndexes);
       }
 });
 
