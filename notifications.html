@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Example</title>
+</head>
+<body>
+    <h1>Notification Example</h1>
+    <button id="notifyBtn">Enable Notifications</button>
+
+    <script>
+        const notifyBtn = document.getElementById('notifyBtn');
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                        startSendingNotifications();
+                    } else {
+                        console.log('Notification permission denied.');
+                    }
+                });
+            } else {
+                console.log('Notifications not supported.');
+            }
+        }
+
+        // Start sending notifications every 30 seconds
+        function startSendingNotifications() {
+            setInterval(() => {
+                console.log("notification sent");
+                new Notification('Notification Title', {
+                    body: 'This is a notification body.'
+                });
+            }, 10000); // 30000 milliseconds = 30 seconds
+        }
+
+        notifyBtn.addEventListener('click', requestNotificationPermission);
+    </script>
+</body>
+</html>
