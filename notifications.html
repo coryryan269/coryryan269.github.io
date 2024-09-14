@@ -7,8 +7,8 @@
 </head>
 <body>
     <h1>Notification Example</h1>
-    <button id="notifyBtn">Enable Notifications</button>
-
+    <button id="notifyBtn">Enablee Notifications</button>
+    <a id="prompt"></a>
     <script>
         const notifyBtn = document.getElementById('notifyBtn');
 
@@ -18,13 +18,16 @@
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
                         document.write('Notification permission granted.');
+                        document.getElementById("prompt").innerHTML = "Permission granted";
                         startSendingNotifications();
                     } else {
                         document.write('Notification permission denied.');
+                        document.getElementById("prompt").innerHTML = "Permission denied";
                     }
                 });
             } else {
                 document.write'Notifications not supported.');
+                document.getElementById("prompt").innerHTML = "not supported";
             }
         }
 
