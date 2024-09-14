@@ -17,14 +17,14 @@
             if ('Notification' in window) {
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
-                        console.log('Notification permission granted.');
+                        document.write('Notification permission granted.');
                         startSendingNotifications();
                     } else {
-                        console.log('Notification permission denied.');
+                        document.write('Notification permission denied.');
                     }
                 });
             } else {
-                console.log('Notifications not supported.');
+                document.write'Notifications not supported.');
             }
         }
 
