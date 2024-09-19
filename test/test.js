@@ -2,4 +2,4 @@ testDisplay = document.getElementById("testDisplay");
 
 fetch("https://jsonplaceholder.typicode.com/users")
   .then(res => res.json())
-  .then(data => testDisplay.innerHTML = data);
+  .then(data => testDisplay.innerHTML = data[0]);
