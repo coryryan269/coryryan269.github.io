@@ -161,13 +161,25 @@
 
 
     
+
+    // For already scanned items, scan out all others for same name
+     function getAllScriptsWithSameName(){
+         for (a = 0; a < scannedItems.length; a++){
+              getAllScriptsWithSameName(scannedItems[a] + "-228", true);
+         }
+        
+    }
+
+     ///////////////////// DONE WITH SAME NAME
+
      
-    function getAllScriptsWithSameName(rxNumber){
+    function getAllScriptsWithSameName(rxNumber, skipExtraction = false){
       console.log("string passed: " + rxNumber);
       console.log("ran getAllScripts");
-      if (!(rxNumber.includes("4581357")))
+      if (!(rxNumber.includes("4581357")) && skipExtraction == false)
         return;
-        rxNumber = extractTextBetweenRXAnd228(rxNumber)[0] + "-228";
+        if (skipExctraction == false)
+            rxNumber = extractTextBetweenRXAnd228(rxNumber)[0] + "-228";
         compare2(rxNumber);
         name = "";
         rxNumbers = [];
@@ -620,6 +632,7 @@
 
 
     function extractTextBetweenRXAnd228(inputString) {
+        console.log("INPUT STRING: " + inputString);
         // Regular expressions
         let regexDefault = /\\RX(.*?)\-/g;
         let regexAlternate = /RX(.*?)\-/g;
