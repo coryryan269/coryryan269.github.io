@@ -1,35 +1,405 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>DO I WORK</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Schedule Checker</title>
     <style>
-        body {background-color: #a8d5e5;}
-        input {  font-size: 62px; }
-        #dateDiv {display: flex; justify-content: center; margin-top: 30%;}
-        #employeeDiv {margin-top: 45%; display: flex; justify-content: center; font-size: 68px; font-weight: bold;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #557ed6 0%, #7898dd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #4facfe 0%, #1bb0b8 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .date-input-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        input[type="date"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+        
+        .check-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #4c6af1 0%, #557ed6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .check-btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .results h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .employee-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .employee-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .employee-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .work-period {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .no-work {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="employeeDiv"><a id="output"> </a></div>
-    <div id="dateDiv"><input type="date" id="selectedDate" onchange="dateChanged()"></div>
-</body>
-<script>
-    function dateChanged(){
-        output  = document.getElementById("output");
-        dateSelected = new Date(document.getElementById("selectedDate").value);
-        dateSelected.setDate(dateSelected.getDate() + 1);
-        baseDate = new Date("Mon Aug 02 2021 19:00:00 GMT-0500 (Central Daylight Time)");
-        weekInSeconds = 86400000 * 7;
-        twoWeeksInSeconds = 86400000 * 14;
-        difference = dateSelected - baseDate;
+    <div class="container">
+        <div class="header">
+            <h1>Work Schedule Checker</h1>
+            <!-- <p>Find out who's working on any date</p> -->
+        </div>
+        
+        <div class="content">
+            <div class="date-input-group">
+                <label for="checkDate">Select Date:</label>
+                <input type="date" id="checkDate" />
+            </div>
+            
+            <button class="check-btn" onclick="checkSchedule()">Check Schedule</button>
+            
+            <div id="results" style="display: none;"></div>
+        </div>
+    </div>
 
-        if(Math.abs(difference) % twoWeeksInSeconds >= weekInSeconds){
-            output.innerHTML = "PODENY AND JOSH";
+    <script>
+        // Set today's date as default
+        document.getElementById('checkDate').valueAsDate = new Date();
+        
+        // Employee schedule data with reference dates
+        const employees = [
+            {
+                name: "Charlotte",
+                schedule: "Monday to Sunday",
+                referenceStart: new Date('2025-06-02'), // Her work week 06/02/25 to 06/08/25
+                interval: 14 // Every other week (14 days)
+            },
+            {
+                name: "Podeny", 
+                schedule: "Monday to Sunday",
+                referenceStart: new Date('2025-06-09'), // Her work week 06/09/25 to 06/15/25
+                interval: 14 // Every other week (14 days)
+            },
+            {
+                name: "Cory",
+                schedule: "Thursday to Wednesday", 
+                referenceStart: new Date('2025-07-17'), // His work week 07/17/25 to 07/23/25
+                interval: 14 // Every other week (14 days)
+            },
+            {
+                name: "Emily",
+                schedule: "Thursday to Wednesday",
+                referenceStart: new Date('2025-07-24'), // Her work week 07/24/25 to 07/30/25  
+                interval: 14 // Every other week (14 days)
+            }
+        ];
+        
+        function isEmployeeWorking(employee, checkDate) {
+            // Check for temporary schedule overrides first
+            if (hasTemporaryOverride(employee, checkDate)) {
+                return true;
+            }
+            
+            const daysDiff = Math.floor((checkDate - employee.referenceStart) / (1000 * 60 * 60 * 24));
+            
+            // Calculate which cycle we're in (each cycle is 14 days)
+            const cyclePosition = ((daysDiff % employee.interval) + employee.interval) % employee.interval;
+            
+            // For Monday-Sunday workers: work days 0-6 of their cycle
+            if (employee.schedule === "Monday to Sunday") {
+                return cyclePosition >= 0 && cyclePosition <= 6;
+            }
+            
+            // For Thursday-Wednesday workers: work days 0-6 of their cycle
+            if (employee.schedule === "Thursday to Wednesday") {
+                return cyclePosition >= 0 && cyclePosition <= 6;
+            }
+            
+            return false;
         }
-        else{
-            output.innerHTML = "CHARLOTTE AND CORY";
+        
+        function hasTemporaryOverride(employee, checkDate) {
+            // Emily's temporary work periods
+            if (employee.name === "Emily") {
+                // 06/09/2025 through 06/15/2025
+                const period1Start = new Date('2025-06-09');
+                const period1End = new Date('2025-06-15');
+                
+                // 06/23/2025 through 07/02/2025
+                const period2Start = new Date('2025-06-23');
+                const period2End = new Date('2025-07-02');
+                
+                if ((checkDate >= period1Start && checkDate <= period1End) ||
+                    (checkDate >= period2Start && checkDate <= period2End)) {
+                    return true;
+                }
+            }
+            
+            // Cory's temporary work period
+            if (employee.name === "Cory") {
+                // 06/16/2025 through 06/22/2025
+                const periodStart = new Date('2025-06-16');
+                const periodEnd = new Date('2025-06-22');
+                
+                if (checkDate >= periodStart && checkDate <= periodEnd) {
+                    return true;
+                }
+            }
+            
+            return false;
         }
-    } 
-</script>
+        
+        function getWorkPeriod(employee, checkDate) {
+            // Check if this is a temporary override period
+            if (hasTemporaryOverride(employee, checkDate)) {
+                return getTemporaryWorkPeriod(employee, checkDate);
+            }
+            
+            const daysDiff = Math.floor((checkDate - employee.referenceStart) / (1000 * 60 * 60 * 24));
+            const cyclePosition = ((daysDiff % employee.interval) + employee.interval) % employee.interval;
+            
+            let periodStart;
+            if (employee.schedule === "Monday to Sunday") {
+                periodStart = new Date(checkDate);
+                periodStart.setDate(checkDate.getDate() - cyclePosition);
+            } else { // Thursday to Wednesday
+                periodStart = new Date(checkDate);
+                periodStart.setDate(checkDate.getDate() - cyclePosition);
+            }
+            
+            const periodEnd = new Date(periodStart);
+            periodEnd.setDate(periodStart.getDate() + 6);
+            
+            return {
+                start: periodStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                end: periodEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            };
+        }
+        
+        function getTemporaryWorkPeriod(employee, checkDate) {
+            // Emily's temporary work periods
+            if (employee.name === "Emily") {
+                // 06/09/2025 through 06/15/2025
+                const period1Start = new Date('2025-06-09');
+                const period1End = new Date('2025-06-15');
+                
+                // 06/23/2025 through 07/02/2025
+                const period2Start = new Date('2025-06-23');
+                const period2End = new Date('2025-07-02');
+                
+                if (checkDate >= period1Start && checkDate <= period1End) {
+                    return {
+                        start: period1Start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        end: period1End.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    };
+                }
+                
+                if (checkDate >= period2Start && checkDate <= period2End) {
+                    return {
+                        start: period2Start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        end: period2End.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    };
+                }
+            }
+            
+            // Cory's temporary work period
+            if (employee.name === "Cory") {
+                // 06/16/2025 through 06/22/2025
+                const periodStart = new Date('2025-06-16');
+                const periodEnd = new Date('2025-06-22');
+                
+                if (checkDate >= periodStart && checkDate <= periodEnd) {
+                    return {
+                        start: periodStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        end: periodEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    };
+                }
+            }
+            
+            // Fallback (shouldn't reach here if hasTemporaryOverride is correct)
+            return {
+                start: checkDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                end: checkDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            };
+        }
+        
+        function checkSchedule() {
+            const dateInput = document.getElementById('checkDate');
+            const resultsDiv = document.getElementById('results');
+            
+            if (!dateInput.value) {
+                alert('Please select a date');
+                return;
+            }
+            
+            const checkDate = new Date(dateInput.value + 'T12:00:00'); // Add time to avoid timezone issues
+            const workingEmployees = [];
+            
+            employees.forEach(employee => {
+                if (isEmployeeWorking(employee, checkDate)) {
+                    const period = getWorkPeriod(employee, checkDate);
+                    workingEmployees.push({
+                        ...employee,
+                        period: period
+                    });
+                }
+            });
+            
+            // Display results
+            let resultsHTML = `<h3>Schedule for ${checkDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })}</h3>`;
+            
+            if (workingEmployees.length > 0) {
+                workingEmployees.forEach(employee => {
+                    resultsHTML += `
+                        <div class="employee-card">
+                            <div class="employee-name">${employee.name}</div>
+                            <div class="work-period">${employee.schedule} • ${employee.period.start} - ${employee.period.end}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                resultsHTML += '<div class="no-work">No one is scheduled to work on this date</div>';
+            }
+            
+            resultsDiv.innerHTML = resultsHTML;
+            resultsDiv.style.display = 'block';
+        }
+        
+        // Check schedule when page loads
+        window.onload = function() {
+            checkSchedule();
+        };
+        
+        // Allow Enter key to trigger check
+        document.getElementById('checkDate').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkSchedule();
+            }
+        });
+    </script>
 </body>
 </html>
