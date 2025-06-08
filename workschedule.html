@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Schedule Checker</title>
-    <style>
+     <style>
         * {
             margin: 0;
             padding: 0;
@@ -166,13 +166,13 @@
     <div class="container">
         <div class="header">
             <h1>Work Schedule Checker</h1>
-            <!-- <p>Find out who's working on any date</p> -->
+            <p>Find out who's working on any date</p>
         </div>
         
         <div class="content">
             <div class="date-input-group">
                 <label for="checkDate">Select Date:</label>
-                <input type="date" id="checkDate" />
+                <input type="date" onchange="checkSchedule()" id="checkDate" />
             </div>
             
             <button class="check-btn" onclick="checkSchedule()">Check Schedule</button>
@@ -215,8 +215,9 @@
         
         function isEmployeeWorking(employee, checkDate) {
             // Check for temporary schedule overrides first
-            if (hasTemporaryOverride(employee, checkDate)) {
-                return true;
+            const overrideResult = getTemporaryOverrideStatus(employee, checkDate);
+            if (overrideResult !== null) {
+                return overrideResult;
             }
             
             const daysDiff = Math.floor((checkDate - employee.referenceStart) / (1000 * 60 * 60 * 24));
@@ -237,35 +238,45 @@
             return false;
         }
         
+        function getTemporaryOverrideStatus(employee, checkDate) {
+            // Only apply overrides to Emily and Cory
+            if (employee.name !== "Emily" && employee.name !== "Cory") {
+                return null; // No override for Charlotte and Podeny
+            }
+            
+            // Emily works during these periods (Cory does NOT work)
+            const emilyPeriod1Start = new Date('2025-06-09');
+            const emilyPeriod1End = new Date('2025-06-12'); // Changed from 06/15 to 06/12
+            const emilyPeriod2Start = new Date('2025-06-15');
+            const emilyPeriod2End = new Date('2025-06-15'); // Just 06/15
+            const emilyPeriod3Start = new Date('2025-06-23');
+            const emilyPeriod3End = new Date('2025-07-02');
+            
+            // Cory works during these periods (Emily does NOT work)
+            const coryPeriod1Start = new Date('2025-06-13');
+            const coryPeriod1End = new Date('2025-06-14'); // New: 06/13-06/14
+            const coryPeriod2Start = new Date('2025-06-16');
+            const coryPeriod2End = new Date('2025-06-22');
+            
+            const isInEmilyPeriod = (checkDate >= emilyPeriod1Start && checkDate <= emilyPeriod1End) ||
+                                   (checkDate >= emilyPeriod2Start && checkDate <= emilyPeriod2End) ||
+                                   (checkDate >= emilyPeriod3Start && checkDate <= emilyPeriod3End);
+            const isInCoryPeriod = (checkDate >= coryPeriod1Start && checkDate <= coryPeriod1End) ||
+                                  (checkDate >= coryPeriod2Start && checkDate <= coryPeriod2End);
+            
+            if (isInEmilyPeriod) {
+                return employee.name === "Emily"; // Emily works, Cory doesn't
+            }
+            
+            if (isInCoryPeriod) {
+                return employee.name === "Cory"; // Cory works, Emily doesn't
+            }
+            
+            return null; // No override, use normal schedule
+        }
+        
         function hasTemporaryOverride(employee, checkDate) {
-            // Emily's temporary work periods
-            if (employee.name === "Emily") {
-                // 06/09/2025 through 06/15/2025
-                const period1Start = new Date('2025-06-09');
-                const period1End = new Date('2025-06-15');
-                
-                // 06/23/2025 through 07/02/2025
-                const period2Start = new Date('2025-06-23');
-                const period2End = new Date('2025-07-02');
-                
-                if ((checkDate >= period1Start && checkDate <= period1End) ||
-                    (checkDate >= period2Start && checkDate <= period2End)) {
-                    return true;
-                }
-            }
-            
-            // Cory's temporary work period
-            if (employee.name === "Cory") {
-                // 06/16/2025 through 06/22/2025
-                const periodStart = new Date('2025-06-16');
-                const periodEnd = new Date('2025-06-22');
-                
-                if (checkDate >= periodStart && checkDate <= periodEnd) {
-                    return true;
-                }
-            }
-            
-            return false;
+            return getTemporaryOverrideStatus(employee, checkDate) !== null;
         }
         
         function getWorkPeriod(employee, checkDate) {
@@ -298,13 +309,17 @@
         function getTemporaryWorkPeriod(employee, checkDate) {
             // Emily's temporary work periods
             if (employee.name === "Emily") {
-                // 06/09/2025 through 06/15/2025
+                // 06/09/2025 through 06/12/2025
                 const period1Start = new Date('2025-06-09');
-                const period1End = new Date('2025-06-15');
+                const period1End = new Date('2025-06-12');
+                
+                // 06/15/2025 (single day)
+                const period2Start = new Date('2025-06-15');
+                const period2End = new Date('2025-06-15');
                 
                 // 06/23/2025 through 07/02/2025
-                const period2Start = new Date('2025-06-23');
-                const period2End = new Date('2025-07-02');
+                const period3Start = new Date('2025-06-23');
+                const period3End = new Date('2025-07-02');
                 
                 if (checkDate >= period1Start && checkDate <= period1End) {
                     return {
@@ -319,18 +334,36 @@
                         end: period2End.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                     };
                 }
+                
+                if (checkDate >= period3Start && checkDate <= period3End) {
+                    return {
+                        start: period3Start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        end: period3End.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    };
+                }
             }
             
-            // Cory's temporary work period
+            // Cory's temporary work periods
             if (employee.name === "Cory") {
-                // 06/16/2025 through 06/22/2025
-                const periodStart = new Date('2025-06-16');
-                const periodEnd = new Date('2025-06-22');
+                // 06/13/2025 through 06/14/2025
+                const period1Start = new Date('2025-06-13');
+                const period1End = new Date('2025-06-14');
                 
-                if (checkDate >= periodStart && checkDate <= periodEnd) {
+                // 06/16/2025 through 06/22/2025
+                const period2Start = new Date('2025-06-16');
+                const period2End = new Date('2025-06-22');
+                
+                if (checkDate >= period1Start && checkDate <= period1End) {
                     return {
-                        start: periodStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                        end: periodEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                        start: period1Start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        end: period1End.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    };
+                }
+                
+                if (checkDate >= period2Start && checkDate <= period2End) {
+                    return {
+                        start: period2Start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        end: period2End.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                     };
                 }
             }
