@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .calendar-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .calendar-header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .month-year {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #ecf0f1;
+            padding: 1px;
+        }
+        
+        .day-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .day-cell {
+            background: white;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .day-cell:hover {
+            transform: scale(1.05);
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .day-cell.other-month {
+            color: #bdc3c7;
+            background: #f8f9fa;
+        }
+        
+        .day-cell.today {
+            border: 3px solid #e67e22;
+            border-radius: 50%;
+            font-weight: bold;
+            color: #e67e22;
+        }
+        
+        .day-cell.blue-period {
+            background-color: rgba(52, 152, 219, 0.3);
+        }
+        
+        .day-cell.red-period {
+            background-color: rgba(231, 76, 60, 0.3);
+        }
+        
+        .legend {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        
+        .legend-blue { background-color: rgba(52, 152, 219, 0.3); }
+        .legend-red { background-color: rgba(231, 76, 60, 0.3); }
+        .legend-today { border: 2px solid #e67e22; border-radius: 50%; }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="nav-btn" onclick="previousMonth()">‹</button>
+            <div class="month-year" id="monthYear"></div>
+            <button class="nav-btn" onclick="nextMonth()">›</button>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid">
+            <div class="day-header">Sun</div>
+            <div class="day-header">Mon</div>
+            <div class="day-header">Tue</div>
+            <div class="day-header">Wed</div>
+            <div class="day-header">Thu</div>
+            <div class="day-header">Fri</div>
+            <div class="day-header">Sat</div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color legend-blue"></div>
+                <span>Thursday-Sunday (Active Week)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-red"></div>
+                <span>Monday-Wednesday (Active Week)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-today"></div>
+                <span>Today</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        const today = new Date();
+        
+        // Reference dates for the pattern
+        const blueStart = new Date(2025, 6, 3); // July 3, 2025 (Thursday)
+        const blueEnd = new Date(2025, 6, 6);   // July 6, 2025 (Sunday)
+        const redStart = new Date(2025, 6, 7);  // July 7, 2025 (Monday)
+        const redEnd = new Date(2025, 6, 9);    // July 9, 2025 (Wednesday)
+        
+        // Exception dates
+        const exceptions = {
+            // 06/09/2025 to 06/12/2025 - no formatting
+            '2025-06-09': 'none',
+            '2025-06-10': 'none',
+            '2025-06-11': 'none',
+            '2025-06-12': 'none',
+            // 06/13/2025 and 06/14/2025 - red
+            '2025-06-13': 'red',
+            '2025-06-14': 'red',
+            // 06/15/2025 - no formatting
+            '2025-06-15': 'none',
+            // 06/16/2025 through 06/22/2025 - blue
+            '2025-06-16': 'blue',
+            '2025-06-17': 'blue',
+            '2025-06-18': 'blue',
+            '2025-06-19': 'blue',
+            '2025-06-20': 'blue',
+            '2025-06-21': 'blue',
+            '2025-06-22': 'blue',
+            // 06/23/2025 through 07/02/2025 - no formatting
+            '2025-06-23': 'none',
+            '2025-06-24': 'none',
+            '2025-06-25': 'none',
+            '2025-06-26': 'none',
+            '2025-06-27': 'none',
+            '2025-06-28': 'none',
+            '2025-06-29': 'none',
+            '2025-06-30': 'none',
+            '2025-07-01': 'none',
+            '2025-07-02': 'none'
+        };
+        
+        function getDateString(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+        
+        function getDaysSinceReference(date) {
+            const refDate = new Date(2025, 6, 3); // July 3, 2025
+            const timeDiff = date.getTime() - refDate.getTime();
+            return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        }
+        
+        function getColorForDate(date) {
+            const dateStr = getDateString(date);
+            
+            // Check exceptions first
+            if (exceptions[dateStr]) {
+                if (exceptions[dateStr] === 'none') return '';
+                return exceptions[dateStr] === 'blue' ? 'blue-period' : 'red-period';
+            }
+            
+            const daysSinceRef = getDaysSinceReference(date);
+            const cyclePosition = ((daysSinceRef % 14) + 14) % 14; // 14-day cycle
+            
+            // The reference pattern over 2 weeks:
+            // Week 1: July 3-6 (Thu-Sun) blue, July 7-9 (Mon-Wed) red, July 10-16 no color
+            // Week 2: July 17-20 (Thu-Sun) blue, July 21-23 (Mon-Wed) red, July 24-30 no color
+            // July 3 is day 0, so:
+            // Days 0,1,2,3 (Thu-Sun) = blue (July 3-6)
+            // Days 4,5,6 (Mon-Wed) = red (July 7-9)
+            // Days 7-13 = no color (July 10-16)
+            // Pattern repeats every 14 days
+            
+            if (cyclePosition >= 0 && cyclePosition <= 3) {
+                return 'blue-period';  // Thu-Sun of active week
+            } else if (cyclePosition >= 4 && cyclePosition <= 6) {
+                return 'red-period';   // Mon-Wed of active week
+            }
+            // Days 7-13 have no color (off week)
+            
+            return '';
+        }
+        
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthYear = document.getElementById('monthYear');
+            
+            // Clear existing calendar days (keep headers)
+            while (grid.children.length > 7) {
+                grid.removeChild(grid.lastChild);
+            }
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Set header
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const prevMonthDay = new Date(year, month, -(startingDayOfWeek - 1 - i));
+                const cell = document.createElement('div');
+                cell.className = 'day-cell other-month';
+                cell.textContent = prevMonthDay.getDate();
+                grid.appendChild(cell);
+            }
+            
+            // Add days of the current month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cellDate = new Date(year, month, day);
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                cell.textContent = day;
+                
+                // Check if it's today
+                if (cellDate.toDateString() === today.toDateString()) {
+                    cell.classList.add('today');
+                }
+                
+                // Apply color coding
+                const colorClass = getColorForDate(cellDate);
+                if (colorClass) {
+                    cell.classList.add(colorClass);
+                }
+                
+                grid.appendChild(cell);
+            }
+            
+            // Fill remaining cells with next month's days
+            const totalCells = grid.children.length - 7; // Subtract header row
+            const remainingCells = 42 - totalCells; // 6 weeks * 7 days = 42 total cells
+            
+            for (let day = 1; day <= remainingCells; day++) {
+                const nextMonthDay = new Date(year, month + 1, day);
+                const cell = document.createElement('div');
+                cell.className = 'day-cell other-month';
+                cell.textContent = day;
+                grid.appendChild(cell);
+            }
+        }
+        
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+        
+        // Initialize calendar
+        renderCalendar();
+    </script>
+</body>
+</html>
