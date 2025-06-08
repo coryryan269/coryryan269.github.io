@@ -9,23 +9,26 @@
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             min-height: 100vh;
+            box-sizing: border-box;
         }
         
         .calendar-container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow: hidden;
+            width: 95%;
+            box-sizing: border-box;
         }
         
         .calendar-header {
             background: linear-gradient(45deg, #2c3e50, #34495e);
             color: white;
-            padding: 20px;
+            padding: 15px 10px;
             text-align: center;
             display: flex;
             justify-content: space-between;
@@ -36,11 +39,13 @@
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            font-size: 18px;
-            padding: 10px 15px;
+            font-size: 16px;
+            padding: 8px 12px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 40px;
+            min-height: 40px;
         }
         
         .nav-btn:hover {
@@ -49,8 +54,10 @@
         }
         
         .month-year {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
+            flex: 1;
+            text-align: center;
         }
         
         .calendar-grid {
@@ -59,28 +66,36 @@
             gap: 1px;
             background: #ecf0f1;
             padding: 1px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .day-header {
             background: #3498db;
             color: white;
-            padding: 15px;
+            padding: 10px 5px;
             text-align: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .day-cell {
             background: white;
-            padding: 15px;
+            padding: 8px 4px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-height: 40px;
+            min-height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            font-size: 14px;
+            box-sizing: border-box;
         }
         
         .day-cell:hover {
@@ -110,29 +125,175 @@
         }
         
         .legend {
-            padding: 20px;
+            padding: 15px 10px;
             background: #f8f9fa;
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 20px;
             flex-wrap: wrap;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 12px;
         }
         
         .legend-color {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 3px;
+            flex-shrink: 0;
         }
         
         .legend-blue { background-color: rgba(52, 152, 219, 0.3); }
         .legend-red { background-color: rgba(231, 76, 60, 0.3); }
         .legend-today { border: 2px solid #e67e22; border-radius: 50%; }
+        
+        /* Tablet and Desktop Styles */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .calendar-container {
+                width: 90%;
+                max-width: 600px;
+            }
+            
+            .calendar-header {
+                padding: 20px 15px;
+            }
+            
+            .month-year {
+                font-size: 22px;
+            }
+            
+            .nav-btn {
+                font-size: 18px;
+                padding: 10px 15px;
+                min-width: 45px;
+                min-height: 45px;
+            }
+            
+            .day-header {
+                padding: 12px 8px;
+                font-size: 14px;
+                min-height: 25px;
+            }
+            
+            .day-cell {
+                padding: 12px 8px;
+                min-height: 35px;
+                font-size: 16px;
+            }
+            
+            .day-cell:hover {
+                transform: scale(1.05);
+                z-index: 1;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            
+            .legend {
+                padding: 20px 15px;
+                gap: 25px;
+            }
+            
+            .legend-item {
+                font-size: 14px;
+                gap: 8px;
+            }
+            
+            .legend-color {
+                width: 18px;
+                height: 18px;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .calendar-container {
+                max-width: 650px;
+            }
+            
+            .day-cell {
+                min-height: 40px;
+                padding: 15px 10px;
+            }
+            
+            .day-header {
+                padding: 15px 10px;
+                min-height: 30px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            
+            .calendar-header {
+                padding: 10px 5px;
+            }
+            
+            .month-year {
+                font-size: 16px;
+            }
+            
+            .nav-btn {
+                font-size: 14px;
+                padding: 6px 10px;
+                min-width: 35px;
+                min-height: 35px;
+            }
+            
+            .day-header {
+                padding: 8px 2px;
+                font-size: 10px;
+                min-height: 15px;
+            }
+            
+            .day-cell {
+                padding: 6px 2px;
+                min-height: 25px;
+                font-size: 12px;
+            }
+            
+            .day-cell:hover {
+                transform: none; /* Disable hover effects on mobile */
+            }
+            
+            .legend {
+                padding: 10px 5px;
+                gap: 15px;
+            }
+            
+            .legend-item {
+                font-size: 11px;
+                gap: 4px;
+            }
+            
+            .legend-color {
+                width: 14px;
+                height: 14px;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .day-header {
+                font-size: 9px;
+                padding: 6px 1px;
+            }
+            
+            .day-cell {
+                font-size: 11px;
+                padding: 4px 1px;
+                min-height: 20px;
+            }
+            
+            .legend-item {
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body>
