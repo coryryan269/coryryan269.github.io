@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 25.2.4.3 (Windows)"/>
+	<meta name="created" content="2025-07-26T02:02:55.489514500"/>
+	<meta name="changed" content="2025-07-26T02:05:45.276564600"/>
+	<style type="text/css">
+		@page { size: 8.5in 11in; margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">--
+CREATE TABLE WITH EVERYTHING</span></font></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">CREATE</font>
+<font color="#0000ff">TABLE</font> employee_profile (</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">employee_id
+&nbsp; &nbsp; &nbsp; &nbsp; NUMBER </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">GENERATED</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">BY</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">DEFAULT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">IDENTITY</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">first_name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;VARCHAR2(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">50</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">NOT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">NULL</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">middle_initial
+&nbsp; &nbsp; &nbsp;CHAR(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">1</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CHECK</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(middle_initial </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">IS
+NULL</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">OR</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+REGEXP_LIKE(middle_initial, </span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'^[A-Z]$'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">last_name
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; VARCHAR2(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">50</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">NOT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">NULL</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">email
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; VARCHAR2(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">100</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">UNIQUE</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">phone_number
+&nbsp; &nbsp; &nbsp; &nbsp;CHAR(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">10</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CONSTRAINT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+chk_phone_digits </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CHECK</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(phone_number </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">BETWEEN</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'0000000000'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AND</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'9999999999'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">salary
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;NUMBER(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">8</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,
+</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">2</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">DEFAULT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">50000</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CHECK</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(salary &gt;= </span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">30000</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">hire_date
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DATE </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">DEFAULT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+SYSDATE,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">last_login
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;TIMESTAMP </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">DEFAULT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+CURRENT_TIMESTAMP,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">timezone_login
+&nbsp; &nbsp; &nbsp;TIMESTAMP WITH TIME ZONE,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">local_time_login
+&nbsp; &nbsp;TIMESTAMP WITH LOCAL TIME ZONE,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">probation_period
+&nbsp; &nbsp;</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">INTERVAL</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">DAY</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">3</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">SECOND</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">0</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">contract_duration
+&nbsp; </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">INTERVAL</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">YEAR</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">(</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">2</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">MONTH</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">department_id
+&nbsp; &nbsp; &nbsp; NUMBER,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; </span></font>
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">--
+Out-of-line constraints</span></font></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CONSTRAINT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+pk_employee PRIMARY </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">KEY</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(employee_id),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CONSTRAINT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+fk_dept FOREIGN </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">KEY</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(department_id) </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">REFERENCES</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+departments(department_id),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CONSTRAINT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+uc_emp_name </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">UNIQUE</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(first_name, last_name),</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CONSTRAINT</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+chk_salary_range </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">CHECK</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+(salary </span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">BETWEEN</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">30000</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AND</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+</span></font></font><font color="#098658"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">200000</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">);</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">----------
+ALTER TABLE ---------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--
+Add a new column</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">ALTER</font>
+<font color="#0000ff">TABLE</font> employee_profile</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">ADD</font>
+nickname VARCHAR2(<font color="#098658">50</font>);</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--
+Remove a column</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">ALTER</font>
+<font color="#0000ff">TABLE</font> employee_profile</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">DROP</font>
+<font color="#0000ff">COLUMN</font> nickname;</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--
+Add a constraint after creation</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">ALTER</font>
+<font color="#0000ff">TABLE</font> employee_profile</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">ADD</font>
+<font color="#0000ff">CONSTRAINT</font> chk_hire_date <font color="#0000ff">CHECK</font>
+(hire_date &lt;= SYSDATE);</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--
+Drop a constraint</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">ALTER</font>
+<font color="#0000ff">TABLE</font> employee_profile</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">DROP</font>
+<font color="#0000ff">CONSTRAINT</font> chk_hire_date;</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0.2in"><br/>
+<br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp;<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">--
+EXAMPLE INSERT WITH DEFAULTS</span></font></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">INSERT</font>
+<font color="#0000ff">INTO</font> employee_profile (first_name,
+last_name, email, phone_number, department_id)</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">VALUES</font>
+(<font color="#a31515">'Jane'</font>, <font color="#a31515">'Doe'</font>,
+<font color="#a31515">'jane.doe@example.com'</font>, <font color="#a31515">'5551234567'</font>,
+<font color="#098658">10</font>);</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0.2in"><br/>
+<br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">--
+CONVERSIONS</span></font></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--
+Implicit conversions (Oracle will attempt these automatically)</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">SELECT</font>
+<font color="#a31515">'100'</font> + <font color="#098658">50</font>
+<font color="#0000ff">FROM</font> dual; &nbsp;<font color="#008000">--
+Converts '100' to number</font></span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--
+Explicit conversions</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">SELECT</font>
+</span></font></font></font>
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO_NUMBER(</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'123.45'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+num_val,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO_CHAR(SYSDATE,
+</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'YYYY-MM-DD'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+date_str,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO_DATE(</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'2025-07-22'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,
+</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'YYYY-MM-DD'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+real_date,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO_TIMESTAMP(</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'2025-07-22
+14:30:00'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">,
+</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'YYYY-MM-DD
+HH24:MI:SS'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+ts_val,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO_YMINTERVAL(</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'2-6'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+contract_interval,</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; <font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">TO_DSINTERVAL(</span></font></font><font color="#a31515"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">'5
+10:00:00'</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">)
+</span></font></font><font color="#0000ff"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">AS</span></font></font></font><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">
+probation_interval</span></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><font color="#0000ff">FROM</font>
+dual;</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><font color="#000000"><span style="background: #ffffff">&nbsp;
+&nbsp; &nbsp; &nbsp;<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="font-weight: normal">--
+NOTES ON CONSTRAINTS</span></font></font></font></span></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#008000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">--------------------------------------</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+<font color="#0000ff">Constraint</font> <font color="#0000ff">Type</font>
+| Defined <font color="#0000ff">Inline</font> | Defined <font color="#0000ff">Out</font>-<font color="#0000ff">of</font>-Line
+| <font color="#0000ff">Description</font> &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; |</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+<font color="#008000">--------------- | -------------- |
+------------------- | ------------------------- |</font></span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+`<font color="#0000ff">NOT</font> <font color="#0000ff">NULL</font>`
+&nbsp; &nbsp; &nbsp;| ✅ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;| ❌ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+| <font color="#0000ff">Only</font> <font color="#0000ff">inline</font>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+`<font color="#0000ff">UNIQUE</font>` &nbsp; &nbsp; &nbsp; &nbsp;| ✅
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ✅ &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Can be multicolumn &nbsp;
+&nbsp; &nbsp; &nbsp;|</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+`PRIMARY <font color="#0000ff">KEY</font>` &nbsp; | ✅ &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ✅ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; | Implies <font color="#0000ff">NOT</font>
+<font color="#0000ff">NULL</font> + <font color="#0000ff">UNIQUE</font>
+|</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+`FOREIGN <font color="#0000ff">KEY</font>` &nbsp; | ✅ &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ✅ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; | <font color="#0000ff">References</font>
+another <font color="#0000ff">table</font> &nbsp;|</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+`<font color="#0000ff">CHECK</font>` &nbsp; &nbsp; &nbsp; &nbsp; | ✅
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ✅ &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Conditional validation &nbsp;
+&nbsp;|</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff">|
+`<font color="#0000ff">DEFAULT</font>` &nbsp; &nbsp; &nbsp; | ✅ &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ❌ &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | <font color="#0000ff">Only</font>
+<font color="#0000ff">inline</font> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; |</span></font></font></font></p>
+<p style="line-height: 0.2in; margin-bottom: 0.2in; font-weight: normal">
+<font color="#000000"><font face="Consolas, Courier New, monospace"><font size="2" style="font-size: 10pt"><span style="background: #ffffff"><br/>
+</span></font></font></font><br/>
+<br/>
+
+</p>
+<p style="line-height: 0.2in; margin-bottom: 0in"><img src="RANDOM%20HELP_html_43d2a934.gif" name="Image1" align="left" width="665" height="668" border="0"/>
+<br/>
+
+</p>
+</body>
+</html>
