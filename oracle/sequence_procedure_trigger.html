@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 25.2.4.3 (Windows)"/>
+	<meta name="created" content="2025-07-26T02:24:51.491387200"/>
+	<meta name="changed" content="2025-07-26T02:25:10.270468100"/>
+	<style type="text/css">
+		@page { size: 8.5in 11in; margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		h3 { margin-top: 0.1in; margin-bottom: 0.08in; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-size: 10pt; font-family: "NSimSun", monospace }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		strong { font-weight: bold }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><p>Absolutely
+— here are <strong>very brief</strong> examples of each:</p>
+<hr/>
+
+<h3 class="western">🔹 <strong>1. SEQUENCE</strong></h3>
+<p><strong>Create:</strong></p>
+<pre class="western" style="margin-bottom: 0.2in"><code class="western">CREATE SEQUENCE emp_seq START WITH 1 INCREMENT BY 1;</code></pre><p>
+<strong>Use in Insert:</strong></p>
+<pre class="western"><code class="western">INSERT INTO employees (employee_id, first_name)</code>
+<code class="western">VALUES (emp_seq.NEXTVAL, 'Cory');</code></pre><p>
+<strong>Drop:</strong></p>
+<pre class="western" style="margin-bottom: 0.2in"><code class="western">DROP SEQUENCE emp_seq;</code></pre>
+<hr/>
+
+<h3 class="western">🔹 <strong>2. PROCEDURE</strong></h3>
+<p><strong>Create:</strong></p>
+<pre class="western"><code class="western">CREATE OR REPLACE PROCEDURE greet_user(p_name VARCHAR2) AS</code>
+<code class="western">BEGIN</code>
+<code class="western">    </code><code class="western">DBMS_OUTPUT.PUT_LINE('Hello, ' || p_name || '!');</code>
+<code class="western">END;</code></pre><p>
+<strong>Execute:</strong></p>
+<pre class="western" style="margin-bottom: 0.2in"><code class="western">EXEC greet_user('Cory');</code></pre><p>
+<strong>Drop:</strong></p>
+<pre class="western" style="margin-bottom: 0.2in"><code class="western">DROP PROCEDURE greet_user;</code></pre>
+<hr/>
+
+<h3 class="western">🔹 <strong>3. TRIGGER</strong></h3>
+<p><strong>Create:</strong></p>
+<pre class="western"><code class="western">CREATE OR REPLACE TRIGGER trg_set_hiredate</code>
+<code class="western">BEFORE INSERT ON employees</code>
+<code class="western">FOR EACH ROW</code>
+<code class="western">BEGIN</code>
+<code class="western">    </code><code class="western">:NEW.hire_date := SYSDATE;</code>
+<code class="western">END;</code></pre><p>
+<strong>Trigger is automatically executed</strong> on <code class="western">INSERT</code>
+into <code class="western">employees</code>.</p>
+<p><strong>Drop:</strong></p>
+<pre class="western" style="margin-bottom: 0.2in"><code class="western">DROP TRIGGER trg_set_hiredate;</code></pre>
+<hr/>
+
+<p>Let me know if you want the versions with conditions or error
+handling next!</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+</body>
+</html>
