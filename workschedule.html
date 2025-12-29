@@ -224,7 +224,7 @@
                 interval: 14 // Every other week (14 days)
             },
             {
-                name: "Emily",
+                name: "Sue",
                 schedule: "Thursday to Wednesday",
                 referenceStart: new Date('2025-07-24'), // Her work week 07/24/25 to 07/30/25  
                 interval: 14 // Every other week (14 days)
@@ -257,37 +257,37 @@
         }
         
         function getTemporaryOverrideStatus(employee, checkDate) {
-            // Only apply overrides to Emily and Cory
-            if (employee.name !== "Emily" && employee.name !== "Cory") {
+            // Only apply overrides to Sue and Cory
+            if (employee.name !== "Sue" && employee.name !== "Cory") {
                 return null; // No override for Charlotte and Podeny
             }
             
-            // Emily works during these periods (Cory does NOT work)
-            const emilyPeriod1Start = new Date('2025-06-09');
-            const emilyPeriod1End = new Date('2025-06-12'); // Changed from 06/15 to 06/12
-            const emilyPeriod2Start = new Date('2025-06-15');
-            const emilyPeriod2End = new Date('2025-06-15'); // Just 06/15
-            const emilyPeriod3Start = new Date('2025-06-23');
-            const emilyPeriod3End = new Date('2025-07-02');
+            // Sue works during these periods (Cory does NOT work)
+            const SuePeriod1Start = new Date('2025-06-09');
+            const SuePeriod1End = new Date('2025-06-12'); // Changed from 06/15 to 06/12
+            const SuePeriod2Start = new Date('2025-06-15');
+            const SuePeriod2End = new Date('2025-06-15'); // Just 06/15
+            const SuePeriod3Start = new Date('2025-06-23');
+            const SuePeriod3End = new Date('2025-07-02');
             
-            // Cory works during these periods (Emily does NOT work)
+            // Cory works during these periods (Sue does NOT work)
             const coryPeriod1Start = new Date('2025-06-13');
             const coryPeriod1End = new Date('2025-06-14'); // New: 06/13-06/14
             const coryPeriod2Start = new Date('2025-06-16');
             const coryPeriod2End = new Date('2025-06-22');
             
-            const isInEmilyPeriod = (checkDate >= emilyPeriod1Start && checkDate <= emilyPeriod1End) ||
-                                   (checkDate >= emilyPeriod2Start && checkDate <= emilyPeriod2End) ||
-                                   (checkDate >= emilyPeriod3Start && checkDate <= emilyPeriod3End);
+            const isInSuePeriod = (checkDate >= SuePeriod1Start && checkDate <= SuePeriod1End) ||
+                                   (checkDate >= SuePeriod2Start && checkDate <= SuePeriod2End) ||
+                                   (checkDate >= SuePeriod3Start && checkDate <= SuePeriod3End);
             const isInCoryPeriod = (checkDate >= coryPeriod1Start && checkDate <= coryPeriod1End) ||
                                   (checkDate >= coryPeriod2Start && checkDate <= coryPeriod2End);
             
-            if (isInEmilyPeriod) {
-                return employee.name === "Emily"; // Emily works, Cory doesn't
+            if (isInSuePeriod) {
+                return employee.name === "Sue"; // Sue works, Cory doesn't
             }
             
             if (isInCoryPeriod) {
-                return employee.name === "Cory"; // Cory works, Emily doesn't
+                return employee.name === "Cory"; // Cory works, Sue doesn't
             }
             
             return null; // No override, use normal schedule
@@ -325,8 +325,8 @@
         }
         
         function getTemporaryWorkPeriod(employee, checkDate) {
-            // Emily's temporary work periods
-            if (employee.name === "Emily") {
+            // Sue's temporary work periods
+            if (employee.name === "Sue") {
                 // 06/09/2025 through 06/12/2025
                 const period1Start = new Date('2025-06-09');
                 const period1End = new Date('2025-06-12');
