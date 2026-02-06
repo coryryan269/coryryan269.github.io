@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Network Type Test</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 16px; line-height: 1.35; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px 14px; margin: 12px 0; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+    .big { font-size: 1.15rem; }
+  </style>
+</head>
+<body>
+  <h1>Network Type Test</h1>
+  <p>This page tries to detect whether you're on <strong>Wi-Fi / cellular (4G/5G/3G)</strong> using browser APIs.</p>
+
+  <div class="card big">
+    <div><strong>Status:</strong> <span id="status">Checking…</span></div>
+    <div><strong>Best guess:</strong> <span id="guess">—</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Raw values</h2>
+    <div><strong>navigator.onLine:</strong> <span id="online">—</span></div>
+    <div><strong>connection supported:</strong> <span id="supported">—</span></div>
+    <div><strong>connection.type:</strong> <span id="type">—</span> <small>(rarely available)</small></div>
+    <div><strong>connection.effectiveType:</strong> <span id="effectiveType">—</span></div>
+    <div><strong>connection.downlink (Mbps):</strong> <span id="downlink">—</span></div>
+    <div><strong>connection.rtt (ms):</strong> <span id="rtt">—</span></div>
+    <div><strong>connection.saveData:</strong> <span id="saveData">—</span></div>
+  </div>
+
+  <div class="card">
+    <button id="recheck">Re-check</button>
+    <p style="margin-top:10px;">
+      Tip: toggle Airplane Mode, switch Wi-Fi on/off, or move between 4G/5G and press Re-check.
+    </p>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function bestGuess(conn) {
+    // Prefer explicit "type" if present.
+    const t = conn && conn.type;
+    if (t) {
+      if (t === "wifi") return "Wi-Fi";
+      if (t === "cellular") return "Cellular";
+      if (t === "ethernet") return "Ethernet";
+      if (t === "none") return "No network";
+      return t;
+    }
+
+    // Otherwise use effectiveType (more common).
+    const et = conn && conn.effectiveType;
+    if (et) {
+      // effectiveType is typically: 'slow-2g', '2g', '3g', '4g'
+      if (et === "4g") return "Likely 4G/5G (browser reports '4g')";
+      if (et === "3g") return "Likely 3G";
+      if (et === "2g" || et === "slow-2g") return "Likely 2G/slow network";
+      return et;
+    }
+
+    return "Unknown (API not supported or blocked)";
+  }
+
+  function render() {
+    const online = navigator.onLine;
+    $("online").textContent = String(online);
+
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const supported = !!conn;
+    $("supported").textContent = supported ? "Yes" : "No";
+
+    if (!online) {
+      $("status").textContent = "Offline";
+      $("guess").textContent = "No network";
+    } else if (!supported) {
+      $("status").textContent = "Online";
+      $("guess").textContent = "Unknown (not supported on this browser)";
+    } else {
+      $("status").textContent = "Online";
+      $("guess").textContent = bestGuess(conn);
+    }
+
+    $("type").textContent = (conn && conn.type) ? conn.type : "—";
+    $("effectiveType").textContent = (conn && conn.effectiveType) ? conn.effectiveType : "—";
+    $("downlink").textContent = (conn && typeof conn.downlink === "number") ? conn.downlink : "—";
+    $("rtt").textContent = (conn && typeof conn.rtt === "number") ? conn.rtt : "—";
+    $("saveData").textContent = (conn && typeof conn.saveData === "boolean") ? conn.saveData : "—";
+  }
+
+  // Re-render on network changes where supported
+  function attachListeners() {
+    window.addEventListener("online", render);
+    window.addEventListener("offline", render);
+
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn && conn.addEventListener) {
+      conn.addEventListener("change", render);
+    }
+  }
+
+  $("recheck").addEventListener("click", render);
+
+  attachListeners();
+  render();
+</script>
+</body>
+</html>
