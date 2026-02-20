@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Physics Scenario Solver (Force / Motion / Energy)</title>
+  <style>
+    :root { --bg:#0b1020; --card:#101a33; --muted:#a9b3d6; --text:#eef2ff; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width: 1250px; margin: 24px auto; padding: 0 18px; }
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    .sub { color: var(--muted); margin: 0 0 18px; line-height: 1.35; }
+    .grid { display:grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+    .card { background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .fields { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    @media (max-width: 700px){ .fields{ grid-template-columns: 1fr; } }
+    .group { margin-bottom: 12px; }
+    .group h3 { font-size:13px; margin:0 0 8px; color:var(--muted); }
+    .group-fields { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    @media (max-width: 700px){ .group-fields{ grid-template-columns: 1fr; } }
+    label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .row { position:relative; }
+    input {
+      width:100%; box-sizing:border-box; padding: 10px 56px 10px 10px; border-radius: 10px;
+      border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
+      color: var(--text); outline:none;
+    }
+    input:focus { border-color: rgba(255,255,255,.35); }
+    input[readonly] { background: rgba(34,197,94,.08); border-color: rgba(34,197,94,.35); }
+    .unit { position:absolute; right:10px; top: 33px; font-size: 12px; color: rgba(238,242,255,.55); pointer-events:none; }
+
+    /* Align unit vertically centered with the input and keep it away from spinner */
+    .unit { top: 50%; transform: translateY(-50%); right: 12px; }
+
+    /* Reduce number input spinners on Firefox while keeping them usable on WebKit */
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { margin-right: 6px; }
+    input[type=number] { -moz-appearance: textfield; }
+    .hint { margin-top: 10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    button {
+      border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
+      color: var(--text); padding: 10px 12px; border-radius: 12px; cursor:pointer;
+    }
+    button:hover { background: rgba(255,255,255,.10); }
+    .status { color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .status b { color: var(--text); }
+    .pill { font-size:12px; padding: 3px 8px; border-radius: 999px; display:inline-block; border:1px solid rgba(255,255,255,.12); }
+    .pill.ok { border-color: rgba(34,197,94,.5); color: rgba(34,197,94,.95); }
+    .pill.warn { border-color: rgba(245,158,11,.5); color: rgba(245,158,11,.95); }
+    .pill.bad { border-color: rgba(239,68,68,.5); color: rgba(239,68,68,.95); }
+
+    /* Tooltip */
+    .row[data-how]:hover::after {
+      content: attr(data-how);
+      position:absolute;
+      left:0; right:0;
+      top: 68px;
+      background: rgba(0,0,0,.92);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 10px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--text);
+      z-index: 50;
+      white-space: pre-wrap;
+      line-height: 1.25;
+    }
+    .row[data-how]:hover::before{
+      content:"";
+      position:absolute;
+      top: 60px; left: 18px;
+      border: 8px solid transparent;
+      border-bottom-color: rgba(0,0,0,.92);
+      z-index: 51;
+    }
+
+    /* Simple illustration */
+    .viz {
+      height: 260px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      position:relative;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: radial-gradient(900px 300px at 50% 30%, rgba(96,165,250,.10), transparent 60%),
+                  linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.0));
+      margin-bottom: 12px;
+    }
+    .track { position:absolute; left:18px; right:18px; top: 55%; height: 2px; background: rgba(255,255,255,.12); }
+    .car {
+      width: 78px; height: 34px; border-radius: 10px;
+      background: rgba(238,242,255,.9);
+      position:absolute; top: calc(55% - 20px);
+      transform: translateX(var(--x, 0px));
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+    }
+    .wheel { width: 14px; height: 14px; background: rgba(0,0,0,.8); border-radius: 50%; position:absolute; bottom: -6px; }
+    .wheel.w1 { left: 12px; } .wheel.w2 { right: 12px; }
+    .arrow {
+      position:absolute; top: calc(55% - 64px);
+      left: calc(18px + var(--x, 0px) + 80px);
+      width: 130px; height: 2px; background: rgba(34,197,94,.8);
+    }
+    .arrow::after{
+      content:""; position:absolute; right:-2px; top:-5px;
+      border-left: 10px solid rgba(34,197,94,.8);
+      border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+    }
+    .badge {
+      position:absolute; left:16px; top:16px;
+      background: rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.12);
+      padding: 8px 10px; border-radius: 12px; font-size: 12px; color: var(--muted);
+      max-width: 95%;
+      line-height: 1.25;
+    }
+    .small { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    /* Conflict highlighting */
+    .row.conflict input { border-color: var(--bad); box-shadow: 0 0 0 4px rgba(239,68,68,0.06); }
+    .row.conflict label { color: var(--bad); }
+    /* Focus dependency highlights */
+    .row.focus-direct input { border-color: rgba(96,165,250,0.9); box-shadow: 0 0 0 6px rgba(96,165,250,0.06); }
+    .row.focus-direct label { color: rgba(96,165,250,0.95); }
+    .row.focus-down1 input { border-color: rgba(99,102,241,0.8); box-shadow: 0 0 0 4px rgba(99,102,241,0.04); }
+    .row.focus-down1 label { color: rgba(159,163,246,0.95); }
+    .eq-box { margin-top: 12px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); font-size:13px; color:var(--muted); }
+    .eq-box h4 { margin: 0 0 8px 0; color: var(--text); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Physics Scenario Solver</h1>
+    <p class="sub">
+      Enter any combination of values you know. Click <b>Solve</b> to compute the rest.
+      Hover a computed field to see how it was calculated. (All assumes 1D motion, constant acceleration/force, force aligned with motion.)
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="fields" id="fields"></div>
+
+        <div class="hint">
+          <button id="solveBtn">Solve</button>
+          <button id="clearBtn">Clear</button>
+          <span class="pill ok">computed fields turn green</span>
+          <span class="status" id="status"></span>
+        </div>
+
+        <p class="small" style="margin-top:10px;">
+          Notes: Work uses <span class="mono">W = F·d</span> and also <span class="mono">W = ΔKE</span>.
+          Power uses <span class="mono">P = W/t</span> (if time known) or average <span class="mono">P ≈ F·v̄</span> with <span class="mono">v̄=(vᵢ+v𝒻)/2</span>.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="viz" id="viz">
+          <div class="badge" id="badge"></div>
+          <div class="track"></div>
+          <div class="car" id="car">
+            <div class="wheel w1"></div>
+            <div class="wheel w2"></div>
+          </div>
+          <div class="arrow" id="arrow"></div>
+        </div>
+        <p class="small" id="vizText"></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // --- Field config (user-facing) ---
+  const FIELDS = [
+    { key:"F",   label:"Force (F)", unit:"N" },
+    { key:"m",   label:"Mass (m)", unit:"kg" },
+    { key:"a",   label:"Acceleration (a)", unit:"m/s²" },
+
+    { key:"vi",  label:"Initial velocity (vᵢ)", unit:"m/s" },
+    { key:"vf",  label:"Final velocity (v𝒻)", unit:"m/s" },
+
+    { key:"t",   label:"Time interval (t)", unit:"s" },
+    { key:"d",   label:"Displacement (d)", unit:"m" },
+
+    { key:"pi",  label:"Initial momentum (pᵢ)", unit:"kg·m/s" },
+    { key:"pf",  label:"Final momentum (p𝒻)", unit:"kg·m/s" },
+    { key:"dp",  label:"Change in momentum (Δp)", unit:"kg·m/s" },
+
+    { key:"KEi", label:"Initial kinetic energy (KEᵢ)", unit:"J" },
+    { key:"KEf", label:"Final kinetic energy (KE𝒻)", unit:"J" },
+    { key:"dKE", label:"Change in kinetic energy (ΔKE)", unit:"J" },
+
+    { key:"W",   label:"Work (W)", unit:"J" },
+    { key:"P",   label:"Power (P)", unit:"W" },
+  ];
+
+  const elFields = document.getElementById("fields");
+  // Create logical groups
+  const GROUPS = [
+    { id: 'force', title: 'Force & Mass', keys: ['F','m','a'] },
+    { id: 'kinematics', title: 'Kinematics (velocity, time, displacement)', keys: ['vi','vf','t','d'] },
+    { id: 'momentum', title: 'Momentum', keys: ['pi','pf','dp'] },
+    { id: 'energy', title: 'Energy, Work & Power', keys: ['KEi','KEf','dKE','W','P'] }
+  ];
+
+  const groupFields = {};
+  // clear place and build groups
+  elFields.innerHTML = '';
+  for (const g of GROUPS) {
+    const wrap = document.createElement('div');
+    wrap.className = 'group';
+    const h = document.createElement('h3'); h.textContent = g.title;
+    const gf = document.createElement('div'); gf.className = 'group-fields';
+    wrap.appendChild(h); wrap.appendChild(gf);
+    elFields.appendChild(wrap);
+    for (const k of g.keys) groupFields[k] = gf;
+  }
+  // Any remaining fields not in a group (fallback)
+  const remainingWrap = document.createElement('div');
+  remainingWrap.className = 'group';
+  const remainingFieldsDiv = document.createElement('div'); remainingFieldsDiv.className = 'group-fields';
+  remainingWrap.appendChild(remainingFieldsDiv);
+  elFields.appendChild(remainingWrap);
+  const statusEl = document.getElementById("status");
+
+  // Build UI
+  const inputs = {};
+  const rows = {};
+  for (const f of FIELDS) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.dataset.key = f.key;
+
+    const lab = document.createElement("label");
+    lab.textContent = f.label;
+
+    const inp = document.createElement("input");
+    inp.type = "number";
+    inp.step = "any";
+    inp.placeholder = "enter value";
+
+    const unit = document.createElement("div");
+    unit.className = "unit";
+    unit.textContent = f.unit;
+
+    row.appendChild(lab);
+    row.appendChild(inp);
+    row.appendChild(unit);
+    // append to appropriate group or fallback
+    const target = groupFields[f.key] || remainingFieldsDiv;
+    target.appendChild(row);
+
+    inputs[f.key] = inp;
+    rows[f.key] = row;
+
+    // If user edits a field, treat it as "given" and unlock it
+    inp.addEventListener("input", () => {
+      inp.readOnly = false;
+      row.removeAttribute("data-how");
+      row.dataset.given = inp.value.trim() !== "" ? "1" : "";
+      // If user clears it, also clear readOnly
+      if (inp.value.trim() === "") {
+        inp.readOnly = false;
+        inp.dataset.computed = "";
+      }
+      updateViz();
+      // live-check for conflicting given inputs
+      try { detectConflicts(readStateFromUI()); } catch(e) { /* silent */ }
+    });
+
+    // Focus/blur: show dependency highlights and equation box
+    inp.addEventListener('focus', () => {
+      try { showDependencies(f.key); } catch(e) { /* silent */ }
+    });
+    inp.addEventListener('blur', () => {
+      try { clearFocusHighlights(); hideEqBox(); } catch(e) { }
+    });
+  }
+
+  // --- Helpers ---
+  const isNum = (x) => Number.isFinite(x);
+  const get = (state, k) => state[k];
+  const set = (state, how, k, v) => {
+    if (!isNum(v)) return false;
+    // Keep user's given values if present
+    if (state._given.has(k)) return false;
+    // Avoid overwriting with same number
+    const old = state[k];
+    const eps = 1e-10;
+    if (isNum(old) && Math.abs(old - v) < eps) return false;
+    state[k] = v;
+    state._how[k] = how;
+    return true;
+  };
+
+  const fmt = (x) => {
+    if (!isNum(x)) return "";
+    const ax = Math.abs(x);
+    if (ax !== 0 && (ax < 1e-3 || ax >= 1e6)) return x.toExponential(4);
+    return (Math.round(x * 10000) / 10000).toString();
+  };
+
+  function readStateFromUI() {
+    const state = { _how: {}, _given: new Set() };
+    for (const f of FIELDS) {
+      const raw = inputs[f.key].value.trim();
+      if (raw !== "") {
+        const val = Number(raw);
+        if (isNum(val)) {
+          state[f.key] = val;
+          state._given.add(f.key);
+        }
+      }
+    }
+    return state;
+  }
+
+  function writeStateToUI(state) {
+    for (const f of FIELDS) {
+      const v = state[f.key];
+      const inp = inputs[f.key];
+      const row = rows[f.key];
+
+      if (state._given.has(f.key)) {
+        // user-provided
+        inp.readOnly = false;
+        inp.dataset.computed = "";
+        row.removeAttribute("data-how");
+      } else if (isNum(v)) {
+        // computed
+        inp.value = fmt(v);
+        inp.readOnly = true;
+        inp.dataset.computed = "1";
+        row.dataset.how = state._how[f.key] || "Computed (no trace).";
+      } else {
+        // unknown
+        if (inp.dataset.computed === "1") {
+          // leave value visible until cleared? we'll clear for clarity
+          inp.value = "";
+        }
+        inp.readOnly = false;
+        inp.dataset.computed = "";
+        row.removeAttribute("data-how");
+      }
+    }
+    updateViz(state);
+  }
+
+  // --- Core solver rules (iterative) ---
+  function solve(state) {
+    let changed = true;
+    let loops = 0;
+
+    while (changed && loops < 40) {
+      changed = false;
+      loops++;
+
+      const F  = get(state,"F");
+      const m  = get(state,"m");
+      const a  = get(state,"a");
+      const vi = get(state,"vi");
+      const vf = get(state,"vf");
+      const t  = get(state,"t");
+      const d  = get(state,"d");
+
+      const pi = get(state,"pi");
+      const pf = get(state,"pf");
+      const dp = get(state,"dp");
+
+      const KEi = get(state,"KEi");
+      const KEf = get(state,"KEf");
+      const dKE = get(state,"dKE");
+
+      const W = get(state,"W");
+      const P = get(state,"P");
+
+      // Newton's 2nd law: F = m a
+      if (isNum(m) && isNum(a)) changed |= set(state, `F = m·a\n= ${fmt(m)} · ${fmt(a)}`, "F", m*a);
+      if (isNum(F) && isNum(a) && a !== 0) changed |= set(state, `m = F/a\n= ${fmt(F)} / ${fmt(a)}`, "m", F/a);
+      if (isNum(F) && isNum(m) && m !== 0) changed |= set(state, `a = F/m\n= ${fmt(F)} / ${fmt(m)}`, "a", F/m);
+
+      // Kinematics: vf = vi + a t
+      if (isNum(vi) && isNum(a) && isNum(t)) changed |= set(state, `v𝒻 = vᵢ + a·t\n= ${fmt(vi)} + ${fmt(a)}·${fmt(t)}`, "vf", vi + a*t);
+      if (isNum(vf) && isNum(a) && isNum(t) && t !== 0) changed |= set(state, `vᵢ = v𝒻 − a·t\n= ${fmt(vf)} − ${fmt(a)}·${fmt(t)}`, "vi", vf - a*t);
+      if (isNum(vf) && isNum(vi) && isNum(a) && a !== 0) changed |= set(state, `t = (v𝒻 − vᵢ)/a\n= (${fmt(vf)} − ${fmt(vi)}) / ${fmt(a)}`, "t", (vf - vi)/a);
+      if (isNum(vf) && isNum(vi) && isNum(t) && t !== 0) changed |= set(state, `a = (v𝒻 − vᵢ)/t\n= (${fmt(vf)} − ${fmt(vi)}) / ${fmt(t)}`, "a", (vf - vi)/t);
+
+      // Displacement with constant acceleration
+      // d = v_i t + 1/2 a t^2
+      if (isNum(vi) && isNum(t) && isNum(a)) changed |= set(state, `d = vᵢ·t + ½·a·t²\n= ${fmt(vi)}·${fmt(t)} + 0.5·${fmt(a)}·${fmt(t)}²`, "d", vi*t + 0.5*a*t*t);
+      // d = (v_f^2 - v_i^2)/(2a)
+      if (isNum(vf) && isNum(vi) && isNum(a) && a !== 0) changed |= set(state, `d = (v𝒻² − vᵢ²)/(2a)\n= (${fmt(vf)}² − ${fmt(vi)}²) / (2·${fmt(a)})`, "d", (vf*vf - vi*vi)/(2*a));
+      // time from d = v_avg * t where v_avg = (vi+vf)/2 (constant a)
+      if (isNum(d) && isNum(vi) && isNum(vf)) {
+        const vavg = (vi+vf)/2;
+        if (vavg !== 0) changed |= set(state, `t = d / v̄,  v̄=(vᵢ+v𝒻)/2\n= ${fmt(d)} / ${fmt(vavg)}`, "t", d / vavg);
+      }
+
+      // Momentum: p = m v
+      if (isNum(m) && isNum(vi)) changed |= set(state, `pᵢ = m·vᵢ\n= ${fmt(m)}·${fmt(vi)}`, "pi", m*vi);
+      if (isNum(m) && isNum(vf)) changed |= set(state, `p𝒻 = m·v𝒻\n= ${fmt(m)}·${fmt(vf)}`, "pf", m*vf);
+
+      if (isNum(pi) && isNum(vi) && vi !== 0) changed |= set(state, `m = pᵢ / vᵢ\n= ${fmt(pi)} / ${fmt(vi)}`, "m", pi/vi);
+      if (isNum(pf) && isNum(vf) && vf !== 0) changed |= set(state, `m = p𝒻 / v𝒻\n= ${fmt(pf)} / ${fmt(vf)}`, "m", pf/vf);
+
+      if (isNum(pi) && isNum(pf)) changed |= set(state, `Δp = p𝒻 − pᵢ\n= ${fmt(pf)} − ${fmt(pi)}`, "dp", pf - pi);
+      if (isNum(dp) && isNum(pi)) changed |= set(state, `p𝒻 = pᵢ + Δp\n= ${fmt(pi)} + ${fmt(dp)}`, "pf", pi + dp);
+      if (isNum(dp) && isNum(pf)) changed |= set(state, `pᵢ = p𝒻 − Δp\n= ${fmt(pf)} − ${fmt(dp)}`, "pi", pf - dp);
+
+      // Kinetic energy: KE = 1/2 m v^2
+      if (isNum(m) && isNum(vi)) changed |= set(state, `KEᵢ = ½·m·vᵢ²\n= 0.5·${fmt(m)}·${fmt(vi)}²`, "KEi", 0.5*m*vi*vi);
+      if (isNum(m) && isNum(vf)) changed |= set(state, `KE𝒻 = ½·m·v𝒻²\n= 0.5·${fmt(m)}·${fmt(vf)}²`, "KEf", 0.5*m*vf*vf);
+
+      if (isNum(KEi) && isNum(KEf)) changed |= set(state, `ΔKE = KE𝒻 − KEᵢ\n= ${fmt(KEf)} − ${fmt(KEi)}`, "dKE", KEf - KEi);
+      if (isNum(dKE) && isNum(KEi)) changed |= set(state, `KE𝒻 = KEᵢ + ΔKE\n= ${fmt(KEi)} + ${fmt(dKE)}`, "KEf", KEi + dKE);
+      if (isNum(dKE) && isNum(KEf)) changed |= set(state, `KEᵢ = KE𝒻 − ΔKE\n= ${fmt(KEf)} − ${fmt(dKE)}`, "KEi", KEf - dKE);
+
+      // Work-energy theorem (net work): W = ΔKE
+      if (isNum(dKE)) changed |= set(state, `W = ΔKE\n= ${fmt(dKE)}`, "W", dKE);
+      if (isNum(W)) changed |= set(state, `ΔKE = W\n= ${fmt(W)}`, "dKE", W);
+
+      // Work: W = F d (aligned)
+      if (isNum(F) && isNum(d)) changed |= set(state, `W = F·d\n= ${fmt(F)}·${fmt(d)}`, "W", F*d);
+      if (isNum(W) && isNum(d) && d !== 0) changed |= set(state, `F = W/d\n= ${fmt(W)} / ${fmt(d)}`, "F", W/d);
+      if (isNum(W) && isNum(F) && F !== 0) changed |= set(state, `d = W/F\n= ${fmt(W)} / ${fmt(F)}`, "d", W/F);
+
+      // Average power: P = W/t
+      if (isNum(W) && isNum(t) && t !== 0) changed |= set(state, `P = W/t\n= ${fmt(W)} / ${fmt(t)}`, "P", W/t);
+      if (isNum(P) && isNum(t)) changed |= set(state, `W = P·t\n= ${fmt(P)}·${fmt(t)}`, "W", P*t);
+      if (isNum(W) && isNum(P) && P !== 0) changed |= set(state, `t = W/P\n= ${fmt(W)} / ${fmt(P)}`, "t", W/P);
+
+      // Alternate average power for constant force: P ≈ F * v_avg
+      if (isNum(F) && isNum(vi) && isNum(vf)) {
+        const vavg = (vi + vf)/2;
+        changed |= set(state, `P ≈ F·v̄,  v̄=(vᵢ+v𝒻)/2\n= ${fmt(F)}·${fmt(vavg)}`, "P", F*vavg);
+      }
+      if (isNum(P) && isNum(vi) && isNum(vf)) {
+        const vavg = (vi + vf)/2;
+        if (vavg !== 0) changed |= set(state, `F ≈ P/v̄,  v̄=(vᵢ+v𝒻)/2\n= ${fmt(P)} / ${fmt(vavg)}`, "F", P/vavg);
+      }
+    }
+
+    return state;
+  }
+
+  function computeNeedMessage(state) {
+    // Heuristic: if key outputs missing, suggest what additional inputs enable them.
+    const missing = [];
+    const have = (k) => isNum(state[k]);
+
+    // Prioritize the user's listed concepts
+    const want = ["F","vi","vf","a","W","dKE","pi","pf","P"];
+    for (const k of want) if (!have(k)) missing.push(k);
+
+    // Suggest minimal next inputs based on what's missing
+    const tips = [];
+    const needMass = (!have("m") && ( !have("F") || !have("a") ) && (!have("pi") || !have("vi")) && (!have("pf") || !have("vf")));
+    if (needMass) tips.push("To compute momentum/kinetic energy, you’ll need mass (m) OR momentum+velocity (p and v) OR force+acceleration (F and a).");
+
+    if (!have("t") && have("a") && have("vi") && have("vf") === false) tips.push("To get time, provide vᵢ and v𝒻 along with a (or provide displacement d too).");
+    if (!have("d") && have("vi") && have("vf") && have("a") === false) tips.push("To get displacement, provide acceleration a (or time t).");
+    if (!have("W") && !(have("F") && have("d")) && !(have("dKE"))) tips.push("To get work W, provide F and d OR provide ΔKE (or enough info to compute KEᵢ and KE𝒻).");
+    if (!have("P") && !(have("W") && have("t")) && !(have("F") && have("vi") && have("vf"))) tips.push("To get power P, provide W and t OR provide F with vᵢ and v𝒻 (for average power).");
+
+    return { missingCount: missing.length, tips };
+  }
+
+  // --- Conflict detection ---
+  function detectConflicts(state) {
+    const conflicts = {};
+    const given = state._given || new Set();
+    const tolRel = 1e-3; // relative tolerance
+    const cmp = (expected, actual) => {
+      if (!isNum(expected) || !isNum(actual)) return false;
+      const tol = Math.max(1e-6, Math.abs(expected) * tolRel);
+      return Math.abs(expected - actual) > tol;
+    };
+
+    // Helper to mark multiple keys with message
+    const mark = (keys, msg) => { for (const k of keys) conflicts[k] = msg; };
+
+    const F  = get(state,'F');
+    const m  = get(state,'m');
+    const a  = get(state,'a');
+    const vi = get(state,'vi');
+    const vf = get(state,'vf');
+    const t  = get(state,'t');
+    const d  = get(state,'d');
+    const pi = get(state,'pi');
+    const pf = get(state,'pf');
+    const KEi = get(state,'KEi');
+    const KEf = get(state,'KEf');
+    const dKE = get(state,'dKE');
+    const W = get(state,'W');
+    const P = get(state,'P');
+
+    // F = m * a
+    if (given.has('F') && given.has('m') && given.has('a')) {
+      const exp = m * a;
+      if (cmp(exp, F)) mark(['F','m','a'], `Inconsistent: expected F = m·a = ${fmt(exp)}, but F = ${fmt(F)}.`);
+    }
+
+    // vf = vi + a t
+    if (given.has('vf') && given.has('vi') && given.has('a') && given.has('t')) {
+      const exp = vi + a * t;
+      if (cmp(exp, vf)) mark(['vf','vi','a','t'], `Inconsistent kinematics: expected v𝒻 = vᵢ + a·t = ${fmt(exp)}, but v𝒻 = ${fmt(vf)}.`);
+    }
+
+    // d = vi t + 1/2 a t^2
+    if (given.has('d') && given.has('vi') && given.has('a') && given.has('t')) {
+      const exp = vi * t + 0.5 * a * t * t;
+      if (cmp(exp, d)) mark(['d','vi','a','t'], `Inconsistent displacement: expected d = vᵢ·t + ½·a·t² = ${fmt(exp)}, but d = ${fmt(d)}.`);
+    }
+
+    // d = (vf^2 - vi^2)/(2a)
+    if (given.has('d') && given.has('vf') && given.has('vi') && given.has('a') && a !== 0) {
+      const exp = (vf*vf - vi*vi) / (2*a);
+      if (cmp(exp, d)) mark(['d','vf','vi','a'], `Inconsistent displacement (energy kinematics): expected d = (v𝒻² − vᵢ²)/(2a) = ${fmt(exp)}, but d = ${fmt(d)}.`);
+    }
+
+    // p = m v
+    if (given.has('pi') && given.has('m') && given.has('vi')) {
+      const exp = m * vi;
+      if (cmp(exp, pi)) mark(['pi','m','vi'], `Inconsistent momentum: expected pᵢ = m·vᵢ = ${fmt(exp)}, but pᵢ = ${fmt(pi)}.`);
+    }
+    if (given.has('pf') && given.has('m') && given.has('vf')) {
+      const exp = m * vf;
+      if (cmp(exp, pf)) mark(['pf','m','vf'], `Inconsistent momentum: expected p𝒻 = m·v𝒻 = ${fmt(exp)}, but p𝒻 = ${fmt(pf)}.`);
+    }
+
+    // KE = 1/2 m v^2
+    if (given.has('KEi') && given.has('m') && given.has('vi')) {
+      const exp = 0.5 * m * vi * vi;
+      if (cmp(exp, KEi)) mark(['KEi','m','vi'], `Inconsistent KE: expected KEᵢ = ½·m·vᵢ² = ${fmt(exp)}, but KEᵢ = ${fmt(KEi)}.`);
+    }
+    if (given.has('KEf') && given.has('m') && given.has('vf')) {
+      const exp = 0.5 * m * vf * vf;
+      if (cmp(exp, KEf)) mark(['KEf','m','vf'], `Inconsistent KE: expected KE𝒻 = ½·m·v𝒻² = ${fmt(exp)}, but KE𝒻 = ${fmt(KEf)}.`);
+    }
+
+    // W = F d
+    if (given.has('W') && given.has('F') && given.has('d')) {
+      const exp = F * d;
+      if (cmp(exp, W)) mark(['W','F','d'], `Inconsistent work: expected W = F·d = ${fmt(exp)}, but W = ${fmt(W)}.`);
+    }
+
+    // W = ΔKE
+    if (given.has('W') && given.has('KEi') && given.has('KEf')) {
+      const exp = KEf - KEi;
+      if (cmp(exp, W)) mark(['W','KEi','KEf'], `Inconsistent work/energy: expected W = ΔKE = ${fmt(exp)}, but W = ${fmt(W)}.`);
+    }
+
+    // P = W/t
+    if (given.has('P') && given.has('W') && given.has('t') && t !== 0) {
+      const exp = W / t;
+      if (cmp(exp, P)) mark(['P','W','t'], `Inconsistent power: expected P = W/t = ${fmt(exp)}, but P = ${fmt(P)}.`);
+    }
+
+    // P ≈ F * vavg
+    if (given.has('P') && given.has('F') && given.has('vi') && given.has('vf')) {
+      const vavg = (vi + vf) / 2;
+      if (vavg !== 0) {
+        const exp = F * vavg;
+        if (cmp(exp, P)) mark(['P','F','vi','vf'], `Inconsistent power approx: expected P ≈ F·v̄ = ${fmt(exp)}, but P = ${fmt(P)}.`);
+      }
+    }
+
+    // Apply visual markers
+    for (const f of FIELDS) {
+      const row = rows[f.key];
+      if (!row) continue;
+      if (conflicts[f.key]) {
+        row.classList.add('conflict');
+        row.dataset.how = conflicts[f.key];
+      } else {
+        row.classList.remove('conflict');
+        // If it was computed, keep its computed trace
+        if (row.dataset.computed === "1") {
+          // leave data-how as set by computation
+        } else if (!row.dataset.given) {
+          row.removeAttribute('data-how');
+        }
+      }
+    }
+
+    return conflicts;
+  }
+
+  // --- Dependency highlighting & equation box ---
+  const NAME = {
+    F: 'Force', m: 'Mass', a: 'Acceleration', vi: 'Initial velocity', vf: 'Final velocity',
+    t: 'Time', d: 'Displacement', pi: 'Initial momentum', pf: 'Final momentum', dp: 'Change in momentum',
+    KEi: 'Initial kinetic energy', KEf: 'Final kinetic energy', dKE: 'Change in kinetic energy',
+    W: 'Work', P: 'Power'
+  };
+
+  const EQUATIONS = [
+    { text: 'Force equals mass times acceleration (Force = mass · acceleration)', keys: ['F','m','a'] },
+    { text: 'Final velocity equals initial velocity plus acceleration times time (Final velocity = Initial velocity + acceleration · time)', keys: ['vf','vi','a','t'] },
+    { text: 'Initial velocity equals final velocity minus acceleration times time (Initial velocity = Final velocity − acceleration · time)', keys: ['vi','vf','a','t'] },
+    { text: 'Time equals (final velocity minus initial velocity) divided by acceleration (Time = (Final velocity − Initial velocity) / acceleration)', keys: ['t','vf','vi','a'] },
+    { text: 'Displacement equals initial velocity times time plus one half acceleration times time squared (Displacement = Initial velocity · time + ½ · acceleration · time²)', keys: ['d','vi','t','a'] },
+    { text: 'Displacement equals (final velocity squared minus initial velocity squared) divided by two times acceleration (Displacement = (Final velocity² − Initial velocity²) / (2 · acceleration))', keys: ['d','vf','vi','a'] },
+    { text: 'Time equals displacement divided by average velocity where average velocity is (initial velocity + final velocity)/2 (Time = Displacement / average velocity, average velocity = (Initial velocity + Final velocity)/2)', keys: ['t','d','vi','vf'] },
+    { text: 'Initial momentum equals mass times initial velocity (Initial momentum = mass · Initial velocity)', keys: ['pi','m','vi'] },
+    { text: 'Final momentum equals mass times final velocity (Final momentum = mass · Final velocity)', keys: ['pf','m','vf'] },
+    { text: 'Change in momentum equals final momentum minus initial momentum (Change in momentum = Final momentum − Initial momentum)', keys: ['dp','pf','pi'] },
+    { text: 'Initial kinetic energy equals one half mass times initial velocity squared (Initial kinetic energy = ½ · mass · Initial velocity²)', keys: ['KEi','m','vi'] },
+    { text: 'Final kinetic energy equals one half mass times final velocity squared (Final kinetic energy = ½ · mass · Final velocity²)', keys: ['KEf','m','vf'] },
+    { text: 'Change in kinetic energy equals final kinetic energy minus initial kinetic energy (Change in kinetic energy = Final kinetic energy − Initial kinetic energy)', keys: ['dKE','KEf','KEi'] },
+    { text: 'Work equals change in kinetic energy (Work = Change in kinetic energy)', keys: ['W','dKE'] },
+    { text: 'Work equals force times displacement (Work = Force · Displacement)', keys: ['W','F','d'] },
+    { text: 'Power equals work divided by time (Power = Work / Time)', keys: ['P','W','t'] },
+    { text: 'Approximate power equals force times average velocity where average velocity is (initial velocity + final velocity)/2 (Power ≈ Force · average velocity, average velocity = (Initial velocity + Final velocity)/2)', keys: ['P','F','vi','vf'] }
+  ];
+
+  const depMap = {};
+  function buildDepMap() {
+    for (const k of FIELDS.map(f=>f.key)) depMap[k] = [];
+    for (const eq of EQUATIONS) {
+      for (const k of eq.keys) {
+        if (!depMap[k]) depMap[k] = [];
+        depMap[k].push(eq);
+      }
+    }
+  }
+  buildDepMap();
+
+  // Create equation box element and insert after the buttons (.hint)
+  const eqBox = document.createElement('div');
+  eqBox.id = 'eqBox';
+  eqBox.className = 'eq-box';
+  eqBox.style.display = 'none';
+  const hintEl = document.querySelector('.hint');
+  if (hintEl && hintEl.parentNode) hintEl.insertAdjacentElement('afterend', eqBox);
+  else elFields.insertAdjacentElement('afterend', eqBox);
+
+  function clearFocusHighlights() {
+    for (const f of FIELDS) {
+      const row = rows[f.key];
+      if (row) {
+        row.classList.remove('focus-direct');
+        row.classList.remove('focus-down1');
+      }
+    }
+  }
+
+  function hideEqBox() { eqBox.style.display = 'none'; eqBox.innerHTML = ''; }
+
+  function showDependencies(key) {
+    clearFocusHighlights();
+    // Direct equations where key appears
+    const directEqs = depMap[key] || [];
+    const directKeys = new Set([key]);
+    for (const eq of directEqs) for (const k of eq.keys) directKeys.add(k);
+
+    // Downline: keys connected to direct keys (one more step)
+    const downKeys = new Set();
+    for (const dk of Array.from(directKeys)) {
+      const eqs = depMap[dk] || [];
+      for (const eq of eqs) for (const k of eq.keys) if (!directKeys.has(k)) downKeys.add(k);
+    }
+
+    // Apply classes
+    for (const k of directKeys) {
+      if (k === key) continue; // skip the focused itself
+      const r = rows[k]; if (r) r.classList.add('focus-direct');
+    }
+    for (const k of downKeys) { const r = rows[k]; if (r) r.classList.add('focus-down1'); }
+
+    // Populate eqBox with full-word equations
+    const lines = [];
+    if (directEqs.length) {
+      lines.push('<h4>Direct equations (useful immediately):</h4>');
+      for (const eq of directEqs) lines.push('• ' + eq.text.replace(/\b([A-Za-z0-9]+)\b/g, (m)=> (NAME[m] ? NAME[m] + ' (' + m + ')' : m)));
+    }
+    // Downline equations: equations that reference downKeys
+    const downEqs = new Set();
+    for (const dk of downKeys) for (const eq of depMap[dk]||[]) downEqs.add(eq.text);
+    if (downEqs.size) {
+      lines.push('<h4>Downline equations (one step further):</h4>');
+      for (const t of Array.from(downEqs)) lines.push('• ' + t.replace(/\b([A-Za-z0-9]+)\b/g, (m)=> (NAME[m] ? NAME[m] + ' (' + m + ')' : m)));
+    }
+
+    eqBox.innerHTML = lines.join('<br>');
+    eqBox.style.display = 'block';
+  }
+
+  // --- Visualization ---
+  const carEl = document.getElementById("car");
+  const arrowEl = document.getElementById("arrow");
+  const badgeEl = document.getElementById("badge");
+  const vizText = document.getElementById("vizText");
+
+  function updateViz(state = readStateFromUI()) {
+    const vi = state.vi, vf = state.vf, a = state.a, F = state.F, m = state.m, W = state.W, P = state.P;
+
+    // Position car based on displacement (scaled)
+    const d = isNum(state.d) ? state.d : null;
+    const x = d === null ? 0 : Math.max(-220, Math.min(220, d * 8)); // scale & clamp
+    carEl.style.setProperty("--x", `${x}px`);
+    arrowEl.style.setProperty("--x", `${x}px`);
+
+    // Arrow visibility (if force known)
+    arrowEl.style.opacity = isNum(F) ? "1" : "0.25";
+
+    // Badge text
+    const lines = [];
+    if (isNum(m)) lines.push(`m = ${fmt(m)} kg`);
+    if (isNum(F)) lines.push(`F = ${fmt(F)} N`);
+    if (isNum(a)) lines.push(`a = ${fmt(a)} m/s²`);
+    if (isNum(vi)) lines.push(`vᵢ = ${fmt(vi)} m/s`);
+    if (isNum(vf)) lines.push(`v𝒻 = ${fmt(vf)} m/s`);
+    if (isNum(W)) lines.push(`W = ${fmt(W)} J`);
+    if (isNum(P)) lines.push(`P = ${fmt(P)} W`);
+    badgeEl.textContent = lines.length ? lines.join("  •  ") : "Enter values on the left, then Solve.";
+
+    // Description line
+    let text = "Assumes straight-line motion and constant acceleration.";
+    if (isNum(vi) && isNum(vf)) {
+      if (vf > vi) text = "Object speeds up (v increases).";
+      else if (vf < vi) text = "Object slows down (v decreases).";
+      else text = "Velocity stays constant (v unchanged).";
+    }
+    if (isNum(a)) {
+      text += `  Acceleration is ${a > 0 ? "positive" : (a < 0 ? "negative" : "zero")}.`;
+    }
+    vizText.textContent = text;
+  }
+
+  // --- Actions ---
+  document.getElementById("solveBtn").addEventListener("click", () => {
+    // Clear computed readOnly flags before solving; keep user inputs
+    for (const f of FIELDS) {
+      const inp = inputs[f.key];
+      const row = rows[f.key];
+      if (inp.value.trim() === "") {
+        inp.readOnly = false;
+        row.removeAttribute("data-how");
+      }
+    }
+
+    const state0 = readStateFromUI();
+    const state = solve(state0);
+    writeStateToUI(state);
+    // Conflict detection and status message
+    const conflicts = detectConflicts(state);
+    if (Object.keys(conflicts).length > 0) {
+      const msgs = Array.from(new Set(Object.values(conflicts)));
+      statusEl.innerHTML = `<span class="pill bad">Inconsistent inputs</span> <span class="status">Conflicting entries detected.</span><br><b>Issues:</b><br>• ${msgs.join("<br>• ")}`;
+      return;
+    }
+
+    // Status message: require enough info
+    const { tips } = computeNeedMessage(state);
+    const unknown = FIELDS.filter(f => !isNum(state[f.key])).map(f => f.label);
+
+    if (unknown.length === 0) {
+      statusEl.innerHTML = `<span class="pill ok">Solved</span> <span class="status">All fields computed from your inputs.</span>`;
+    } else {
+      const tipText = tips.length ? ("<br><b>Add one of these to compute more:</b><br>• " + tips.join("<br>• ")) : "";
+      statusEl.innerHTML = `<span class="pill warn">Need more info</span> <span class="status">Still missing: <b>${unknown.length}</b> field(s).</span>${tipText}`;
+    }
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    for (const f of FIELDS) {
+      inputs[f.key].value = "";
+      inputs[f.key].readOnly = false;
+      inputs[f.key].dataset.computed = "";
+      rows[f.key].removeAttribute("data-how");
+      rows[f.key].dataset.given = "";
+    }
+    statusEl.textContent = "";
+    updateViz();
+      try { detectConflicts(readStateFromUI()); } catch(e) { }
+  });
+
+  // Initial viz
+  updateViz();
+})();
+</script>
+</body>
+</html>
