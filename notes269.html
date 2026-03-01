@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Local Notes + Hashtags + Reminders</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#121826;
+      --panel2:#0f1420;
+      --text:#e6edf3;
+      --muted:#9fb0c0;
+      --accent:#7dd3fc;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --line:#243044;
+      --chip:#1b2436;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 14px;
+      --radius2: 10px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 800px at 20% 0%, rgba(125,211,252,.08), transparent 60%),
+                  radial-gradient(1000px 700px at 100% 20%, rgba(52,211,153,.08), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:var(--accent)}
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    header{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.3px;
+      font-weight:700;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .topActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    button, .btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      box-shadow: var(--shadow);
+      transition: transform .05s ease, border-color .15s ease, background .15s ease;
+      font-size: 13px;
+      white-space:nowrap;
+    }
+    button:hover{ border-color: rgba(125,211,252,.5) }
+    button:active{ transform: translateY(1px) }
+    .btnPlain{
+      box-shadow:none;
+      background: transparent;
+    }
+    .btnGood{ border-color: rgba(52,211,153,.45) }
+    .btnBad{ border-color: rgba(251,113,133,.55) }
+    .btnWarn{ border-color: rgba(251,191,36,.55) }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size: 14px;
+      color: #dbe7f3;
+      letter-spacing:.2px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .row > *{ flex: 1 1 auto; }
+    .row .tight{ flex: 0 0 auto; }
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="datetime-local"], input[type="date"], textarea, select{
+      width:100%;
+      border:1px solid var(--line);
+      background: rgba(10,14,22,.65);
+      color: var(--text);
+      padding: 9px 10px;
+      border-radius: 12px;
+      outline:none;
+      font-size: 13px;
+    }
+    textarea{
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+    .help{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(125,211,252,.06);
+      border: 1px solid rgba(125,211,252,.18);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .pillbar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+    .pill{
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor:pointer;
+      user-select:none;
+    }
+    .pill:hover{ border-color: rgba(125,211,252,.5); color: var(--text) }
+    .split{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .split > div{
+      flex: 1 1 240px;
+    }
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .item{
+      border: 1px solid var(--line);
+      background: rgba(10,14,22,.5);
+      border-radius: var(--radius2);
+      padding: 10px;
+    }
+    .meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 8px;
+    }
+    .metaLeft{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .badge{
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--chip);
+      border:1px solid var(--line);
+      color: var(--muted);
+    }
+    .badge.good{ border-color: rgba(52,211,153,.45); color: rgba(209,250,229,.9) }
+    .badge.warn{ border-color: rgba(251,191,36,.55); color: rgba(255,237,213,.95) }
+    .badge.bad{ border-color: rgba(251,113,133,.55); color: rgba(255,228,230,.95) }
+    .mono{ font-family: var(--mono) }
+    .content{
+      white-space: pre-wrap;
+      line-height:1.35;
+      font-size: 13px;
+      color: #dbe7f3;
+    }
+    .tags{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+    .tag{
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(125,211,252,.09);
+      border:1px solid rgba(125,211,252,.22);
+      color: rgba(186,230,253,.95);
+      cursor:pointer;
+      user-select:none;
+    }
+    .tag:hover{ border-color: rgba(125,211,252,.5) }
+    .itemActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .banner{
+      display:none;
+      margin-bottom: 14px;
+      border-radius: var(--radius);
+      padding: 12px;
+      border: 1px solid rgba(251,191,36,.45);
+      background: rgba(251,191,36,.07);
+      box-shadow: var(--shadow);
+    }
+    .banner.show{ display:block }
+    .bannerTitle{
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+      margin:0 0 6px 0;
+      font-size: 14px;
+    }
+    .bannerTitle strong{ color: #ffe7b0 }
+    .banner small{ color: var(--muted) }
+    .muted{ color: var(--muted) }
+    .hr{
+      height:1px;
+      background: var(--line);
+      margin: 10px 0;
+      opacity:.7;
+    }
+    .tiny{
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .rightColSticky{
+      position: sticky;
+      top: 14px;
+    }
+    @media (max-width: 980px){
+      .rightColSticky{ position: static; }
+    }
+    .fileInput{ display:none; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="title">
+      <h1>Local Notes + Hashtags + Reminders</h1>
+      <p class="sub">Stored only in this browser (localStorage). Export/import to move data between devices.</p>
+    </div>
+    <div class="topActions">
+      <button class="btnPlain" id="btnAbout">Search help</button>
+      <button id="btnExport">Export</button>
+      <button id="btnImport">Import</button>
+      <input class="fileInput" id="importFile" type="file" accept="application/json" />
+      <button class="btnBad" id="btnWipe" title="Deletes all local data for this app">Wipe all</button>
+    </div>
+  </header>
+
+  <div class="banner" id="overdueBanner">
+    <p class="bannerTitle"><strong>Overdue reminders</strong> <span class="badge warn" id="overdueCount">0</span></p>
+    <small>These are reminders whose due time has passed and are not completed.</small>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: Search + list -->
+    <section class="card">
+      <h2>Search</h2>
+      <div class="split">
+        <div>
+          <label for="q">Query</label>
+          <input id="q" type="text" placeholder='Try: #work "project alpha" -draft after:2026-01-01 type:note' />
+        </div>
+        <div>
+          <label for="sort">Sort</label>
+          <select id="sort">
+            <option value="updated_desc">Updated (new → old)</option>
+            <option value="created_desc">Created (new → old)</option>
+            <option value="created_asc">Created (old → new)</option>
+            <option value="expires_asc">Expiration (soonest first)</option>
+            <option value="due_asc">Reminder due (soonest first)</option>
+          </select>
+        </div>
+        <div class="tight">
+          <button id="btnClearSearch">Clear</button>
+        </div>
+      </div>
+
+      <div class="pillbar" id="quickTags"></div>
+
+      <div class="hr"></div>
+      <div class="row" style="justify-content:space-between">
+        <div class="tiny" id="resultSummary">0 items</div>
+        <div class="tiny muted" id="storageSummary"></div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="list" id="list"></div>
+    </section>
+
+    <!-- RIGHT: Editor -->
+    <aside class="card rightColSticky">
+      <h2 id="editorTitle">Add note / reminder</h2>
+
+      <div class="row">
+        <div>
+          <label for="type">Type</label>
+          <select id="type">
+            <option value="note">Note</option>
+            <option value="reminder">Reminder</option>
+          </select>
+        </div>
+        <div>
+          <label for="title">Title (optional)</label>
+          <input id="title" type="text" placeholder="Short title (optional)" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <label for="text">Text (hashtags like #home #work are auto-detected)</label>
+        <textarea id="text" placeholder="Write your note or reminder details here..."></textarea>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label for="tags">Extra tags (optional, comma/space separated)</label>
+          <input id="tags" type="text" placeholder="work, finance, chores" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px" id="noteFields">
+        <div>
+          <label for="expires">Expiration (optional)</label>
+          <input id="expires" type="date" />
+        </div>
+        <div class="tight" style="align-self:end">
+          <button id="btnNoExpire" class="btnPlain" title="Clears expiration date">No expiration</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px; display:none" id="reminderFields">
+        <div>
+          <label for="due">Due date/time</label>
+          <input id="due" type="datetime-local" />
+        </div>
+        <div>
+          <label for="completed">Completed</label>
+          <select id="completed">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="itemActions" style="margin-top:12px">
+        <button class="btnGood" id="btnSave">Save</button>
+        <button id="btnNew">New</button>
+        <button class="btnBad" id="btnDelete" style="display:none">Delete</button>
+      </div>
+
+      <div class="help" id="helpBox" style="display:none">
+        <div><strong class="mono">Search cheatsheet</strong></div>
+        <div style="margin-top:8px">
+          <div><span class="mono">#tag</span> or <span class="mono">tag:work</span></div>
+          <div><span class="mono">"quoted phrase"</span></div>
+          <div><span class="mono">-exclude</span> or <span class="mono">-#tag</span></div>
+          <div><span class="mono">before:YYYY-MM-DD</span> <span class="mono">after:YYYY-MM-DD</span></div>
+          <div><span class="mono">expired:true</span> or <span class="mono">expired:false</span></div>
+          <div><span class="mono">type:note</span> or <span class="mono">type:reminder</span></div>
+        </div>
+        <div style="margin-top:10px" class="muted">
+          Notes are searched across title, text, and hashtags. Reminders are searched the same way.
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="tiny">
+        Tip: Click a hashtag on any item to search it.
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- Storage schema ----------
+  // localStorage key: "nh_notes_v1"
+  // {
+  //   version: 1,
+  //   items: [
+  //     {
+  //       id: "uuid",
+  //       type: "note"|"reminder",
+  //       title: "",
+  //       text: "",
+  //       tags: ["work","home"],
+  //       createdAt: number(ms),
+  //       updatedAt: number(ms),
+  //       expiresAt: number(ms)|null, // note only
+  //       dueAt: number(ms)|null, // reminder only
+  //       completed: boolean, // reminder only
+  //       completedAt: number(ms)|null
+  //     }
+  //   ]
+  // }
+
+  const LS_KEY = "nh_notes_v1";
+  const ONE_MIN = 60 * 1000;
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  const ONE_YEAR = 365 * ONE_DAY; // simple rule per request
+
+  // ---------- DOM ----------
+  const $ = (id) => document.getElementById(id);
+
+  const qEl = $("q");
+  const sortEl = $("sort");
+  const listEl = $("list");
+  const resultSummaryEl = $("resultSummary");
+  const storageSummaryEl = $("storageSummary");
+  const quickTagsEl = $("quickTags");
+
+  const editorTitleEl = $("editorTitle");
+  const typeEl = $("type");
+  const titleEl = $("title");
+  const textEl = $("text");
+  const tagsEl = $("tags");
+  const expiresEl = $("expires");
+  const dueEl = $("due");
+  const completedEl = $("completed");
+  const noteFieldsEl = $("noteFields");
+  const reminderFieldsEl = $("reminderFields");
+
+  const btnSave = $("btnSave");
+  const btnNew = $("btnNew");
+  const btnDelete = $("btnDelete");
+  const btnNoExpire = $("btnNoExpire");
+  const btnClearSearch = $("btnClearSearch");
+
+  const btnExport = $("btnExport");
+  const btnImport = $("btnImport");
+  const importFile = $("importFile");
+  const btnWipe = $("btnWipe");
+  const btnAbout = $("btnAbout");
+  const helpBox = $("helpBox");
+
+  const overdueBanner = $("overdueBanner");
+  const overdueCount = $("overdueCount");
+
+  // ---------- State ----------
+  let db = loadDB();
+  let selectedId = null;
+
+  // ---------- Helpers ----------
+  function uuid() {
+    // Good enough for local use
+    return (crypto?.randomUUID ? crypto.randomUUID() : ("id-" + Math.random().toString(16).slice(2) + "-" + Date.now()));
+  }
+
+  function clampStr(s, n=220) {
+    s = (s ?? "").toString();
+    return s.length > n ? s.slice(0, n-1) + "…" : s;
+  }
+
+  function formatDT(ms) {
+    if (!ms) return "";
+    const d = new Date(ms);
+    return d.toLocaleString(undefined, { year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+  }
+
+  function formatDate(ms) {
+    if (!ms) return "";
+    const d = new Date(ms);
+    return d.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"2-digit" });
+  }
+
+  function toDateInputValue(ms) {
+    if (!ms) return "";
+    const d = new Date(ms);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function toDateTimeLocalValue(ms) {
+    if (!ms) return "";
+    const d = new Date(ms);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return `${y}-${m}-${day}T${hh}:${mm}`;
+  }
+
+  function parseDateYYYYMMDD(s) {
+    // Interprets as local date at midnight
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if (!m) return null;
+    const y = +m[1], mo = +m[2]-1, d = +m[3];
+    const dt = new Date(y, mo, d, 0, 0, 0, 0);
+    if (Number.isNaN(dt.getTime())) return null;
+    return dt.getTime();
+  }
+
+  function normalizeTag(t) {
+    return (t ?? "")
+      .toString()
+      .trim()
+      .replace(/^#/, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9_\-]/g, "");
+  }
+
+  function extractTagsFromText(text) {
+    const tags = new Set();
+    const re = /(^|\s)#([a-zA-Z0-9_\-]{1,40})/g;
+    let m;
+    while ((m = re.exec(text || "")) !== null) {
+      tags.add(normalizeTag(m[2]));
+    }
+    return [...tags].filter(Boolean);
+  }
+
+  function parseExtraTags(s) {
+    if (!s) return [];
+    return s
+      .split(/[\s,]+/g)
+      .map(normalizeTag)
+      .filter(Boolean);
+  }
+
+  function unique(arr) {
+    return [...new Set(arr)];
+  }
+
+  function saveDB() {
+    localStorage.setItem(LS_KEY, JSON.stringify(db));
+    updateStorageSummary();
+  }
+
+  function loadDB() {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return { version: 1, items: [] };
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") throw new Error("bad");
+      if (!Array.isArray(parsed.items)) parsed.items = [];
+      if (!parsed.version) parsed.version = 1;
+      return parsed;
+    } catch {
+      return { version: 1, items: [] };
+    }
+  }
+
+  function nowMs() { return Date.now(); }
+
+  function isExpired(item, now = nowMs()) {
+    if (item.type !== "note") return false;
+    return item.expiresAt != null && item.expiresAt < now;
+  }
+
+  function isOverdueReminder(item, now = nowMs()) {
+    if (item.type !== "reminder") return false;
+    if (!item.dueAt) return false;
+    if (item.completed) return false;
+    return item.dueAt <= now;
+  }
+
+  function reminderPastDeletion(item, now = nowMs()) {
+    if (item.type !== "reminder") return false;
+    if (!item.dueAt) return false;
+    return (item.dueAt + ONE_YEAR) <= now;
+  }
+
+  function cleanup() {
+    // Remove reminders 1 year after due time
+    const before = db.items.length;
+    const now = nowMs();
+    db.items = db.items.filter(it => !reminderPastDeletion(it, now));
+    const after = db.items.length;
+    if (after !== before) saveDB();
+
+    // Also optionally prune expired notes? (Not requested to auto-delete notes.)
+    // You can add auto-deletion for expired notes here if you decide later.
+  }
+
+  // ---------- Search parsing ----------
+  // Supports:
+  //  - quoted phrases
+  //  - #tag tokens
+  //  - tag:work, type:note, expired:true, before:YYYY-MM-DD, after:YYYY-MM-DD
+  //  - negation: -term, -#tag
+  function tokenize(query) {
+    query = (query || "").trim();
+    const tokens = [];
+    const re = /"([^"]+)"|(\S+)/g;
+    let m;
+    while ((m = re.exec(query)) !== null) {
+      if (m[1]) tokens.push(m[1]);
+      else if (m[2]) tokens.push(m[2]);
+    }
+    return tokens;
+  }
+
+  function parseQuery(query) {
+    const tokens = tokenize(query);
+    const q = {
+      includeText: [],
+      excludeText: [],
+      includeTags: [],
+      excludeTags: [],
+      type: null, // note|reminder
+      expired: null, // true|false
+      after: null, // ms
+      before: null, // ms
+    };
+
+    for (const raw of tokens) {
+      let t = raw;
+      let neg = false;
+      if (t.startsWith("-") && t.length > 1) {
+        neg = true;
+        t = t.slice(1);
+      }
+
+      const lower = t.toLowerCase();
+
+      // key:value filters
+      const kv = /^([a-z]+):(.*)$/.exec(lower);
+      if (kv) {
+        const key = kv[1];
+        const val = kv[2];
+        if (key === "type" && (val === "note" || val === "reminder")) {
+          q.type = val;
+          continue;
+        }
+        if (key === "tag") {
+          const tag = normalizeTag(val);
+          if (tag) (neg ? q.excludeTags : q.includeTags).push(tag);
+          continue;
+        }
+        if (key === "expired" && (val === "true" || val === "false")) {
+          q.expired = (val === "true");
+          continue;
+        }
+        if (key === "after") {
+          const ms = parseDateYYYYMMDD(val);
+          if (ms != null) q.after = ms;
+          continue;
+        }
+        if (key === "before") {
+          const ms = parseDateYYYYMMDD(val);
+          if (ms != null) q.before = ms + ONE_DAY; // inclusive date → add a day as exclusive upper bound
+          continue;
+        }
+        // fallthrough: unknown key treated as text
+      }
+
+      // hashtags
+      if (t.startsWith("#")) {
+        const tag = normalizeTag(t);
+        if (tag) (neg ? q.excludeTags : q.includeTags).push(tag);
+        continue;
+      }
+
+      // plain text
+      if (t.trim()) (neg ? q.excludeText : q.includeText).push(t);
+    }
+
+    q.includeTags = unique(q.includeTags);
+    q.excludeTags = unique(q.excludeTags);
+    return q;
+  }
+
+  function matchesQuery(item, pq) {
+    // Type filter
+    if (pq.type && item.type !== pq.type) return false;
+
+    // Date filters apply to "updatedAt" for notes/reminders (feels most intuitive for searching)
+    if (pq.after != null && item.updatedAt < pq.after) return false;
+    if (pq.before != null && item.updatedAt >= pq.before) return false;
+
+    // Expired filter (notes only). If expired:true, only notes that are expired.
+    if (pq.expired != null) {
+      if (item.type !== "note") return false;
+      const exp = isExpired(item);
+      if (exp !== pq.expired) return false;
+    }
+
+    const hay = (item.title + "\n" + item.text + "\n" + (item.tags || []).map(t => "#" + t).join(" "))
+      .toLowerCase();
+
+    const tags = new Set((item.tags || []).map(normalizeTag));
+
+    // Tags include
+    for (const tg of pq.includeTags) if (!tags.has(tg)) return false;
+    // Tags exclude
+    for (const tg of pq.excludeTags) if (tags.has(tg)) return false;
+
+    // Text include (all must match)
+    for (const term of pq.includeText) {
+      if (!hay.includes(term.toLowerCase())) return false;
+    }
+    // Text exclude (none may match)
+    for (const term of pq.excludeText) {
+      if (hay.includes(term.toLowerCase())) return false;
+    }
+
+    return true;
+  }
+
+  function sortItems(items, sortKey) {
+    const copy = items.slice();
+    const now = nowMs();
+    switch (sortKey) {
+      case "created_desc":
+        copy.sort((a,b) => b.createdAt - a.createdAt);
+        return copy;
+      case "created_asc":
+        copy.sort((a,b) => a.createdAt - b.createdAt);
+        return copy;
+      case "expires_asc":
+        copy.sort((a,b) => {
+          const ae = (a.type==="note" ? a.expiresAt : null);
+          const be = (b.type==="note" ? b.expiresAt : null);
+          // nulls last
+          if (ae == null && be == null) return (b.updatedAt - a.updatedAt);
+          if (ae == null) return 1;
+          if (be == null) return -1;
+          return ae - be;
+        });
+        return copy;
+      case "due_asc":
+        copy.sort((a,b) => {
+          const ad = (a.type==="reminder" ? a.dueAt : null);
+          const bd = (b.type==="reminder" ? b.dueAt : null);
+          if (ad == null && bd == null) return (b.updatedAt - a.updatedAt);
+          if (ad == null) return 1;
+          if (bd == null) return -1;
+          // Overdue reminders bubble up a bit
+          const ao = isOverdueReminder(a, now);
+          const bo = isOverdueReminder(b, now);
+          if (ao !== bo) return ao ? -1 : 1;
+          return ad - bd;
+        });
+        return copy;
+      case "updated_desc":
+      default:
+        copy.sort((a,b) => b.updatedAt - a.updatedAt);
+        return copy;
+    }
+  }
+
+  // ---------- UI render ----------
+  function updateTypeFields() {
+    const t = typeEl.value;
+    if (t === "note") {
+      noteFieldsEl.style.display = "";
+      reminderFieldsEl.style.display = "none";
+    } else {
+      noteFieldsEl.style.display = "none";
+      reminderFieldsEl.style.display = "";
+    }
+  }
+
+  function renderQuickTags(items) {
+    // show top tags from all items (not just filtered) for discoverability
+    const counts = new Map();
+    for (const it of db.items) {
+      for (const tg of (it.tags || [])) {
+        const k = normalizeTag(tg);
+        if (!k) continue;
+        counts.set(k, (counts.get(k) || 0) + 1);
+      }
+    }
+    const sorted = [...counts.entries()].sort((a,b) => b[1] - a[1]).slice(0, 16);
+    quickTagsEl.innerHTML = "";
+    if (sorted.length === 0) return;
+
+    for (const [tag, n] of sorted) {
+      const el = document.createElement("div");
+      el.className = "pill";
+      el.textContent = `#${tag} (${n})`;
+      el.title = "Click to search this tag";
+      el.addEventListener("click", () => {
+        const current = qEl.value.trim();
+        const append = current ? (current + " ") : "";
+        qEl.value = append + `#${tag}`;
+        render();
+      });
+      quickTagsEl.appendChild(el);
+    }
+  }
+
+  function renderBanner() {
+    const now = nowMs();
+    const overdue = db.items.filter(it => isOverdueReminder(it, now));
+    overdueCount.textContent = String(overdue.length);
+    overdueBanner.classList.toggle("show", overdue.length > 0);
+  }
+
+  function renderList(items) {
+    listEl.innerHTML = "";
+
+    if (items.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "item";
+      empty.innerHTML = `<div class="muted">No matches. Try searching for <span class="mono">#tags</span> or phrases like <span class="mono">"bank login"</span>.</div>`;
+      listEl.appendChild(empty);
+      return;
+    }
+
+    const now = nowMs();
+
+    for (const it of items) {
+      const wrap = document.createElement("div");
+      wrap.className = "item";
+
+      const expired = isExpired(it, now);
+      const overdue = isOverdueReminder(it, now);
+
+      const leftBadges = [];
+      leftBadges.push(`<span class="badge">${it.type}</span>`);
+
+      if (it.type === "note") {
+        if (it.expiresAt == null) leftBadges.push(`<span class="badge good">no expiration</span>`);
+        else if (expired) leftBadges.push(`<span class="badge bad">expired ${formatDate(it.expiresAt)}</span>`);
+        else leftBadges.push(`<span class="badge warn">expires ${formatDate(it.expiresAt)}</span>`);
+      } else {
+        if (it.dueAt) {
+          if (it.completed) leftBadges.push(`<span class="badge good">completed</span>`);
+          else if (overdue) leftBadges.push(`<span class="badge warn">overdue</span>`);
+          else leftBadges.push(`<span class="badge">due ${formatDT(it.dueAt)}</span>`);
+        } else {
+          leftBadges.push(`<span class="badge warn">no due date</span>`);
+        }
+      }
+
+      const title = it.title ? `<strong>${escapeHtml(it.title)}</strong>` : `<strong class="muted">(untitled)</strong>`;
+
+      wrap.innerHTML = `
+        <div class="meta">
+          <div class="metaLeft">
+            ${leftBadges.join(" ")}
+          </div>
+          <div class="tiny mono">
+            created ${escapeHtml(formatDT(it.createdAt))} · updated ${escapeHtml(formatDT(it.updatedAt))}
+          </div>
+        </div>
+        <div>${title}</div>
+        <div class="content" style="margin-top:6px">${escapeHtml(clampStr(it.text || "", 480))}</div>
+        <div class="tags" id="tags-${it.id}"></div>
+        <div class="itemActions">
+          <button class="btnPlain" data-act="open" data-id="${it.id}">Open</button>
+          ${it.type==="reminder" && !it.completed ? `<button class="btnGood" data-act="complete" data-id="${it.id}">Mark complete</button>` : ""}
+          ${it.type==="reminder" && it.completed ? `<button class="btnWarn" data-act="uncomplete" data-id="${it.id}">Mark uncompleted</button>` : ""}
+          <button class="btnBad" data-act="delete" data-id="${it.id}">Delete</button>
+        </div>
+      `;
+
+      // tag chips
+      const tagsWrap = wrap.querySelector(`#tags-${CSS.escape(it.id)}`);
+      for (const tg of (it.tags || [])) {
+        const t = normalizeTag(tg);
+        if (!t) continue;
+        const chip = document.createElement("div");
+        chip.className = "tag";
+        chip.textContent = `#${t}`;
+        chip.title = "Click to search this tag";
+        chip.addEventListener("click", () => {
+          const current = qEl.value.trim();
+          const append = current ? (current + " ") : "";
+          qEl.value = append + `#${t}`;
+          render();
+        });
+        tagsWrap.appendChild(chip);
+      }
+
+      // actions
+      wrap.addEventListener("click", (ev) => {
+        const btn = ev.target?.closest?.("button");
+        if (!btn) return;
+        const act = btn.getAttribute("data-act");
+        const id = btn.getAttribute("data-id");
+        if (!act || !id) return;
+
+        if (act === "open") openItem(id);
+        if (act === "delete") deleteItem(id);
+        if (act === "complete") setReminderCompleted(id, true);
+        if (act === "uncomplete") setReminderCompleted(id, false);
+      });
+
+      listEl.appendChild(wrap);
+    }
+  }
+
+  function render() {
+    cleanup();
+    renderBanner();
+    renderQuickTags();
+
+    const pq = parseQuery(qEl.value);
+    const filtered = db.items.filter(it => matchesQuery(it, pq));
+
+    const sorted = sortItems(filtered, sortEl.value);
+
+    resultSummaryEl.textContent = `${sorted.length} item${sorted.length === 1 ? "" : "s"}`;
+    renderList(sorted);
+  }
+
+  function updateStorageSummary() {
+    const raw = localStorage.getItem(LS_KEY) || "";
+    const kb = (raw.length / 1024);
+    storageSummaryEl.textContent = `storage ~ ${kb.toFixed(1)} KB`;
+  }
+
+  function setEditorModeNew() {
+    selectedId = null;
+    editorTitleEl.textContent = "Add note / reminder";
+    typeEl.value = "note";
+    titleEl.value = "";
+    textEl.value = "";
+    tagsEl.value = "";
+    expiresEl.value = "";
+    dueEl.value = "";
+    completedEl.value = "false";
+    btnDelete.style.display = "none";
+    updateTypeFields();
+  }
+
+  function openItem(id) {
+    const it = db.items.find(x => x.id === id);
+    if (!it) return;
+
+    selectedId = it.id;
+    editorTitleEl.textContent = "Edit item";
+    typeEl.value = it.type;
+    titleEl.value = it.title || "";
+    textEl.value = it.text || "";
+    tagsEl.value = (it.tags || []).join(" ");
+    expiresEl.value = it.type === "note" ? toDateInputValue(it.expiresAt) : "";
+    dueEl.value = it.type === "reminder" ? toDateTimeLocalValue(it.dueAt) : "";
+    completedEl.value = it.type === "reminder" ? String(!!it.completed) : "false";
+
+    btnDelete.style.display = "";
+    updateTypeFields();
+    // Helpful on mobile
+    editorTitleEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function deleteItem(id) {
+    const it = db.items.find(x => x.id === id);
+    if (!it) return;
+    const ok = confirm(`Delete this ${it.type}? This cannot be undone.`);
+    if (!ok) return;
+
+    db.items = db.items.filter(x => x.id !== id);
+    saveDB();
+
+    if (selectedId === id) setEditorModeNew();
+    render();
+  }
+
+  function setReminderCompleted(id, completed) {
+    const it = db.items.find(x => x.id === id);
+    if (!it || it.type !== "reminder") return;
+    it.completed = !!completed;
+    it.completedAt = completed ? nowMs() : null;
+    it.updatedAt = nowMs();
+    saveDB();
+    render();
+    if (selectedId === id) openItem(id); // refresh editor
+  }
+
+  function saveFromEditor() {
+    const type = typeEl.value;
+    const title = (titleEl.value || "").trim();
+    const text = (textEl.value || "").trim();
+    const extraTags = parseExtraTags(tagsEl.value);
+    const inlineTags = extractTagsFromText(text);
+    const tags = unique([...inlineTags, ...extraTags]).filter(Boolean);
+
+    if (!text && !title) {
+      alert("Add at least a title or some text.");
+      return;
+    }
+
+    const now = nowMs();
+
+    let item = null;
+    if (selectedId) item = db.items.find(x => x.id === selectedId) || null;
+
+    if (!item) {
+      item = {
+        id: uuid(),
+        type,
+        title,
+        text,
+        tags,
+        createdAt: now,
+        updatedAt: now,
+        expiresAt: null,
+        dueAt: null,
+        completed: false,
+        completedAt: null
+      };
+      db.items.push(item);
+      selectedId = item.id;
+    } else {
+      // If changing type, normalize fields
+      item.type = type;
+      item.title = title;
+      item.text = text;
+      item.tags = tags;
+      item.updatedAt = now;
+      if (type === "note") {
+        item.dueAt = null;
+        item.completed = false;
+        item.completedAt = null;
+      } else {
+        item.expiresAt = null;
+      }
+    }
+
+    if (type === "note") {
+      const expVal = (expiresEl.value || "").trim();
+      item.expiresAt = expVal ? (parseDateYYYYMMDD(expVal) + (ONE_DAY - 1)) : null; // set to end-of-day
+    } else {
+      const dueVal = (dueEl.value || "").trim();
+      item.dueAt = dueVal ? new Date(dueVal).getTime() : null;
+      item.completed = (completedEl.value === "true");
+      item.completedAt = item.completed ? (item.completedAt || now) : null;
+    }
+
+    saveDB();
+    render();
+    openItem(item.id);
+  }
+
+  function exportData() {
+    cleanup();
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      app: "Local Notes + Hashtags + Reminders",
+      schemaVersion: 1,
+      data: db
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    a.href = url;
+    a.download = `notes-reminders-export-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importDataFile(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(String(reader.result || ""));
+        const incoming = obj?.data ?? obj; // allow raw db or wrapped export
+        if (!incoming || typeof incoming !== "object") throw new Error("Invalid JSON");
+        if (!Array.isArray(incoming.items)) throw new Error("Missing items[]");
+
+        // Merge strategy: by id, prefer newest updatedAt
+        const map = new Map(db.items.map(it => [it.id, it]));
+        for (const it of incoming.items) {
+          if (!it || !it.id) continue;
+          const existing = map.get(it.id);
+          if (!existing) {
+            map.set(it.id, sanitizeItem(it));
+          } else {
+            const a = existing.updatedAt || 0;
+            const b = it.updatedAt || 0;
+            map.set(it.id, sanitizeItem(b >= a ? it : existing));
+          }
+        }
+        db.items = [...map.values()];
+        saveDB();
+        render();
+        alert("Import complete. Items were merged by id (newer updates win).");
+      } catch (e) {
+        console.error(e);
+        alert("Could not import: invalid format.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function sanitizeItem(it) {
+    const now = nowMs();
+    const type = (it.type === "reminder") ? "reminder" : "note";
+    const out = {
+      id: String(it.id),
+      type,
+      title: (it.title || "").toString(),
+      text: (it.text || "").toString(),
+      tags: Array.isArray(it.tags) ? it.tags.map(normalizeTag).filter(Boolean) : [],
+      createdAt: Number(it.createdAt) || now,
+      updatedAt: Number(it.updatedAt) || now,
+      expiresAt: null,
+      dueAt: null,
+      completed: false,
+      completedAt: null
+    };
+    if (type === "note") {
+      out.expiresAt = (it.expiresAt == null) ? null : Number(it.expiresAt);
+      if (!Number.isFinite(out.expiresAt)) out.expiresAt = null;
+    } else {
+      out.dueAt = (it.dueAt == null) ? null : Number(it.dueAt);
+      if (!Number.isFinite(out.dueAt)) out.dueAt = null;
+      out.completed = !!it.completed;
+      out.completedAt = (it.completedAt == null) ? null : Number(it.completedAt);
+      if (!Number.isFinite(out.completedAt)) out.completedAt = null;
+    }
+    return out;
+  }
+
+  function wipeAll() {
+    const ok = confirm("Wipe ALL notes/reminders stored in this browser for this app?");
+    if (!ok) return;
+    localStorage.removeItem(LS_KEY);
+    db = { version: 1, items: [] };
+    setEditorModeNew();
+    updateStorageSummary();
+    render();
+  }
+
+  function escapeHtml(s) {
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ---------- Reminder checking ----------
+  function checkRemindersTick() {
+    cleanup();
+    renderBanner();
+
+    // If the page is open, we can also lightly notify on newly-overdue reminders.
+    // Minimal approach: if any exist, show the banner (already). No popups spam.
+    // If you want audible/notification APIs later, you can add here.
+  }
+
+  // ---------- Events ----------
+  typeEl.addEventListener("change", updateTypeFields);
+
+  btnNoExpire.addEventListener("click", () => {
+    expiresEl.value = "";
+  });
+
+  btnSave.addEventListener("click", saveFromEditor);
+  btnNew.addEventListener("click", setEditorModeNew);
+  btnDelete.addEventListener("click", () => {
+    if (!selectedId) return;
+    deleteItem(selectedId);
+  });
+
+  qEl.addEventListener("input", () => render());
+  sortEl.addEventListener("change", () => render());
+
+  btnClearSearch.addEventListener("click", () => {
+    qEl.value = "";
+    render();
+  });
+
+  btnExport.addEventListener("click", exportData);
+
+  btnImport.addEventListener("click", () => importFile.click());
+  importFile.addEventListener("change", (ev) => {
+    const file = ev.target.files?.[0];
+    if (file) importDataFile(file);
+    importFile.value = "";
+  });
+
+  btnWipe.addEventListener("click", wipeAll);
+
+  btnAbout.addEventListener("click", () => {
+    helpBox.style.display = (helpBox.style.display === "none") ? "" : "none";
+  });
+
+  // ---------- Init ----------
+  updateStorageSummary();
+  updateTypeFields();
+  render();
+  setEditorModeNew();
+
+  // check reminders right away + every minute
+  checkRemindersTick();
+  setInterval(checkRemindersTick, ONE_MIN);
+
+})();
+</script>
+</body>
+</html>
