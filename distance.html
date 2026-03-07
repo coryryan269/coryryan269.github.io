@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Location Distance Tracker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #60a5fa;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --border: #374151;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #020617);
+      color: var(--text);
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+    }
+
+    p {
+      color: var(--muted);
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 550px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 6px;
+    }
+
+    button.secondary {
+      background: #374151;
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    .status {
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      background: #0b1220;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .target-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .target {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #0b1220;
+    }
+
+    .target-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+
+    .target-name {
+      font-size: 1.05rem;
+      font-weight: bold;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .distance {
+      margin-top: 8px;
+      font-size: 1.2rem;
+      color: var(--good);
+      font-weight: bold;
+    }
+
+    .small {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .inline-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 10px 0;
+    }
+
+    .coords {
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Live Distance From Coordinates</h1>
+    <p>
+      This page uses your browser’s geolocation to continuously update your position
+      and calculate distance to saved coordinates.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Your Location</h2>
+        <div class="inline-buttons">
+          <button id="startBtn">Start Tracking</button>
+          <button id="stopBtn" class="secondary">Stop Tracking</button>
+        </div>
+
+        <div class="status" id="locationStatus">Tracking has not started.</div>
+
+        <div class="status">
+          <div><strong>Latitude:</strong> <span id="lat" class="coords">-</span></div>
+          <div><strong>Longitude:</strong> <span id="lng" class="coords">-</span></div>
+          <div><strong>Accuracy:</strong> <span id="accuracy">-</span></div>
+          <div><strong>Last Update:</strong> <span id="lastUpdate">-</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Add Target Coordinates</h2>
+
+        <div class="row">
+          <div>
+            <label for="name">Label</label>
+            <input id="name" type="text" placeholder="Home, Office, Favorite Spot" />
+          </div>
+          <div>
+            <label for="latitude">Latitude</label>
+            <input id="latitude" type="number" step="any" placeholder="41.8781" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="longitude">Longitude</label>
+            <input id="longitude" type="number" step="any" placeholder="-87.6298" />
+          </div>
+          <div style="display:flex; align-items:end;">
+            <button id="addBtn">Add Target</button>
+          </div>
+        </div>
+
+        <div class="small">
+          Tip: latitude ranges from -90 to 90, longitude from -180 to 180.
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Saved Targets</h2>
+      <div id="targetList" class="target-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "distance_tracker_targets_v1";
+
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const addBtn = document.getElementById("addBtn");
+
+    const nameInput = document.getElementById("name");
+    const latitudeInput = document.getElementById("latitude");
+    const longitudeInput = document.getElementById("longitude");
+
+    const locationStatus = document.getElementById("locationStatus");
+    const latEl = document.getElementById("lat");
+    const lngEl = document.getElementById("lng");
+    const accuracyEl = document.getElementById("accuracy");
+    const lastUpdateEl = document.getElementById("lastUpdate");
+    const targetListEl = document.getElementById("targetList");
+
+    let watchId = null;
+    let currentPosition = null;
+    let targets = loadTargets();
+
+    function loadTargets() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTargets() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(targets));
+    }
+
+    function formatTime(date) {
+      return new Date(date).toLocaleString();
+    }
+
+    function formatDistance(meters) {
+      if (meters < 1000) {
+        return `${meters.toFixed(1)} meters`;
+      }
+      const km = meters / 1000;
+      return `${km.toFixed(3)} km`;
+    }
+
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const toRad = deg => deg * Math.PI / 180;
+
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function updateLocationUI(position) {
+      const { latitude, longitude, accuracy } = position.coords;
+      currentPosition = position;
+
+      latEl.textContent = latitude.toFixed(6);
+      lngEl.textContent = longitude.toFixed(6);
+      accuracyEl.textContent = `${accuracy.toFixed(1)} meters`;
+      lastUpdateEl.textContent = formatTime(position.timestamp);
+      locationStatus.textContent = "Tracking active.";
+      renderTargets();
+    }
+
+    function handleLocationError(error) {
+      let message = "Location error.";
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          message = "Permission denied. Allow location access in your browser settings.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          message = "Location unavailable.";
+          break;
+        case error.TIMEOUT:
+          message = "Location request timed out.";
+          break;
+      }
+      locationStatus.textContent = message;
+    }
+
+    function startTracking() {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = "Geolocation is not supported by this browser.";
+        return;
+      }
+
+      if (watchId !== null) {
+        locationStatus.textContent = "Tracking is already running.";
+        return;
+      }
+
+      watchId = navigator.geolocation.watchPosition(
+        updateLocationUI,
+        handleLocationError,
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 5000
+        }
+      );
+
+      locationStatus.textContent = "Starting location tracking...";
+    }
+
+    function stopTracking() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        locationStatus.textContent = "Tracking stopped.";
+      }
+    }
+
+    function addTarget() {
+      const name = nameInput.value.trim() || "Unnamed Target";
+      const latitude = Number(latitudeInput.value);
+      const longitude = Number(longitudeInput.value);
+
+      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
+        alert("Please enter a valid latitude between -90 and 90.");
+        return;
+      }
+
+      if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        alert("Please enter a valid longitude between -180 and 180.");
+        return;
+      }
+
+      targets.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+        name,
+        latitude,
+        longitude
+      });
+
+      saveTargets();
+      renderTargets();
+
+      nameInput.value = "";
+      latitudeInput.value = "";
+      longitudeInput.value = "";
+    }
+
+    function deleteTarget(id) {
+      targets = targets.filter(t => t.id !== id);
+      saveTargets();
+      renderTargets();
+    }
+
+    function renderTargets() {
+      if (targets.length === 0) {
+        targetListEl.innerHTML = `<div class="empty">No targets saved yet.</div>`;
+        return;
+      }
+
+      const sortedTargets = [...targets].sort((a, b) => {
+        if (!currentPosition) return 0;
+        const da = haversineDistance(
+          currentPosition.coords.latitude,
+          currentPosition.coords.longitude,
+          a.latitude,
+          a.longitude
+        );
+        const db = haversineDistance(
+          currentPosition.coords.latitude,
+          currentPosition.coords.longitude,
+          b.latitude,
+          b.longitude
+        );
+        return da - db;
+      });
+
+      targetListEl.innerHTML = "";
+
+      sortedTargets.forEach(target => {
+        const div = document.createElement("div");
+        div.className = "target";
+
+        let distanceHtml = `<div class="distance muted">Distance unavailable until tracking starts</div>`;
+        if (currentPosition) {
+          const meters = haversineDistance(
+            currentPosition.coords.latitude,
+            currentPosition.coords.longitude,
+            target.latitude,
+            target.longitude
+          );
+          distanceHtml = `<div class="distance">${formatDistance(meters)}</div>`;
+        }
+
+        div.innerHTML = `
+          <div class="target-top">
+            <div>
+              <div class="target-name">${escapeHtml(target.name)}</div>
+              <div class="muted coords">
+                ${target.latitude.toFixed(6)}, ${target.longitude.toFixed(6)}
+              </div>
+            </div>
+            <div>
+              <button class="danger" data-id="${target.id}">Delete</button>
+            </div>
+          </div>
+          ${distanceHtml}
+        `;
+
+        div.querySelector("button").addEventListener("click", () => {
+          deleteTarget(target.id);
+        });
+
+        targetListEl.appendChild(div);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    startBtn.addEventListener("click", startTracking);
+    stopBtn.addEventListener("click", stopTracking);
+    addBtn.addEventListener("click", addTarget);
+
+    renderTargets();
+  </script>
+</body>
+</html>
