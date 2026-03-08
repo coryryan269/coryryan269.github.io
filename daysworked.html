@@ -1,1 +1,412 @@
-placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pharmacy Rotation Day Counter</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbe3ee;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --good: #166534;
+      --good-soft: #ecfdf5;
+      --warn: #92400e;
+      --warn-soft: #fffbeb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    p {
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+
+    .muted { color: var(--muted); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: #eef2f7;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fbfdff;
+    }
+
+    .stat h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .value {
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-size: 0.95rem;
+      color: var(--muted);
+      background: #fafcff;
+    }
+
+    .note {
+      padding: 14px 16px;
+      border-radius: 14px;
+      margin-top: 14px;
+    }
+
+    .note.info {
+      background: var(--accent-soft);
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .note.warn {
+      background: var(--warn-soft);
+      color: var(--warn);
+      border: 1px solid #fcd34d;
+    }
+
+    .tiny {
+      font-size: 0.92rem;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Pharmacy Rotation Day Counter</h1>
+      <p class="muted">Pick any inclusive date range to see how many days each pharmacist and technician works in that period.</p>
+      <p class="tiny"><strong>Reference schedule:</strong> Pharmacist 1 starts on <code>2026-03-09</code> and alternates every 7 days. Tech 1 starts on <code>2026-03-12</code> and alternates every 7 days.</p>
+
+      <div class="grid">
+        <div>
+          <label for="startDate">Start date</label>
+          <input id="startDate" type="date" />
+        </div>
+        <div>
+          <label for="endDate">End date</label>
+          <input id="endDate" type="date" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="calculateBtn">Calculate</button>
+        <button class="secondary" id="thisWeekBtn">Set to current week</button>
+        <button class="secondary" id="clearBtn">Clear</button>
+      </div>
+
+      <div id="message"></div>
+
+      <div id="results" style="display:none;">
+        <div class="summary">
+          <div class="stat">
+            <h3>Total days in range</h3>
+            <div class="value" id="totalDays">0</div>
+          </div>
+          <div class="stat">
+            <h3>Pharmacist 1</h3>
+            <div class="value" id="ph1Days">0</div>
+          </div>
+          <div class="stat">
+            <h3>Pharmacist 2</h3>
+            <div class="value" id="ph2Days">0</div>
+          </div>
+          <div class="stat">
+            <h3>Tech 1</h3>
+            <div class="value" id="tech1Days">0</div>
+          </div>
+          <div class="stat">
+            <h3>Tech 2</h3>
+            <div class="value" id="tech2Days">0</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Person</th>
+                <th>Days worked</th>
+                <th>% of selected range</th>
+              </tr>
+            </thead>
+            <tbody id="resultTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="note info tiny" id="rangeSummary"></div>
+      </div>
+    </div>
+
+    <div class="card tiny">
+      <p><strong>How it works</strong></p>
+      <p>Pharmacists alternate in full 7-day blocks from Monday through Sunday. Technicians alternate in full 7-day blocks from Thursday through Wednesday.</p>
+      <p>The counter checks every day in the selected range, so it works for both past and future dates and handles partial weeks correctly.</p>
+    </div>
+  </div>
+
+  <script>
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    const PHARMACIST_1_START = dayNumberFromYMD('2026-03-09'); // Monday
+    const TECH_1_START = dayNumberFromYMD('2026-03-12');       // Thursday
+
+    function dayNumberFromYMD(ymd) {
+      const [year, month, day] = ymd.split('-').map(Number);
+      return Math.floor(Date.UTC(year, month - 1, day) / MS_PER_DAY);
+    }
+
+    function ymdFromDateObj(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatDisplayDate(dayNumber) {
+      const date = new Date(dayNumber * MS_PER_DAY);
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC'
+      });
+    }
+
+    function positiveModulo(n, mod) {
+      return ((n % mod) + mod) % mod;
+    }
+
+    function isPharmacist1Working(dayNumber) {
+      const diff = dayNumber - PHARMACIST_1_START;
+      const blockIndex = Math.floor(diff / 7);
+      return positiveModulo(blockIndex, 2) === 0;
+    }
+
+    function isTech1Working(dayNumber) {
+      const diff = dayNumber - TECH_1_START;
+      const blockIndex = Math.floor(diff / 7);
+      return positiveModulo(blockIndex, 2) === 0;
+    }
+
+    function calculateRange() {
+      const startInput = document.getElementById('startDate').value;
+      const endInput = document.getElementById('endDate').value;
+      const message = document.getElementById('message');
+      const results = document.getElementById('results');
+
+      message.innerHTML = '';
+      results.style.display = 'none';
+
+      if (!startInput || !endInput) {
+        message.innerHTML = '<div class="note warn">Please choose both a start date and an end date.</div>';
+        return;
+      }
+
+      let startDay = dayNumberFromYMD(startInput);
+      let endDay = dayNumberFromYMD(endInput);
+
+      if (startDay > endDay) {
+        [startDay, endDay] = [endDay, startDay];
+      }
+
+      let pharmacist1 = 0;
+      let pharmacist2 = 0;
+      let tech1 = 0;
+      let tech2 = 0;
+
+      for (let day = startDay; day <= endDay; day++) {
+        if (isPharmacist1Working(day)) {
+          pharmacist1++;
+        } else {
+          pharmacist2++;
+        }
+
+        if (isTech1Working(day)) {
+          tech1++;
+        } else {
+          tech2++;
+        }
+      }
+
+      const totalDays = endDay - startDay + 1;
+
+      document.getElementById('totalDays').textContent = totalDays;
+      document.getElementById('ph1Days').textContent = pharmacist1;
+      document.getElementById('ph2Days').textContent = pharmacist2;
+      document.getElementById('tech1Days').textContent = tech1;
+      document.getElementById('tech2Days').textContent = tech2;
+
+      const rows = [
+        ['Pharmacist', 'Pharmacist 1', pharmacist1],
+        ['Pharmacist', 'Pharmacist 2', pharmacist2],
+        ['Technician', 'Tech 1', tech1],
+        ['Technician', 'Tech 2', tech2]
+      ];
+
+      document.getElementById('resultTableBody').innerHTML = rows.map(([role, person, days]) => {
+        const pct = ((days / totalDays) * 100).toFixed(2);
+        return `
+          <tr>
+            <td>${role}</td>
+            <td>${person}</td>
+            <td>${days}</td>
+            <td>${pct}%</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('rangeSummary').textContent =
+        `Selected range: ${formatDisplayDate(startDay)} through ${formatDisplayDate(endDay)} (inclusive). ` +
+        `If you entered the dates backwards, they were automatically reordered.`;
+
+      results.style.display = 'block';
+    }
+
+    function setCurrentWeek() {
+      const today = new Date();
+      const localDay = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      const mondayOffset = localDay === 0 ? -6 : 1 - localDay;
+
+      const monday = new Date(today);
+      monday.setDate(today.getDate() + mondayOffset);
+
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
+      document.getElementById('startDate').value = ymdFromDateObj(monday);
+      document.getElementById('endDate').value = ymdFromDateObj(sunday);
+      calculateRange();
+    }
+
+    function clearAll() {
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      document.getElementById('message').innerHTML = '';
+      document.getElementById('results').style.display = 'none';
+    }
+
+    document.getElementById('calculateBtn').addEventListener('click', calculateRange);
+    document.getElementById('thisWeekBtn').addEventListener('click', setCurrentWeek);
+    document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+    document.getElementById('startDate').addEventListener('change', () => {
+      if (document.getElementById('endDate').value) calculateRange();
+    });
+
+    document.getElementById('endDate').addEventListener('change', () => {
+      if (document.getElementById('startDate').value) calculateRange();
+    });
+  </script>
+</body>
+</html>
