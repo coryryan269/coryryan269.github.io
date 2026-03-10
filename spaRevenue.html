@@ -341,10 +341,10 @@
               <label for="avgAppointmentRevenue">Revenue per appointment</label>
               <input id="avgAppointmentRevenue" type="number" min="1" step="1" />
             </div>
-            <!-- <div class="field">
+            <div class="field">
               <label for="commissionPercent">Commission % of revenue</label>
               <input id="commissionPercent" type="number" min="0" max="100" step="0.1" />
-            </div> -->
+            </div>
             <div class="field">
               <label for="profitRetainedPercent">Target retained profit % of revenue</label>
               <input id="profitRetainedPercent" type="number" min="0" max="100" step="0.1" />
@@ -474,15 +474,15 @@
         <div class="field" style="margin-bottom:0;">
           <label>Expense name</label>
           <input type="text" class="expense-name" placeholder="Rent, payroll taxes, laundry, products..." />
-        </div>
+        </div><br>
         <div class="field" style="margin-bottom:0;">
           <label>Flat monthly $</label>
           <input type="number" class="expense-flat" min="0" step="1" />
         </div>
-        <div class="field" style="margin-bottom:0;">
+        <!-- <div class="field" style="margin-bottom:0;">
           <label>% of revenue</label>
-          <input type="number" class="expense-percent" min="0" max="100" step="0.1" />
-        </div>
+          <input type="number" class="expense-percent" min="0" max="0" step="0.1" />
+        </div> -->
         <div class="expense-actions">
           <button class="ghost delete-expense" title="Delete expense">✕</button>
         </div>
