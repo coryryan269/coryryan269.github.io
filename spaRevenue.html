@@ -108,6 +108,7 @@
     }
 
     input, button, select {
+      width: 100%;
       border: 1px solid var(--border);
       background: #0b1220;
       color: var(--text);
@@ -194,9 +195,10 @@
 
     .expense-grid {
       display: grid;
-      grid-template-columns: 1.5fr 0.9fr 0.9fr auto;
+      grid-template-columns: minmax(0,1fr) 120px 120px auto;
       gap: 10px;
       align-items: end;
+      width: 100%;
     }
 
     .expense-actions {
