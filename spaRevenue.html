@@ -194,12 +194,11 @@
     }
 
     .expense-grid {
-      display: grid;
-      grid-template-columns: minmax(0,1fr) 120px 120px auto;
-      gap: 10px;
-      align-items: end;
-      width: 100%;
-    }
+  display: grid;
+  grid-template-columns: 1fr 110px auto;
+  gap: 10px;
+  align-items: end;
+}
 
     .expense-actions {
       display: flex;
@@ -342,10 +341,10 @@
               <label for="avgAppointmentRevenue">Revenue per appointment</label>
               <input id="avgAppointmentRevenue" type="number" min="1" step="1" />
             </div>
-            <div class="field">
+            <!-- <div class="field">
               <label for="commissionPercent">Commission % of revenue</label>
               <input id="commissionPercent" type="number" min="0" max="100" step="0.1" />
-            </div>
+            </div> -->
             <div class="field">
               <label for="profitRetainedPercent">Target retained profit % of revenue</label>
               <input id="profitRetainedPercent" type="number" min="0" max="100" step="0.1" />
