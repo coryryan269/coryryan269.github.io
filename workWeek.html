@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Calendar</title>
+    <title>Work Weeks</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -117,11 +117,15 @@
         }
         
         .day-cell.blue-period {
-            background-color: rgba(52, 152, 219, 0.3);
+            background-color: rgba(52, 152, 219, 0.5);
         }
         
         .day-cell.red-period {
-            background-color: rgba(231, 76, 60, 0.3);
+            background-color: rgba(231, 76, 60, 0.5);
+        }
+        
+        .day-cell.pharmacist-one-day {
+            text-decoration: underline;
         }
         
         .legend {
@@ -147,8 +151,8 @@
             flex-shrink: 0;
         }
         
-        .legend-blue { background-color: rgba(52, 152, 219, 0.3); }
-        .legend-red { background-color: rgba(231, 76, 60, 0.3); }
+        .legend-blue { background-color: rgba(52, 152, 219, 0.5); }
+        .legend-red { background-color: rgba(231, 76, 60, 0.5); }
         .legend-today { border: 2px solid #e67e22; border-radius: 50%; }
         
         /* Tablet and Desktop Styles */
@@ -317,11 +321,11 @@
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color legend-blue"></div>
-                <span>Thursday-Sunday (Active Week)</span>
+                <span>Working with Pharmacist 1</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color legend-red"></div>
-                <span>Monday-Wednesday (Active Week)</span>
+                <span>Working with Pharmacist 2</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color legend-today"></div>
@@ -334,11 +338,14 @@
         let currentDate = new Date();
         const today = new Date();
         
-        // Reference dates for the pattern
+        // Reference dates for your work pattern
         const blueStart = new Date(2025, 6, 3); // July 3, 2025 (Thursday)
         const blueEnd = new Date(2025, 6, 6);   // July 6, 2025 (Sunday)
         const redStart = new Date(2025, 6, 7);  // July 7, 2025 (Monday)
         const redEnd = new Date(2025, 6, 9);    // July 9, 2025 (Wednesday)
+        
+        // Reference dates for pharmacist schedules
+        const pharmacistRefDate = new Date(2026, 2, 9); // March 9, 2026 (Pharmacist One starts)
         
         // Exception dates
         const exceptions = {
@@ -383,6 +390,20 @@
             return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
         }
         
+        function getPharmacistSchedule(date) {
+            // Pharmacist One: starts March 9, 2026, works 7 days, then off 7 days
+            // Pharmacist Two: alternates with Pharmacist One
+            const timeDiff = date.getTime() - pharmacistRefDate.getTime();
+            const daysSinceRef = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const cyclePosition = ((daysSinceRef % 14) + 14) % 14;
+            
+            if (cyclePosition < 7) {
+                return 'pharmacist-one'; // First 7 days of cycle
+            } else {
+                return 'pharmacist-two'; // Second 7 days of cycle
+            }
+        }
+        
         function getColorForDate(date) {
             const dateStr = getDateString(date);
             
@@ -393,23 +414,17 @@
             }
             
             const daysSinceRef = getDaysSinceReference(date);
-            const cyclePosition = ((daysSinceRef % 14) + 14) % 14; // 14-day cycle
+            const cyclePosition = ((daysSinceRef % 14) + 14) % 14;
             
-            // The reference pattern over 2 weeks:
-            // Week 1: July 3-6 (Thu-Sun) blue, July 7-9 (Mon-Wed) red, July 10-16 no color
-            // Week 2: July 17-20 (Thu-Sun) blue, July 21-23 (Mon-Wed) red, July 24-30 no color
-            // July 3 is day 0, so:
-            // Days 0,1,2,3 (Thu-Sun) = blue (July 3-6)
-            // Days 4,5,6 (Mon-Wed) = red (July 7-9)
-            // Days 7-13 = no color (July 10-16)
-            // Pattern repeats every 14 days
+            // Days 0,1,2,3 (Thu-Sun) = blue (Pharmacist 1)
+            // Days 4,5,6 (Mon-Wed) = red (Pharmacist 2)
+            // Days 7-13 = no color (off week)
             
             if (cyclePosition >= 0 && cyclePosition <= 3) {
-                return 'blue-period';  // Thu-Sun of active week
+                return 'blue-period';  // Working with Pharmacist 1
             } else if (cyclePosition >= 4 && cyclePosition <= 6) {
-                return 'red-period';   // Mon-Wed of active week
+                return 'red-period';   // Working with Pharmacist 2
             }
-            // Days 7-13 have no color (off week)
             
             return '';
         }
@@ -462,6 +477,11 @@
                 const colorClass = getColorForDate(cellDate);
                 if (colorClass) {
                     cell.classList.add(colorClass);
+                }
+                
+                // Underline if Pharmacist 1 is on duty
+                if (getPharmacistSchedule(cellDate) === 'pharmacist-one') {
+                    cell.classList.add('pharmacist-one-day');
                 }
                 
                 grid.appendChild(cell);
