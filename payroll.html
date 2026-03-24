@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Commission Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --good: #065f46;
+      --good-soft: #d1fae5;
+      --warn: #92400e;
+      --warn-soft: #fef3c7;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #eff6ff, #ffffff);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 1.1;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      max-width: 850px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
+      gap: 12px;
+      margin-top: 20px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    input[type="file"],
+    input[type="search"],
+    select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.96rem;
+      background: white;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid #d1d5db;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .meta, .empty, .error {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: #1d4ed8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .name {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .empno {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .total-chip {
+      background: var(--good-soft);
+      color: var(--good);
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .section {
+      padding: 16px 18px;
+    }
+
+    .section + .section {
+      border-top: 1px solid var(--line);
+    }
+
+    .section-title {
+      font-size: 0.83rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      background: #f9fafb;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.94rem;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .pct {
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+
+    .other-badge {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--warn-soft);
+      color: var(--warn);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .empty, .error {
+      margin-top: 16px;
+    }
+
+    .error {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    @media (max-width: 860px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Employee Commission Dashboard</h1>
+      <p class="sub">
+        Upload a payroll summary CSV and get each employee's service commission, retail commission, tips, total, service hours, services performed,
+        and any other commission types found in the file. Percentages are calculated from each commission divided by its matching sales total.
+      </p>
+
+      <div class="controls">
+        <div class="field">
+          <label for="fileInput">Upload CSV</label>
+          <input id="fileInput" type="file" accept=".csv,text/csv" />
+        </div>
+
+        <div class="field">
+          <label for="searchInput">Search employee</label>
+          <input id="searchInput" type="search" placeholder="Start typing a name..." />
+        </div>
+
+        <div class="field">
+          <label for="sortSelect">Sort by</label>
+          <select id="sortSelect">
+            <option value="name">Employee name</option>
+            <option value="total-desc">Total (high to low)</option>
+            <option value="service-desc">Service commission (high to low)</option>
+            <option value="retail-desc">Retail commission (high to low)</option>
+            <option value="tips-desc">Tips (high to low)</option>
+            <option value="hours-desc">Service hours (high to low)</option>
+            <option value="services-desc">Services performed (high to low)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button id="downloadBtn" class="secondary" type="button">Download JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="meta" class="meta hidden"></div>
+    <div id="error" class="error hidden"></div>
+    <div id="empty" class="empty">Upload a CSV file to get started.</div>
+    <div id="results" class="grid hidden"></div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const meta = document.getElementById('meta');
+    const errorBox = document.getElementById('error');
+    const empty = document.getElementById('empty');
+    const results = document.getElementById('results');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let processedEmployees = [];
+    let sourceFileName = '';
+    let sourcePeriod = '';
+
+    const money = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    });
+
+    const plainNumber = new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 2
+    });
+
+    function normalizeKey(value) {
+      return String(value ?? '').trim();
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined || value === '') return 0;
+      if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+      const cleaned = String(value).replace(/[$,%\s,]/g, '');
+      const parsed = parseFloat(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function formatMoney(value) {
+      return money.format(toNumber(value));
+    }
+
+    function formatPct(value) {
+      if (value === null || value === undefined || Number.isNaN(value)) return '—';
+      return `${value.toFixed(2)}%`;
+    }
+
+    function formatNumber(value) {
+      return plainNumber.format(toNumber(value));
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function percentOf(part, total) {
+      const p = toNumber(part);
+      const t = toNumber(total);
+      if (!t) return null;
+      return (p / t) * 100;
+    }
+
+    function prettifyFieldName(name) {
+      return name
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/^Pkg /, 'Package ')
+        .replace(/^Mem /, 'Membership ')
+        .trim();
+    }
+
+    function detectOtherCommissions(row) {
+      const keys = Object.keys(row);
+      const ignored = new Set(['ServiceComm', 'RetailComm']);
+      const found = [];
+
+      keys.forEach((key) => {
+        if (!/Comm$/i.test(key) || ignored.has(key)) return;
+        const amount = toNumber(row[key]);
+        if (!amount) return;
+
+        const salesKey = key.replace(/Comm$/i, 'Sales');
+        const salesTotal = Object.prototype.hasOwnProperty.call(row, salesKey) ? toNumber(row[salesKey]) : 0;
+
+        found.push({
+          label: prettifyFieldName(key),
+          amount,
+          salesKey,
+          salesTotal,
+          percent: salesTotal ? percentOf(amount, salesTotal) : null
+        });
+      });
+
+      return found;
+    }
+
+    function parsePeriod(rows) {
+      const first = rows[0] || {};
+      const start = normalizeKey(first.PayrollPeriodStartDate).slice(0, 10);
+      const end = normalizeKey(first.PayrollPeriodEndDate).slice(0, 10);
+      if (!start && !end) return '';
+      return `${start || 'Unknown start'} to ${end || 'Unknown end'}`;
+    }
+
+    function processRows(rows) {
+      return rows
+        .filter((row) => normalizeKey(row.EmployeeName))
+        .map((row) => {
+          const serviceSales = toNumber(row.ServiceSales);
+          const retailSales = toNumber(row.RetailSales);
+          const serviceComm = toNumber(row.ServiceComm);
+          const retailComm = toNumber(row.RetailComm);
+          const tips = toNumber(row.Tips);
+          const total = toNumber(row.Total);
+          const totalSrvHours = toNumber(row.TotalSrvHours);
+          const numServices = toNumber(row.NumberSrvPerformed);
+          const others = detectOtherCommissions(row);
+
+          return {
+            employeeName: normalizeKey(row.EmployeeName),
+            employeeNumber: normalizeKey(row.EmployeeNumber),
+            serviceCommission: serviceComm,
+            serviceSales,
+            serviceCommissionPct: percentOf(serviceComm, serviceSales),
+            retailCommission: retailComm,
+            retailSales,
+            retailCommissionPct: percentOf(retailComm, retailSales),
+            tips,
+            total,
+            totalServiceHours: totalSrvHours,
+            servicesPerformed: numServices,
+            otherCommissions: others,
+            raw: row
+          };
+        })
+        .filter(emp => emp.total > 0);
+    }
+
+    function sortEmployees(data, mode) {
+      const list = [...data];
+      const sorterMap = {
+        'name': (a, b) => a.employeeName.localeCompare(b.employeeName),
+        'total-desc': (a, b) => b.total - a.total || a.employeeName.localeCompare(b.employeeName),
+        'service-desc': (a, b) => b.serviceCommission - a.serviceCommission || a.employeeName.localeCompare(b.employeeName),
+        'retail-desc': (a, b) => b.retailCommission - a.retailCommission || a.employeeName.localeCompare(b.employeeName),
+        'tips-desc': (a, b) => b.tips - a.tips || a.employeeName.localeCompare(b.employeeName),
+        'hours-desc': (a, b) => b.totalServiceHours - a.totalServiceHours || a.employeeName.localeCompare(b.employeeName),
+        'services-desc': (a, b) => b.servicesPerformed - a.servicesPerformed || a.employeeName.localeCompare(b.employeeName)
+      };
+      return list.sort(sorterMap[mode] || sorterMap.name);
+    }
+
+    function renderMeta(data) {
+      const employeeCount = data.length;
+      const totals = data.reduce((acc, emp) => {
+        acc.service += emp.serviceCommission;
+        acc.retail += emp.retailCommission;
+        acc.tips += emp.tips;
+        acc.total += emp.total;
+        acc.hours += emp.totalServiceHours;
+        acc.services += emp.servicesPerformed;
+        return acc;
+      }, { service: 0, retail: 0, tips: 0, total: 0, hours: 0, services: 0 });
+
+      meta.innerHTML = `
+        <span class="pill">File: ${escapeHtml(sourceFileName || 'Uploaded CSV')}</span>
+        ${sourcePeriod ? `<span class="pill">Period: ${escapeHtml(sourcePeriod)}</span>` : ''}
+        <span class="pill">Employees: ${employeeCount}</span>
+        <span class="pill">Service Comm: ${formatMoney(totals.service)}</span>
+        <span class="pill">Retail Comm: ${formatMoney(totals.retail)}</span>
+        <span class="pill">Tips: ${formatMoney(totals.tips)}</span>
+        <span class="pill">Grand Total: ${formatMoney(totals.total)}</span>
+        <span class="pill">Service Hours: ${formatNumber(totals.hours)}</span>
+        <span class="pill">Services Performed: ${formatNumber(totals.services)}</span>
+      `;
+      meta.classList.remove('hidden');
+    }
+
+    function employeeCard(emp) {
+      const otherRows = emp.otherCommissions.length
+        ? emp.otherCommissions.map((item) => `
+            <tr>
+              <td><span class="other-badge">${escapeHtml(item.label)}</span></td>
+              <td>${formatMoney(item.amount)}</td>
+              <td>${item.salesTotal ? formatMoney(item.salesTotal) : '—'}</td>
+              <td class="pct">${formatPct(item.percent)}</td>
+            </tr>
+          `).join('')
+        : `
+            <tr>
+              <td colspan="4" style="color: var(--muted);">No other commission types found.</td>
+            </tr>
+          `;
+
+      return `
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="name">${escapeHtml(emp.employeeName)}</h2>
+              <div class="empno">Employee #${escapeHtml(emp.employeeNumber || '—')}</div>
+            </div>
+            <div class="total-chip">Total: ${formatMoney(emp.total)}</div>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Core pay summary</p>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Service Commission</div>
+                <div class="stat-value">${formatMoney(emp.serviceCommission)}</div>
+                <div class="stat-label">${formatPct(emp.serviceCommissionPct)} of ${formatMoney(emp.serviceSales)}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Retail Commission</div>
+                <div class="stat-value">${formatMoney(emp.retailCommission)}</div>
+                <div class="stat-label">${formatPct(emp.retailCommissionPct)} of ${formatMoney(emp.retailSales)}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Tips</div>
+                <div class="stat-value">${formatMoney(emp.tips)}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Total</div>
+                <div class="stat-value">${formatMoney(emp.total)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Service activity</p>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Total Service Hours</div>
+                <div class="stat-value">${formatNumber(emp.totalServiceHours)}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Services Performed</div>
+                <div class="stat-value">${formatNumber(emp.servicesPerformed)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <p class="section-title">Other commission types</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Commission</th>
+                  <th>Matching Sales</th>
+                  <th>Percent</th>
+                </tr>
+              </thead>
+              <tbody>${otherRows}</tbody>
+            </table>
+          </div>
+        </article>
+      `;
+    }
+
+    function render() {
+      const query = searchInput.value.trim().toLowerCase();
+      const sorted = sortEmployees(processedEmployees, sortSelect.value);
+      const filtered = sorted.filter((emp) => emp.employeeName.toLowerCase().includes(query));
+
+      if (!processedEmployees.length) {
+        results.classList.add('hidden');
+        empty.textContent = 'Upload a CSV file to get started.';
+        empty.classList.remove('hidden');
+        meta.classList.add('hidden');
+        return;
+      }
+
+      renderMeta(processedEmployees);
+
+      if (!filtered.length) {
+        results.classList.add('hidden');
+        empty.textContent = 'No employees matched your search.';
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      empty.classList.add('hidden');
+      results.classList.remove('hidden');
+      results.innerHTML = filtered.map(employeeCard).join('');
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.remove('hidden');
+    }
+
+    function clearError() {
+      errorBox.textContent = '';
+      errorBox.classList.add('hidden');
+    }
+
+    function validateColumns(columns) {
+      const required = ['EmployeeName', 'ServiceComm', 'RetailComm', 'Tips', 'Total', 'TotalSrvHours', 'NumberSrvPerformed'];
+      const missing = required.filter((col) => !columns.includes(col));
+      return missing;
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+
+      clearError();
+      sourceFileName = file.name;
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: false,
+        complete: ({ data, meta: parseMeta, errors }) => {
+          if (errors?.length) {
+            showError(`Unable to parse the CSV cleanly. ${errors[0].message}`);
+            return;
+          }
+
+          const missing = validateColumns(parseMeta.fields || []);
+          if (missing.length) {
+            showError(`This file is missing required columns: ${missing.join(', ')}`);
+            return;
+          }
+
+          sourcePeriod = parsePeriod(data);
+          processedEmployees = processRows(data);
+          render();
+        },
+        error: (err) => {
+          showError(`Could not read file: ${err.message}`);
+        }
+      });
+    });
+
+    searchInput.addEventListener('input', render);
+    sortSelect.addEventListener('change', render);
+
+    downloadBtn.addEventListener('click', () => {
+      if (!processedEmployees.length) {
+        showError('Upload a CSV before downloading JSON.');
+        return;
+      }
+      clearError();
+      const exportPayload = {
+        fileName: sourceFileName,
+        period: sourcePeriod,
+        employees: processedEmployees.map(({ raw, ...rest }) => rest)
+      };
+      const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (sourceFileName || 'employee-summary').replace(/\.[^.]+$/, '') + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
