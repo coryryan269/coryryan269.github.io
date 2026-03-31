@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSV Merger (Comma-Safe)</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      max-width: 720px;
+    }
+    button {
+      padding: 0.6rem 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 1rem;
+    }
+    #status table {
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    #status th, #status td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    #status th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>CSV Row Merger</h2>
+  <p>Merge multiple CSV files with identical headers. Commas, quotes, and newlines are handled safely.</p>
+
+  <input type="file" id="fileInput" accept=".csv" multiple />
+  <br />
+  <label>
+    <input type="checkbox" id="removeDuplicates" />
+    Remove duplicate rows
+  </label>
+  <br />
+  <button onclick="mergeCSVs()">Merge & Download</button>
+
+  <div id="status"></div>
+
+  <script>
+    // Robust CSV parser (RFC-style)
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let field = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && inQuotes && next === '"') {
+          field += '"';
+          i++;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          row.push(field);
+          field = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (field.length || row.length) {
+            row.push(field);
+            rows.push(row);
+            row = [];
+            field = '';
+          }
+        } else {
+          field += char;
+        }
+      }
+
+      if (field.length || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    // Proper CSV escaping for output
+    function escapeCSV(value) {
+      if (value == null) return '';
+      const mustQuote = /[",\n\r]/.test(value);
+      let escaped = value.replace(/"/g, '""');
+      return mustQuote ? `"${escaped}"` : escaped;
+    }
+
+    async function mergeCSVs() {
+      const files = document.getElementById('fileInput').files;
+      const status = document.getElementById('status');
+      const removeDuplicates = document.getElementById('removeDuplicates').checked;
+
+      if (!files.length) {
+        status.textContent = '❌ Please select at least one CSV file.';
+        return;
+      }
+
+      let masterHeader = null;
+      const mergedRows = [];
+      const seenRows = new Map();
+      const duplicates = [];
+
+      for (const file of files) {
+        const text = await file.text();
+        const parsed = parseCSV(text);
+        if (!parsed.length) continue;
+
+        const header = parsed[0];
+
+        if (!masterHeader) {
+          masterHeader = header;
+        } else if (
+          header.length !== masterHeader.length ||
+          !header.every((h, i) => h === masterHeader[i])
+        ) {
+          status.textContent =
+            `❌ Header mismatch detected in file:\n${file.name}`;
+          return;
+        }
+
+        for (let i = 1; i < parsed.length; i++) {
+          const rowKey = JSON.stringify(parsed[i]);
+          const lineNum = i + 1;
+          
+          if (removeDuplicates) {
+            if (!seenRows.has(rowKey)) {
+              seenRows.set(rowKey, { file: file.name, line: lineNum, row: parsed[i] });
+              mergedRows.push(parsed[i]);
+            } else {
+              const original = seenRows.get(rowKey);
+              duplicates.push({
+                originalFile: original.file,
+                originalLine: original.line,
+                duplicateFile: file.name,
+                duplicateLine: lineNum,
+                row: parsed[i]
+              });
+            }
+          } else {
+            mergedRows.push(parsed[i]);
+          }
+        }
+      }
+
+      const outputLines = [];
+      outputLines.push(masterHeader.map(escapeCSV).join(','));
+      for (const row of mergedRows) {
+        outputLines.push(row.map(escapeCSV).join(','));
+      }
+
+      const finalCSV = outputLines.join('\n');
+      const blob = new Blob([finalCSV], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'merged.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      let statusHTML = `✅ Success!<br>Files merged: ${files.length}<br>Total rows: ${mergedRows.length}`;
+      if (removeDuplicates && duplicates.length > 0) {
+        statusHTML += `<br>Duplicate rows removed: ${duplicates.length}`;
+        statusHTML += getDuplicatesTableHTML(duplicates, masterHeader);
+      }
+      status.innerHTML = statusHTML;
+    }
+
+    function getDuplicatesTableHTML(duplicates, headers) {
+      let tableHTML = '<h3 style="margin-top: 1.5rem;">Duplicate Rows Removed</h3>';
+      tableHTML += '<table><tr>';
+      tableHTML += '<th>Original File</th>';
+      tableHTML += '<th>Original Line</th>';
+      tableHTML += '<th>Duplicate File</th>';
+      tableHTML += '<th>Duplicate Line</th>';
+      for (const header of headers) {
+        tableHTML += `<th>${escapeHTML(header)}</th>`;
+      }
+      tableHTML += '</tr>';
+      for (const duplicate of duplicates) {
+        tableHTML += '<tr>';
+        tableHTML += `<td>${escapeHTML(duplicate.originalFile)}</td>`;
+        tableHTML += `<td>${duplicate.originalLine}</td>`;
+        tableHTML += `<td>${escapeHTML(duplicate.duplicateFile)}</td>`;
+        tableHTML += `<td>${duplicate.duplicateLine}</td>`;
+        for (const value of duplicate.row) {
+          tableHTML += `<td>${escapeHTML(value)}</td>`;
+        }
+        tableHTML += '</tr>';
+      }
+      tableHTML += '</table>';
+      return tableHTML;
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
