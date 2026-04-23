@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSV to Microsoft SQL Generator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --border: #334155;
+      --good: #22c55e;
+      --warn: #f59e0b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: var(--text);
+    }
+
+    .container {
+      width: min(1200px, 94vw);
+      margin: 24px auto 40px;
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 { margin-top: 0; }
+    h1 { font-size: 28px; margin-bottom: 10px; }
+    h2 { font-size: 20px; }
+    p { color: var(--muted); line-height: 1.5; }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    button {
+      border: none;
+      background: var(--accent);
+      color: #082f49;
+      font-weight: bold;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    button.secondary {
+      background: #cbd5e1;
+      color: #0f172a;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+
+    @media (max-width: 900px) {
+      .col-8, .col-6, .col-4, .col-3 { grid-column: span 12; }
+    }
+
+    .hidden { display: none; }
+
+    .status {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .status.good { border-color: rgba(34, 197, 94, 0.4); color: #bbf7d0; }
+    .status.warn { border-color: rgba(245, 158, 11, 0.4); color: #fde68a; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: #0b1220;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .mono {
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+    }
+
+    textarea {
+      min-height: 360px;
+      resize: vertical;
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      line-height: 1.45;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 999px;
+      color: #bae6fd;
+      font-size: 12px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>CSV to Microsoft SQL Generator</h1>
+      <p>
+        Upload a CSV, choose the SQL type for each column, and generate a <span class="mono">CREATE TABLE</span>
+        statement plus <span class="mono">INSERT</span> statements. Blank cells become <span class="mono">NULL</span>.
+        Quoted CSV values with commas are supported.
+      </p>
+      <div class="grid">
+        <div class="col-6">
+          <label for="csvFile">CSV file</label>
+          <input type="file" id="csvFile" accept=".csv,text/csv" />
+        </div>
+        <div class="col-6">
+          <label for="tableName">SQL table name</label>
+          <input type="text" id="tableName" placeholder="Example: dbo.MyTable" value="dbo.MyTable" />
+        </div>
+        <div class="col-12">
+          <button id="parseBtn">Load CSV</button>
+          <span class="small">The first row is treated as the header row.</span>
+        </div>
+      </div>
+      <div id="parseStatus" class="status hidden"></div>
+    </div>
+
+    <div id="mappingCard" class="card hidden">
+      <h2>Column Types</h2>
+      <p>Review each detected column and choose how it should be stored in Microsoft SQL Server.</p>
+      <div style="margin-bottom: 14px;">
+        <button id="saveSettingsBtn">Save Settings</button>
+        <select id="loadSettingsSelect" style="margin-left: 10px;">
+          <option value="">Load Saved Settings...</option>
+        </select>
+        <button id="loadSettingsBtn" class="secondary" style="margin-left: 10px;">Load</button>
+      </div>
+      <div class="table-wrap">
+        <table id="columnTable">
+          <thead>
+            <tr>
+              <th>Column Name</th>
+              <th>SQL Type</th>
+              <th>Length / Precision</th>
+              <th>Sample Values</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div style="margin-top: 14px;">
+        <button id="generateBtn">Generate SQL</button>
+      </div>
+      <div class="small" style="margin-top: 10px;">
+        Supported type handling includes strings, character values, booleans, dates, datetimes, and several numeric types.
+      </div>
+    </div>
+
+    <div id="outputCard" class="card hidden">
+      <h2>Generated SQL</h2>
+      <div style="margin-bottom: 12px;">
+        <button id="copyBtn">Copy SQL</button>
+        <button id="downloadBtn" class="secondary">Download .sql</button>
+      </div>
+      <textarea id="sqlOutput" spellcheck="false"></textarea>
+      <div id="generateStatus" class="status hidden"></div>
+    </div>
+  </div>
+
+  <script>
+    const TYPE_DEFS = {
+      NVARCHAR_255: { label: 'NVARCHAR(255)', sql: () => 'NVARCHAR(255)', kind: 'string' },
+      NVARCHAR_MAX: { label: 'NVARCHAR(MAX)', sql: () => 'NVARCHAR(MAX)', kind: 'string' },
+      VARCHAR_255: { label: 'VARCHAR(255)', sql: () => 'VARCHAR(255)', kind: 'string' },
+      CHAR_1: { label: 'CHAR(1)', sql: () => 'CHAR(1)', kind: 'char' },
+      CHAR_N: { label: 'CHAR(n)', sql: (opts) => `CHAR(${safeInt(opts.length, 1)})`, kind: 'char' },
+      BIT: { label: 'BIT', sql: () => 'BIT', kind: 'boolean' },
+      DATE: { label: 'DATE', sql: () => 'DATE', kind: 'date' },
+      DATETIME2: { label: 'DATETIME2', sql: () => 'DATETIME2', kind: 'datetime' },
+      INT: { label: 'INT', sql: () => 'INT', kind: 'integer' },
+      BIGINT: { label: 'BIGINT', sql: () => 'BIGINT', kind: 'integer' },
+      DECIMAL: { label: 'DECIMAL(p,s)', sql: (opts) => `DECIMAL(${safeInt(opts.precision, 18)},${safeInt(opts.scale, 2)})`, kind: 'decimal' },
+      FLOAT: { label: 'FLOAT', sql: () => 'FLOAT', kind: 'float' }
+    };
+
+    const state = {
+      headers: [],
+      rows: [],
+      samples: []
+    };
+
+    const csvFile = document.getElementById('csvFile');
+    const tableName = document.getElementById('tableName');
+    const parseBtn = document.getElementById('parseBtn');
+    const parseStatus = document.getElementById('parseStatus');
+    const mappingCard = document.getElementById('mappingCard');
+    const outputCard = document.getElementById('outputCard');
+    const columnTableBody = document.querySelector('#columnTable tbody');
+    const generateBtn = document.getElementById('generateBtn');
+    const sqlOutput = document.getElementById('sqlOutput');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const generateStatus = document.getElementById('generateStatus');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const loadSettingsSelect = document.getElementById('loadSettingsSelect');
+    const loadSettingsBtn = document.getElementById('loadSettingsBtn');
+
+    parseBtn.addEventListener('click', handleParse);
+    generateBtn.addEventListener('click', handleGenerate);
+    saveSettingsBtn.addEventListener('click', handleSaveSettings);
+    loadSettingsBtn.addEventListener('click', handleLoadSettings);
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(sqlOutput.value);
+        showStatus(generateStatus, 'SQL copied to clipboard.', 'good');
+      } catch {
+        showStatus(generateStatus, 'Could not copy automatically. You can still copy from the text box.', 'warn');
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const blob = new Blob([sqlOutput.value], { type: 'text/sql;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'generated_sql.sql';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    function showStatus(el, message, tone) {
+      el.textContent = message;
+      el.className = `status ${tone || ''}`.trim();
+      el.classList.remove('hidden');
+    }
+
+    function hideStatus(el) {
+      el.classList.add('hidden');
+      el.textContent = '';
+      el.className = 'status hidden';
+    }
+
+    async function handleParse() {
+      hideStatus(parseStatus);
+      hideStatus(generateStatus);
+      outputCard.classList.add('hidden');
+
+      const file = csvFile.files[0];
+      if (!file) {
+        showStatus(parseStatus, 'Please choose a CSV file first.', 'warn');
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const parsed = parseCSV(text);
+
+        if (parsed.length < 2) {
+          showStatus(parseStatus, 'The CSV needs a header row and at least one data row.', 'warn');
+          return;
+        }
+
+        const headers = parsed[0].map((h, idx) => sanitizeHeader(h, idx));
+        const rows = parsed.slice(1).filter(row => row.some(cell => String(cell ?? '').trim() !== ''));
+
+        if (!rows.length) {
+          showStatus(parseStatus, 'The CSV did not contain any non-empty data rows.', 'warn');
+          return;
+        }
+
+        state.headers = headers;
+        state.rows = rows.map(row => normalizeRowLength(row, headers.length));
+        state.samples = headers.map((_, colIndex) => collectSamples(state.rows, colIndex, 5));
+
+        renderColumnMappings();
+        mappingCard.classList.remove('hidden');
+        showStatus(parseStatus, `Loaded ${state.rows.length} row(s) and ${state.headers.length} column(s).`, 'good');
+      } catch (err) {
+        console.error(err);
+        showStatus(parseStatus, 'Could not parse that CSV file. Please check that it is a valid CSV.', 'warn');
+      }
+    }
+
+    function renderColumnMappings() {
+      columnTableBody.innerHTML = '';
+
+      state.headers.forEach((header, idx) => {
+        const tr = document.createElement('tr');
+        const suggestion = suggestType(state.rows, idx);
+
+        tr.innerHTML = `
+          <td class="mono">${escapeHtml(header)}</td>
+          <td>
+            <select data-col-index="${idx}" class="type-select">
+              ${Object.entries(TYPE_DEFS).map(([key, def]) => `<option value="${key}" ${key === suggestion ? 'selected' : ''}>${escapeHtml(def.label)}</option>`).join('')}
+            </select>
+          </td>
+          <td>
+            <div class="type-options" data-options-for="${idx}"></div>
+          </td>
+          <td>${state.samples[idx].length ? state.samples[idx].map(v => `<span class="pill mono">${escapeHtml(v)}</span>`).join('') : '<span class="small">No sample values</span>'}</td>
+        `;
+
+        columnTableBody.appendChild(tr);
+      });
+
+      document.querySelectorAll('.type-select').forEach(select => {
+        select.addEventListener('change', () => renderOptionsForColumn(Number(select.dataset.colIndex)));
+      });
+
+      state.headers.forEach((_, idx) => renderOptionsForColumn(idx));
+    }
+
+    function renderOptionsForColumn(colIndex) {
+      const select = document.querySelector(`.type-select[data-col-index="${colIndex}"]`);
+      const target = document.querySelector(`[data-options-for="${colIndex}"]`);
+      const key = select.value;
+
+      const maxLen = computeMaxLength(state.rows, colIndex);
+      const decimalInfo = computeDecimalInfo(state.rows, colIndex);
+
+      if (key === 'CHAR_N') {
+        target.innerHTML = `
+          <label class="small" for="charLen_${colIndex}">Length</label>
+          <input id="charLen_${colIndex}" type="number" min="1" value="${Math.max(1, Math.min(maxLen || 1, 255))}" />
+        `;
+      } else if (key === 'DECIMAL') {
+        target.innerHTML = `
+          <div class="grid">
+            <div class="col-6">
+              <label class="small" for="prec_${colIndex}">Precision</label>
+              <input id="prec_${colIndex}" type="number" min="1" max="38" value="${Math.min(Math.max(decimalInfo.precision, 1), 38)}" />
+            </div>
+            <div class="col-6">
+              <label class="small" for="scale_${colIndex}">Scale</label>
+              <input id="scale_${colIndex}" type="number" min="0" max="38" value="${Math.min(Math.max(decimalInfo.scale, 0), 18)}" />
+            </div>
+          </div>
+        `;
+      } else {
+        target.innerHTML = '<span class="small">No extra settings needed.</span>';
+      }
+    }
+
+    function handleGenerate() {
+      hideStatus(generateStatus);
+
+      if (!state.headers.length || !state.rows.length) {
+        showStatus(generateStatus, 'Load a CSV first.', 'warn');
+        return;
+      }
+
+      const rawTableName = tableName.value.trim();
+      if (!rawTableName) {
+        showStatus(generateStatus, 'Please enter a table name.', 'warn');
+        return;
+      }
+
+      const escapedTableName = escapeTableName(rawTableName);
+      const columnConfigs = state.headers.map((header, idx) => {
+        const typeKey = document.querySelector(`.type-select[data-col-index="${idx}"]`).value;
+        const opts = {};
+
+        if (typeKey === 'CHAR_N') {
+          opts.length = document.getElementById(`charLen_${idx}`)?.value || '1';
+        }
+        if (typeKey === 'DECIMAL') {
+          opts.precision = document.getElementById(`prec_${idx}`)?.value || '18';
+          opts.scale = document.getElementById(`scale_${idx}`)?.value || '2';
+        }
+
+        return {
+          name: header,
+          typeKey,
+          typeSql: TYPE_DEFS[typeKey].sql(opts),
+          kind: TYPE_DEFS[typeKey].kind,
+          opts
+        };
+      });
+
+      const createSql = buildCreateTableSql(escapedTableName, columnConfigs);
+      const insertSql = buildInsertSql(escapedTableName, columnConfigs, state.rows);
+      sqlOutput.value = `${createSql}\n\n${insertSql}`;
+      outputCard.classList.remove('hidden');
+      showStatus(generateStatus, `Generated SQL for ${state.rows.length} row(s).`, 'good');
+    }
+
+    function handleSaveSettings() {
+      const settingsName = prompt('Enter a name for these settings:');
+      if (!settingsName) return;
+
+      const settings = {};
+      state.headers.forEach((header, idx) => {
+        const typeKey = document.querySelector(`.type-select[data-col-index="${idx}"]`).value;
+        const opts = {};
+
+        if (typeKey === 'CHAR_N') {
+          opts.length = document.getElementById(`charLen_${idx}`)?.value || '1';
+        }
+        if (typeKey === 'DECIMAL') {
+          opts.precision = document.getElementById(`prec_${idx}`)?.value || '18';
+          opts.scale = document.getElementById(`scale_${idx}`)?.value || '2';
+        }
+
+        settings[header] = { typeKey, opts };
+      });
+
+      const savedSettings = JSON.parse(localStorage.getItem('csvToSQLSettings') || '{}');
+      savedSettings[settingsName] = settings;
+      localStorage.setItem('csvToSQLSettings', JSON.stringify(savedSettings));
+
+      updateLoadSettingsSelect();
+      showStatus(generateStatus, `Settings saved as "${settingsName}".`, 'good');
+    }
+
+    function handleLoadSettings() {
+      const settingsName = loadSettingsSelect.value;
+      if (!settingsName) return;
+
+      const savedSettings = JSON.parse(localStorage.getItem('csvToSQLSettings') || '{}');
+      const settings = savedSettings[settingsName];
+      if (!settings) return;
+
+      state.headers.forEach((header, idx) => {
+        const columnSettings = settings[header];
+        if (columnSettings) {
+          const select = document.querySelector(`.type-select[data-col-index="${idx}"]`);
+          select.value = columnSettings.typeKey;
+          renderOptionsForColumn(idx);
+
+          // Apply options
+          if (columnSettings.typeKey === 'CHAR_N' && columnSettings.opts.length) {
+            const input = document.getElementById(`charLen_${idx}`);
+            if (input) input.value = columnSettings.opts.length;
+          }
+          if (columnSettings.typeKey === 'DECIMAL') {
+            const precInput = document.getElementById(`prec_${idx}`);
+            const scaleInput = document.getElementById(`scale_${idx}`);
+            if (precInput) precInput.value = columnSettings.opts.precision || '18';
+            if (scaleInput) scaleInput.value = columnSettings.opts.scale || '2';
+          }
+        }
+      });
+
+      showStatus(generateStatus, `Loaded settings "${settingsName}".`, 'good');
+    }
+
+    function updateLoadSettingsSelect() {
+      const savedSettings = JSON.parse(localStorage.getItem('csvToSQLSettings') || '{}');
+      loadSettingsSelect.innerHTML = '<option value="">Load Saved Settings...</option>';
+      Object.keys(savedSettings).forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        loadSettingsSelect.appendChild(option);
+      });
+    }
+
+    function buildCreateTableSql(tableNameSql, columnConfigs) {
+      const lines = columnConfigs.map(col => `    ${escapeIdentifier(col.name)} ${col.typeSql} NULL`);
+      return `CREATE TABLE ${tableNameSql} (\n${lines.join(',\n')}\n);`;
+    }
+
+    function buildInsertSql(tableNameSql, columnConfigs, rows) {
+      const colList = columnConfigs.map(col => escapeIdentifier(col.name)).join(', ');
+      const statements = rows.map(row => {
+        const values = columnConfigs.map((col, idx) => formatValue(row[idx], col));
+        return `INSERT INTO ${tableNameSql} (${colList}) VALUES (${values.join(', ')});`;
+      });
+      return statements.join('\n');
+    }
+
+    function formatValue(value, colConfig) {
+      const raw = value == null ? '' : String(value).trim();
+      if (raw === '') return 'NULL';
+
+      switch (colConfig.kind) {
+        case 'string':
+          return `N'${escapeSqlString(String(value))}'`;
+        case 'char':
+          return `'${escapeSqlString(String(value).slice(0, safeInt(colConfig.opts.length || 1, 1)))}'`;
+        case 'boolean': {
+          const parsed = parseBoolean(raw);
+          return parsed == null ? 'NULL' : String(parsed);
+        }
+        case 'date':
+        case 'datetime':
+          return `'${escapeSqlString(String(value))}'`;
+        case 'integer': {
+          const normalized = normalizeInteger(raw);
+          return normalized == null ? 'NULL' : normalized;
+        }
+        case 'decimal':
+        case 'float': {
+          const normalized = normalizeDecimal(raw);
+          return normalized == null ? 'NULL' : normalized;
+        }
+        default:
+          return `N'${escapeSqlString(String(value))}'`;
+      }
+    }
+
+    function parseBoolean(value) {
+      const v = value.trim().toLowerCase();
+      if (['true', '1', 'yes', 'y', 't'].includes(v)) return 1;
+      if (['false', '0', 'no', 'n', 'f'].includes(v)) return 0;
+      return null;
+    }
+
+    function normalizeInteger(value) {
+      const v = value.replace(/,/g, '').trim();
+      if (!/^[+-]?\d+$/.test(v)) return null;
+      return v;
+    }
+
+    function normalizeDecimal(value) {
+      const v = value.replace(/,/g, '').trim();
+      if (!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(v)) return null;
+      return v;
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let value = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (inQuotes) {
+          if (char === '"' && next === '"') {
+            value += '"';
+            i++;
+          } else if (char === '"') {
+            inQuotes = false;
+          } else {
+            value += char;
+          }
+        } else {
+          if (char === '"') {
+            inQuotes = true;
+          } else if (char === ',') {
+            row.push(value);
+            value = '';
+          } else if (char === '\n') {
+            row.push(value);
+            rows.push(row);
+            row = [];
+            value = '';
+          } else if (char === '\r') {
+            // Ignore CR. LF handling above finalizes the row.
+          } else {
+            value += char;
+          }
+        }
+      }
+
+      row.push(value);
+      if (row.length > 1 || row[0] !== '') {
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function sanitizeHeader(header, idx) {
+      const base = String(header || '').trim() || `Column_${idx + 1}`;
+      return base.replace(/\s+/g, '_');
+    }
+
+    function normalizeRowLength(row, length) {
+      const copy = row.slice(0, length);
+      while (copy.length < length) copy.push('');
+      return copy;
+    }
+
+    function collectSamples(rows, colIndex, limit) {
+      const samples = [];
+      for (const row of rows) {
+        const value = String(row[colIndex] ?? '').trim();
+        if (value && !samples.includes(value)) samples.push(value);
+        if (samples.length >= limit) break;
+      }
+      return samples;
+    }
+
+    function suggestType(rows, colIndex) {
+      const values = rows.map(r => String(r[colIndex] ?? '').trim()).filter(Boolean);
+      if (!values.length) return 'NVARCHAR_255';
+
+      const allBool = values.every(v => parseBoolean(v) != null);
+      if (allBool) return 'BIT';
+
+      const allInt = values.every(v => normalizeInteger(v) != null);
+      if (allInt) return 'INT';
+
+      const allDecimal = values.every(v => normalizeDecimal(v) != null);
+      if (allDecimal) return 'DECIMAL';
+
+      const allDate = values.every(v => isLikelyDate(v));
+      if (allDate) return 'DATE';
+
+      const maxLen = Math.max(...values.map(v => v.length));
+      if (maxLen === 1) return 'CHAR_1';
+
+      return maxLen > 255 ? 'NVARCHAR_MAX' : 'NVARCHAR_255';
+    }
+
+    function isLikelyDate(value) {
+      const parsed = Date.parse(value);
+      return !Number.isNaN(parsed);
+    }
+
+    function computeMaxLength(rows, colIndex) {
+      let max = 1;
+      for (const row of rows) {
+        const len = String(row[colIndex] ?? '').length;
+        if (len > max) max = len;
+      }
+      return max;
+    }
+
+    function computeDecimalInfo(rows, colIndex) {
+      let precision = 1;
+      let scale = 0;
+
+      for (const row of rows) {
+        const raw = String(row[colIndex] ?? '').trim();
+        if (!raw) continue;
+        const normalized = normalizeDecimal(raw);
+        if (!normalized) continue;
+
+        const unsigned = normalized.replace(/^[+-]/, '');
+        const parts = unsigned.split('.');
+        const integerDigits = parts[0] === '' ? 0 : parts[0].replace(/^0+/, '').length || 1;
+        const fractionalDigits = parts[1] ? parts[1].length : 0;
+        precision = Math.max(precision, integerDigits + fractionalDigits);
+        scale = Math.max(scale, fractionalDigits);
+      }
+
+      return { precision, scale };
+    }
+
+    function safeInt(value, fallback) {
+      const parsed = parseInt(value, 10);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+    }
+
+    function escapeSqlString(value) {
+      return String(value).replace(/'/g, "''");
+    }
+
+    function escapeIdentifier(name) {
+      return `[${String(name).replace(/]/g, ']]')}]`;
+    }
+
+    function escapeTableName(name) {
+      return name
+        .split('.')
+        .map(part => part.trim())
+        .filter(Boolean)
+        .map(escapeIdentifier)
+        .join('.');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Initialize
+    updateLoadSettingsSelect();
+  </script>
+</body>
+</html>
