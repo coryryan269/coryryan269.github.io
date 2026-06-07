@@ -1,195 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Time Since</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Since</title>
 
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #111;
-      color: #fff;
+<style>
+    * {
+        box-sizing: border-box;
     }
 
     body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+        margin: 0;
+        background: #111;
+        color: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
     }
 
     .container {
-      text-align: center;
-      position: relative;
+        padding: 20px;
     }
 
-    .time-since {
-      font-size: clamp(3rem, 10vw, 9rem);
-      font-weight: 800;
-      line-height: 1.1;
+    #display {
+        font-size: clamp(3rem, 10vw, 8rem);
+        font-weight: 900;
+        line-height: 1.1;
     }
 
-    .label {
-      margin-top: 1rem;
-      font-size: clamp(1rem, 2vw, 1.5rem);
-      opacity: 0.65;
+    #details {
+        margin-top: 15px;
+        font-size: 1rem;
+        opacity: 0.65;
     }
 
-    .edit-button {
-      position: fixed;
-      right: 1rem;
-      bottom: 1rem;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 999px;
-      padding: 0.4rem 0.7rem;
-      font-size: 0.8rem;
-      cursor: pointer;
+    #editBtn {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        border: none;
+        background: transparent;
+        color: rgba(255,255,255,.25);
+        font-size: 12px;
+        cursor: pointer;
+        padding: 6px;
     }
 
-    .edit-button:hover {
-      color: rgba(255, 255, 255, 0.8);
-      border-color: rgba(255, 255, 255, 0.4);
+    #editBtn:hover {
+        color: rgba(255,255,255,.6);
     }
 
     dialog {
-      border: none;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      background: #222;
-      color: white;
-      max-width: 320px;
-      width: calc(100% - 2rem);
-    }
-
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.7);
+        background: #222;
+        color: white;
+        border: 1px solid #444;
+        border-radius: 10px;
+        padding: 20px;
     }
 
     input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.6rem;
-      margin: 0.75rem 0 1rem;
-      border-radius: 0.5rem;
-      border: none;
-      font-size: 1rem;
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        font-size: 16px;
     }
 
-    .dialog-actions {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: flex-end;
+    .buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
     }
 
-    .dialog-actions button {
-      padding: 0.5rem 0.8rem;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
+    button {
+        padding: 8px 14px;
+        cursor: pointer;
     }
-  </style>
+</style>
 </head>
 
 <body>
-  <main class="container">
-    <div id="timeSince" class="time-since">Loading...</div>
-    <div id="sinceLabel" class="label"></div>
-  </main>
 
-  <button class="edit-button" id="editButton">edit</button>
+<div class="container">
+    <div id="display">0 Days 0 Hours</div>
+    <div id="details"></div>
+</div>
 
-  <dialog id="editDialog">
-    <h2>Change start date/time</h2>
-    <input type="datetime-local" id="dateTimeInput" />
+<button id="editBtn">⚙</button>
 
-    <div class="dialog-actions">
-      <button id="cancelButton">Cancel</button>
-      <button id="saveButton">Save</button>
+<dialog id="editDialog">
+    <h3>Set Start Date/Time</h3>
+
+    <input type="datetime-local" id="dateInput">
+
+    <div class="buttons">
+        <button id="cancelBtn">Cancel</button>
+        <button id="saveBtn">Save</button>
     </div>
-  </dialog>
+</dialog>
 
-  <script>
-    const STORAGE_KEY = "persistentSinceDateTime";
+<script>
+const STORAGE_KEY = "time_since_start";
 
-    const timeSinceEl = document.getElementById("timeSince");
-    const sinceLabelEl = document.getElementById("sinceLabel");
-    const editButton = document.getElementById("editButton");
-    const editDialog = document.getElementById("editDialog");
-    const dateTimeInput = document.getElementById("dateTimeInput");
-    const cancelButton = document.getElementById("cancelButton");
-    const saveButton = document.getElementById("saveButton");
+function getStartDate() {
+    let stored = localStorage.getItem(STORAGE_KEY);
 
-    function getStoredStartTime() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-
-      if (stored) {
-        return new Date(stored);
-      }
-
-      const now = new Date();
-      localStorage.setItem(STORAGE_KEY, now.toISOString());
-      return now;
+    if (!stored) {
+        stored = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, stored);
     }
 
-    let startTime = getStoredStartTime();
+    return new Date(stored);
+}
 
-    function pad(number) {
-      return String(number).padStart(2, "0");
-    }
+function saveStartDate(date) {
+    localStorage.setItem(STORAGE_KEY, date.toISOString());
+}
 
-    function toDateTimeLocalValue(date) {
-      const year = date.getFullYear();
-      const month = pad(date.getMonth() + 1);
-      const day = pad(date.getDate());
-      const hours = pad(date.getHours());
-      const minutes = pad(date.getMinutes());
+let startDate = getStartDate();
 
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
+const display = document.getElementById("display");
+const details = document.getElementById("details");
 
-    function formatSinceLabel(date) {
-      return `Since ${date.toLocaleString()}`;
-    }
+function updateDisplay() {
+    const now = new Date();
 
-    function updateDisplay() {
-      const now = new Date();
-      let diffMs = now - startTime;
+    let diff = now - startDate;
 
-      if (diffMs < 0) diffMs = 0;
+    if (diff < 0) diff = 0;
 
-      const totalHours = Math.floor(diffMs / 1000 / 60 / 60);
-      const days = Math.floor(totalHours / 24);
-      const hours = totalHours % 24;
+    const totalHours = Math.floor(diff / (1000 * 60 * 60));
 
-      timeSinceEl.textContent = `${days} days, ${hours} hours`;
-      sinceLabelEl.textContent = formatSinceLabel(startTime);
-    }
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
 
-    editButton.addEventListener("click", () => {
-      dateTimeInput.value = toDateTimeLocalValue(startTime);
-      editDialog.showModal();
-    });
+    display.textContent = `${days} Days ${hours} Hours`;
 
-    cancelButton.addEventListener("click", () => {
-      editDialog.close();
-    });
+    details.textContent =
+        `Since ${startDate.toLocaleString()}`;
+}
 
-    saveButton.addEventListener("click", () => {
-      if (!dateTimeInput.value) return;
+updateDisplay();
+setInterval(updateDisplay, 1000);
 
-      startTime = new Date(dateTimeInput.value);
-      localStorage.setItem(STORAGE_KEY, startTime.toISOString());
+const dialog = document.getElementById("editDialog");
+const editBtn = document.getElementById("editBtn");
+const dateInput = document.getElementById("dateInput");
+const saveBtn = document.getElementById("saveBtn");
+const cancelBtn = document.getElementById("cancelBtn");
 
-      updateDisplay();
-      editDialog.close();
-    });
+function formatForInput(date) {
+    const pad = n => String(n).padStart(2, "0");
+
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+editBtn.addEventListener("click", () => {
+    dateInput.value = formatForInput(startDate);
+    dialog.showModal();
+});
+
+cancelBtn.addEventListener("click", () => {
+    dialog.close();
+});
+
+saveBtn.addEventListener("click", () => {
+    if (!dateInput.value) return;
+
+    startDate = new Date(dateInput.value);
+
+    saveStartDate(startDate);
 
     updateDisplay();
-    setInterval(updateDisplay, 1000 * 30);
-  </script>
+
+    dialog.close();
+});
+</script>
+
 </body>
 </html>
