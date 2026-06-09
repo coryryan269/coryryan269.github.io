@@ -1,0 +1,106 @@
+@echo off
+title Network Repair for Amazon Connectivity Issue
+color 0A
+
+echo ==================================================
+echo Amazon / Network-Specific Connectivity Repair Tool
+echo ==================================================
+echo.
+echo This will:
+echo - Flush DNS
+echo - Clear ARP and NetBIOS cache
+echo - Reset Winsock
+echo - Reset TCP/IP stack
+echo - Release and renew IP
+echo - Set DNS to Cloudflare temporarily
+echo - Disable and re-enable the active network adapter
+echo - Run diagnostics for amazon.com
+echo.
+pause
+
+echo.
+echo Creating log file...
+set LOG=%USERPROFILE%\Desktop\amazon_network_fix_log.txt
+echo Amazon Network Fix Log > "%LOG%"
+echo Date: %DATE% %TIME% >> "%LOG%"
+echo. >> "%LOG%"
+
+echo.
+echo [1/10] Flushing DNS cache...
+ipconfig /flushdns >> "%LOG%" 2>&1
+
+echo.
+echo [2/10] Clearing ARP cache...
+arp -d * >> "%LOG%" 2>&1
+
+echo.
+echo [3/10] Clearing NetBIOS cache...
+nbtstat -R >> "%LOG%" 2>&1
+nbtstat -RR >> "%LOG%" 2>&1
+
+echo.
+echo [4/10] Resetting Winsock...
+netsh winsock reset >> "%LOG%" 2>&1
+
+echo.
+echo [5/10] Resetting TCP/IP stack...
+netsh int ip reset >> "%LOG%" 2>&1
+
+echo.
+echo [6/10] Releasing IP address...
+ipconfig /release >> "%LOG%" 2>&1
+
+echo.
+echo [7/10] Renewing IP address...
+ipconfig /renew >> "%LOG%" 2>&1
+
+echo.
+echo [8/10] Setting DNS to Cloudflare...
+for /f "tokens=1,2,3,*" %%A in ('netsh interface show interface ^| findstr /R "Connected"') do (
+    set "ADAPTER=%%D"
+)
+
+if defined ADAPTER (
+    echo Active adapter detected: %ADAPTER%
+    echo Active adapter detected: %ADAPTER% >> "%LOG%"
+
+    netsh interface ip set dns name="%ADAPTER%" static 1.1.1.1 primary >> "%LOG%" 2>&1
+    netsh interface ip add dns name="%ADAPTER%" 1.0.0.1 index=2 >> "%LOG%" 2>&1
+) else (
+    echo Could not detect active adapter.
+    echo Could not detect active adapter. >> "%LOG%"
+)
+
+echo.
+echo [9/10] Restarting network adapter...
+if defined ADAPTER (
+    netsh interface set interface "%ADAPTER%" admin=disabled >> "%LOG%" 2>&1
+    timeout /t 5 /nobreak >nul
+    netsh interface set interface "%ADAPTER%" admin=enabled >> "%LOG%" 2>&1
+    timeout /t 10 /nobreak >nul
+)
+
+echo.
+echo [10/10] Running Amazon diagnostics...
+echo. >> "%LOG%"
+echo ===== DNS TEST ===== >> "%LOG%"
+nslookup amazon.com >> "%LOG%" 2>&1
+
+echo. >> "%LOG%"
+echo ===== PING TEST ===== >> "%LOG%"
+ping amazon.com >> "%LOG%" 2>&1
+
+echo. >> "%LOG%"
+echo ===== TRACE ROUTE ===== >> "%LOG%"
+tracert amazon.com >> "%LOG%" 2>&1
+
+echo.
+echo ==================================================
+echo Done.
+echo.
+echo A reboot is strongly recommended.
+echo Log saved to:
+echo %LOG%
+echo ==================================================
+echo.
+pause
