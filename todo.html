@@ -1,25 +1,159 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Repeating To-Do Cycle</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 16px; background: #f6f6f6; }
-    .card { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.08); margin-bottom: 20px; }
-    button, input { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; }
-    button { cursor: pointer; background: #fff; }
-    button.primary { background: #111; color: white; border-color: #111; }
-    .row { display: flex; gap: 8px; margin-top: 10px; }
-    .row input { flex: 1; }
-    .task { display: grid; grid-template-columns: 40px 40px 1fr auto auto auto; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .task:last-child { border-bottom: 0; }
-    .small { font-size: .85rem; color: #666; }
-    .empty { color: #777; font-style: italic; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Repeating To-Do Cycle</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  h1 { font-size: 1.5rem; margin: 10px 0 16px; }
+  h2 { font-size: 1.1rem; margin: 0 0 10px; }
+
+  .card {
+    background: color-mix(in srgb, Canvas 92%, CanvasText 8%);
+    border: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
+    padding: 16px;
+    border-radius: 18px;
+    margin-bottom: 14px;
+  }
+
+  .next-card {
+    position: sticky;
+    top: 8px;
+    z-index: 5;
+  }
+
+  .next-label, .small {
+    font-size: .85rem;
+    opacity: .7;
+  }
+
+  .next-task {
+    font-size: 1.45rem;
+    font-weight: 800;
+    margin: 8px 0;
+  }
+
+  input, button {
+    font: inherit;
+    min-height: 46px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+    padding: 10px 12px;
+  }
+
+  input {
+    width: 100%;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  button {
+    background: Canvas;
+    color: CanvasText;
+    cursor: pointer;
+  }
+
+  button.primary {
+    background: CanvasText;
+    color: Canvas;
+    border-color: CanvasText;
+    font-weight: 800;
+  }
+
+  button.danger {
+    color: #d33;
+  }
+
+  button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+
+  .row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .row input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .task {
+    display: grid;
+    gap: 10px;
+    padding: 14px 0;
+    border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+  }
+
+  .task:last-child {
+    border-bottom: 0;
+  }
+
+  .task.dragging {
+    opacity: .45;
+  }
+
+  .task-title {
+    font-weight: 750;
+  }
+
+  .task input {
+    font-weight: 700;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .actions .primary {
+    grid-column: span 2;
+  }
+
+  .handle {
+    user-select: none;
+    opacity: .65;
+    font-size: .85rem;
+  }
+
+  .empty {
+    opacity: .65;
+    font-style: italic;
+  }
+
+  @media (min-width: 600px) {
+    body { padding: 28px; }
+    .actions { grid-template-columns: repeat(5, 1fr); }
+    .actions .primary { grid-column: auto; }
+  }
+</style>
 </head>
 <body>
 
 <h1>Repeating To-Do Cycle</h1>
+
+<div class="card next-card">
+  <div class="next-label">Next up</div>
+  <div id="nextTask" class="next-task empty">No tasks yet.</div>
+  <div id="nextLastDone" class="small"></div>
+</div>
 
 <div class="card">
   <h2>Add Task</h2>
@@ -30,13 +164,13 @@
 </div>
 
 <div class="card">
-  <h2>Task List</h2>
-  <div class="small">Top item is the next thing to do. Completing any task moves it to the bottom.</div>
+  <h2>Tasks</h2>
+  <div class="small">Complete any task to move it to the bottom. Drag cards to rearrange.</div>
   <div id="taskList"></div>
 </div>
 
 <script>
-const STORAGE_KEY = "repeatingTodoCycle.v2";
+const STORAGE_KEY = "repeatingTodoCycle.v3";
 
 let state = {
   tasks: []
@@ -48,6 +182,7 @@ function save() {
 
 function load() {
   const saved = localStorage.getItem(STORAGE_KEY);
+
   if (!saved) return;
 
   try {
@@ -55,8 +190,11 @@ function load() {
     if (!Array.isArray(state.tasks)) state.tasks = [];
   } catch {
     state = { tasks: [] };
-    save();
   }
+
+  state.tasks.forEach(task => {
+    if (!Array.isArray(task.history)) task.history = [];
+  });
 }
 
 function uid() {
@@ -71,45 +209,64 @@ function formatDate(value) {
 }
 
 function render() {
+  const nextTask = document.getElementById("nextTask");
+  const nextLastDone = document.getElementById("nextLastDone");
   const taskList = document.getElementById("taskList");
+
   taskList.innerHTML = "";
 
   if (state.tasks.length === 0) {
+    nextTask.textContent = "No tasks yet.";
+    nextTask.classList.add("empty");
+    nextLastDone.textContent = "";
     taskList.innerHTML = `<p class="empty">Add a task to start the cycle.</p>`;
     save();
     return;
   }
 
-  state.tasks.forEach((task, index) => {
-    if (!Array.isArray(task.history)) task.history = [];
+  nextTask.textContent = state.tasks[0].text;
+  nextTask.classList.remove("empty");
+  nextLastDone.textContent = "Last completed: " + formatDate(state.tasks[0].lastCompletedAt);
 
+  state.tasks.forEach((task, index) => {
     const div = document.createElement("div");
     div.className = "task";
+    div.draggable = true;
+    div.dataset.id = task.id;
 
     div.innerHTML = `
-      <button title="Move up" ${index === 0 ? "disabled" : ""}>↑</button>
-      <button title="Move down" ${index === state.tasks.length - 1 ? "disabled" : ""}>↓</button>
+      <div class="handle">☰ Drag to reorder</div>
 
       <div>
-        <input value="${escapeHtml(task.text)}" />
+        <input value="${escapeHtml(task.text)}" aria-label="Task text" />
         <div class="small">Last completed: ${formatDate(task.lastCompletedAt)}</div>
       </div>
 
-      <button class="primary">Done</button>
-      <button ${task.history.length === 0 ? "disabled" : ""}>Undo</button>
-      <button>Delete</button>
+      <div class="actions">
+        <button class="primary">Done</button>
+        <button ${task.history.length === 0 ? "disabled" : ""}>Undo</button>
+        <button ${index === 0 ? "disabled" : ""}>↑</button>
+        <button ${index === state.tasks.length - 1 ? "disabled" : ""}>↓</button>
+        <button class="danger">Delete</button>
+      </div>
     `;
 
-    const buttons = div.querySelectorAll("button");
     const input = div.querySelector("input");
-
-    buttons[0].onclick = () => moveTask(index, -1);
-    buttons[1].onclick = () => moveTask(index, 1);
-    buttons[2].onclick = () => completeTask(task.id);
-    buttons[3].onclick = () => undoTask(task.id);
-    buttons[4].onclick = () => deleteTask(task.id);
+    const buttons = div.querySelectorAll("button");
 
     input.onchange = () => editTask(task.id, input.value);
+
+    buttons[0].onclick = () => completeTask(task.id);
+    buttons[1].onclick = () => undoTask(task.id);
+    buttons[2].onclick = () => moveTask(index, -1);
+    buttons[3].onclick = () => moveTask(index, 1);
+    buttons[4].onclick = () => deleteTask(task.id);
+
+    div.addEventListener("dragstart", () => div.classList.add("dragging"));
+    div.addEventListener("dragend", () => {
+      div.classList.remove("dragging");
+      persistDragOrder();
+    });
 
     taskList.appendChild(div);
   });
@@ -149,6 +306,7 @@ function editTask(id, newText) {
   if (!task) return;
 
   const trimmed = newText.trim();
+
   if (!trimmed) {
     render();
     return;
@@ -201,7 +359,7 @@ function undoTask(id) {
   if (currentIndex === -1) return;
 
   const task = state.tasks[currentIndex];
-  if (!task.history || task.history.length === 0) return;
+  if (!task.history.length) return;
 
   const last = task.history.pop();
 
@@ -214,6 +372,46 @@ function undoTask(id) {
 
   save();
   render();
+}
+
+function persistDragOrder() {
+  const ids = [...document.querySelectorAll(".task")].map(el => el.dataset.id);
+
+  state.tasks.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
+
+  save();
+  render();
+}
+
+document.getElementById("taskList").addEventListener("dragover", e => {
+  e.preventDefault();
+
+  const list = document.getElementById("taskList");
+  const dragging = document.querySelector(".dragging");
+  if (!dragging) return;
+
+  const afterElement = getDragAfterElement(list, e.clientY);
+
+  if (afterElement == null) {
+    list.appendChild(dragging);
+  } else {
+    list.insertBefore(dragging, afterElement);
+  }
+});
+
+function getDragAfterElement(container, y) {
+  const elements = [...container.querySelectorAll(".task:not(.dragging)")];
+
+  return elements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      return { offset, element: child };
+    }
+
+    return closest;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
 document.getElementById("newTaskInput").addEventListener("keydown", e => {
