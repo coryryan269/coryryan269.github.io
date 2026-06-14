@@ -4,117 +4,42 @@
   <meta charset="UTF-8" />
   <title>Repeating To-Do Cycle</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 0 16px;
-      background: #f6f6f6;
-    }
-
-    h1 { margin-bottom: 8px; }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
-      margin-bottom: 20px;
-    }
-
-    .current {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin: 12px 0;
-    }
-
-    button, input {
-      font: inherit;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      cursor: pointer;
-      background: #fff;
-    }
-
-    button.primary {
-      background: #111;
-      color: white;
-      border-color: #111;
-    }
-
-    .row {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .row input {
-      flex: 1;
-    }
-
-    .task {
-      display: grid;
-      grid-template-columns: 40px 40px 1fr auto auto;
-      gap: 8px;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .task:last-child {
-      border-bottom: 0;
-    }
-
-    .small {
-      font-size: .85rem;
-      color: #666;
-    }
-
-    .empty {
-      color: #777;
-      font-style: italic;
-    }
+    body { font-family: system-ui, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 16px; background: #f6f6f6; }
+    .card { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.08); margin-bottom: 20px; }
+    button, input { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; }
+    button { cursor: pointer; background: #fff; }
+    button.primary { background: #111; color: white; border-color: #111; }
+    .row { display: flex; gap: 8px; margin-top: 10px; }
+    .row input { flex: 1; }
+    .task { display: grid; grid-template-columns: 40px 40px 1fr auto auto auto; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .task:last-child { border-bottom: 0; }
+    .small { font-size: .85rem; color: #666; }
+    .empty { color: #777; font-style: italic; }
   </style>
 </head>
 <body>
 
-  <h1>Repeating To-Do Cycle</h1>
+<h1>Repeating To-Do Cycle</h1>
 
-  <div class="card">
-    <div class="small">Next up</div>
-    <div id="currentTask" class="current empty">No tasks yet.</div>
-    <div id="currentLastDone" class="small"></div>
-
-    <div class="row">
-      <button class="primary" onclick="completeCurrentTask()">Done → Next</button>
-      <button onclick="undoLastCompletion()">Undo Last Completion</button>
-    </div>
+<div class="card">
+  <h2>Add Task</h2>
+  <div class="row">
+    <input id="newTaskInput" placeholder="New repeating task..." />
+    <button onclick="addTask()">Add</button>
   </div>
+</div>
 
-  <div class="card">
-    <h2>Add Task</h2>
-    <div class="row">
-      <input id="newTaskInput" placeholder="New repeating task..." />
-      <button onclick="addTask()">Add</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Task List</h2>
-    <div id="taskList"></div>
-  </div>
+<div class="card">
+  <h2>Task List</h2>
+  <div class="small">Top item is the next thing to do. Completing any task moves it to the bottom.</div>
+  <div id="taskList"></div>
+</div>
 
 <script>
-const STORAGE_KEY = "repeatingTodoCycle.v1";
+const STORAGE_KEY = "repeatingTodoCycle.v2";
 
 let state = {
-  tasks: [],
-  currentIndex: 0,
-  completionHistory: []
+  tasks: []
 };
 
 function save() {
@@ -123,12 +48,14 @@ function save() {
 
 function load() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try {
-      state = JSON.parse(saved);
-    } catch {
-      save();
-    }
+  if (!saved) return;
+
+  try {
+    state = JSON.parse(saved);
+    if (!Array.isArray(state.tasks)) state.tasks = [];
+  } catch {
+    state = { tasks: [] };
+    save();
   }
 }
 
@@ -143,60 +70,46 @@ function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 
-function normalizeIndex() {
-  if (state.tasks.length === 0) {
-    state.currentIndex = 0;
-  } else if (state.currentIndex >= state.tasks.length) {
-    state.currentIndex = 0;
-  } else if (state.currentIndex < 0) {
-    state.currentIndex = 0;
-  }
-}
-
 function render() {
-  normalizeIndex();
-
-  const currentTask = document.getElementById("currentTask");
-  const currentLastDone = document.getElementById("currentLastDone");
   const taskList = document.getElementById("taskList");
+  taskList.innerHTML = "";
 
   if (state.tasks.length === 0) {
-    currentTask.textContent = "No tasks yet.";
-    currentTask.classList.add("empty");
-    currentLastDone.textContent = "";
-    taskList.innerHTML = `<div class="empty">Add a task to start the cycle.</div>`;
+    taskList.innerHTML = `<p class="empty">Add a task to start the cycle.</p>`;
     save();
     return;
   }
 
-  const task = state.tasks[state.currentIndex];
-  currentTask.textContent = task.text;
-  currentTask.classList.remove("empty");
-  currentLastDone.textContent = `Last completed: ${formatDate(task.lastCompletedAt)}`;
-
-  taskList.innerHTML = "";
-
   state.tasks.forEach((task, index) => {
+    if (!Array.isArray(task.history)) task.history = [];
+
     const div = document.createElement("div");
     div.className = "task";
 
     div.innerHTML = `
       <button title="Move up" ${index === 0 ? "disabled" : ""}>↑</button>
       <button title="Move down" ${index === state.tasks.length - 1 ? "disabled" : ""}>↓</button>
+
       <div>
         <input value="${escapeHtml(task.text)}" />
         <div class="small">Last completed: ${formatDate(task.lastCompletedAt)}</div>
       </div>
-      <button>Edit</button>
+
+      <button class="primary">Done</button>
+      <button ${task.history.length === 0 ? "disabled" : ""}>Undo</button>
       <button>Delete</button>
     `;
 
-    const [upBtn, downBtn, input, editBtn, deleteBtn] = div.querySelectorAll("button, input");
+    const buttons = div.querySelectorAll("button");
+    const input = div.querySelector("input");
 
-    upBtn.onclick = () => moveTask(index, -1);
-    downBtn.onclick = () => moveTask(index, 1);
-    editBtn.onclick = () => editTask(task.id, input.value);
-    deleteBtn.onclick = () => deleteTask(task.id);
+    buttons[0].onclick = () => moveTask(index, -1);
+    buttons[1].onclick = () => moveTask(index, 1);
+    buttons[2].onclick = () => completeTask(task.id);
+    buttons[3].onclick = () => undoTask(task.id);
+    buttons[4].onclick = () => deleteTask(task.id);
+
+    input.onchange = () => editTask(task.id, input.value);
 
     taskList.appendChild(div);
   });
@@ -217,13 +130,13 @@ function escapeHtml(str) {
 function addTask() {
   const input = document.getElementById("newTaskInput");
   const text = input.value.trim();
-
   if (!text) return;
 
   state.tasks.push({
     id: uid(),
     text,
-    lastCompletedAt: null
+    lastCompletedAt: null,
+    history: []
   });
 
   input.value = "";
@@ -236,7 +149,10 @@ function editTask(id, newText) {
   if (!task) return;
 
   const trimmed = newText.trim();
-  if (!trimmed) return;
+  if (!trimmed) {
+    render();
+    return;
+  }
 
   task.text = trimmed;
   save();
@@ -244,73 +160,57 @@ function editTask(id, newText) {
 }
 
 function deleteTask(id) {
-  const index = state.tasks.findIndex(t => t.id === id);
-  if (index === -1) return;
-
-  state.tasks.splice(index, 1);
-
-  state.completionHistory = state.completionHistory.filter(h => h.taskId !== id);
-
-  if (index < state.currentIndex) {
-    state.currentIndex--;
-  }
-
-  normalizeIndex();
+  state.tasks = state.tasks.filter(t => t.id !== id);
   save();
   render();
 }
 
 function moveTask(index, direction) {
   const newIndex = index + direction;
-
   if (newIndex < 0 || newIndex >= state.tasks.length) return;
-
-  const currentTaskId = state.tasks[state.currentIndex]?.id;
 
   const [task] = state.tasks.splice(index, 1);
   state.tasks.splice(newIndex, 0, task);
 
-  state.currentIndex = state.tasks.findIndex(t => t.id === currentTaskId);
-
   save();
   render();
 }
 
-function completeCurrentTask() {
-  if (state.tasks.length === 0) return;
+function completeTask(id) {
+  const index = state.tasks.findIndex(t => t.id === id);
+  if (index === -1) return;
 
-  const task = state.tasks[state.currentIndex];
-  const previousLastCompletedAt = task.lastCompletedAt;
+  const task = state.tasks[index];
 
-  const completedAt = new Date().toISOString();
-  task.lastCompletedAt = completedAt;
-
-  state.completionHistory.push({
-    taskId: task.id,
-    completedAt,
-    previousLastCompletedAt,
-    previousIndex: state.currentIndex
+  task.history.push({
+    previousLastCompletedAt: task.lastCompletedAt,
+    previousIndex: index
   });
 
-  state.currentIndex = (state.currentIndex + 1) % state.tasks.length;
+  task.lastCompletedAt = new Date().toISOString();
+
+  state.tasks.splice(index, 1);
+  state.tasks.push(task);
 
   save();
   render();
 }
 
-function undoLastCompletion() {
-  const last = state.completionHistory.pop();
-  if (!last) return;
+function undoTask(id) {
+  const currentIndex = state.tasks.findIndex(t => t.id === id);
+  if (currentIndex === -1) return;
 
-  const task = state.tasks.find(t => t.id === last.taskId);
-  if (!task) {
-    save();
-    render();
-    return;
-  }
+  const task = state.tasks[currentIndex];
+  if (!task.history || task.history.length === 0) return;
+
+  const last = task.history.pop();
 
   task.lastCompletedAt = last.previousLastCompletedAt;
-  state.currentIndex = state.tasks.findIndex(t => t.id === last.taskId);
+
+  state.tasks.splice(currentIndex, 1);
+
+  const restoreIndex = Math.min(last.previousIndex, state.tasks.length);
+  state.tasks.splice(restoreIndex, 0, task);
 
   save();
   render();
