@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Living Sky Clock</title>
+<style>
+  :root {
+    --sky-top: #07101f;
+    --sky-mid: #18243c;
+    --sky-horizon: #4c4f64;
+    --haze: rgba(255,160,110,.12);
+    --sun-x: 50%;
+    --sun-y: 70%;
+    --sun-size: 72px;
+    --sun-opacity: 0;
+    --star-opacity: 1;
+    --window-opacity: .84;
+    --cloud-opacity: 0;
+    --cloud-brightness: .85;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+  body {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: white;
+    background: #06101d;
+  }
+
+  #scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+      radial-gradient(ellipse at 50% 84%, var(--haze) 0%, transparent 38%),
+      linear-gradient(to bottom,
+        var(--sky-top) 0%,
+        var(--sky-mid) 53%,
+        var(--sky-horizon) 100%);
+    transition: background 1.4s linear;
+  }
+
+  #scene::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.18) 100%),
+      linear-gradient(to bottom, rgba(255,255,255,.025), transparent 16%, rgba(0,0,0,.08));
+    mix-blend-mode: multiply;
+  }
+
+  .grain {
+    position: absolute;
+    inset: -50%;
+    z-index: 19;
+    pointer-events: none;
+    opacity: .08;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E");
+    animation: grain .22s steps(2) infinite;
+  }
+  @keyframes grain {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(2%, -1%); }
+    50% { transform: translate(-1%, 2%); }
+    75% { transform: translate(1%, 1%); }
+  }
+
+  #stars {
+    position: absolute;
+    inset: 0 0 23% 0;
+    z-index: 1;
+    opacity: var(--star-opacity);
+    transition: opacity 1.4s linear;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.4px),
+      radial-gradient(circle, rgba(210,225,255,.7) 0 1px, transparent 1.3px),
+      radial-gradient(circle, rgba(255,244,215,.7) 0 .8px, transparent 1.2px);
+    background-size: 137px 137px, 191px 191px, 83px 83px;
+    background-position: 13px 7px, 71px 42px, 31px 56px;
+    filter: drop-shadow(0 0 2px rgba(255,255,255,.35));
+  }
+
+  #sun {
+    position: absolute;
+    z-index: 4;
+    left: var(--sun-x);
+    top: var(--sun-y);
+    width: var(--sun-size);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: var(--sun-opacity);
+    background: radial-gradient(circle at 38% 35%, #fffef4 0 12%, #fff6bd 28%, #ffd36a 60%, #ff9b45 100%);
+    box-shadow:
+      0 0 18px 5px rgba(255,235,150,.88),
+      0 0 55px 20px rgba(255,182,83,.38),
+      0 0 130px 45px rgba(255,126,53,.18);
+    transition: left 1.4s linear, top 1.4s linear, opacity 1.4s linear, width 1.4s linear;
+  }
+
+  #moon {
+    position: absolute;
+    z-index: 3;
+    width: 48px;
+    height: 48px;
+    left: 79%;
+    top: 18%;
+    opacity: 0;
+    transform: translate(-50%,-50%);
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 24px rgba(220,230,255,.28);
+    transition: opacity 1.4s linear, left 1.4s linear, top 1.4s linear;
+  }
+  .moon-disc {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 34% 30%, rgba(120,130,150,.24) 0 5%, transparent 6%),
+      radial-gradient(circle at 64% 67%, rgba(120,130,150,.2) 0 8%, transparent 9%),
+      radial-gradient(circle at 56% 25%, rgba(120,130,150,.15) 0 4%, transparent 5%),
+      radial-gradient(circle at 72% 43%, rgba(120,130,150,.12) 0 3%, transparent 4%),
+      #fffbea;
+  }
+  .moon-shadow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    border-radius: 50%;
+    background: rgba(5,10,18,.94);
+    transform-origin: center;
+    transition: transform 1.4s linear, left 1.4s linear, right 1.4s linear;
+  }
+
+  #clouds {
+    position: absolute;
+    inset: 0 0 24% 0;
+    z-index: 6;
+    opacity: var(--cloud-opacity);
+    filter: brightness(var(--cloud-brightness));
+    transition: opacity 1.5s ease, filter 1.5s ease;
+    pointer-events: none;
+  }
+  .cloud {
+    position: absolute;
+    width: 260px;
+    height: 76px;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, rgba(255,255,255,.78), rgba(212,220,231,.56));
+    box-shadow: 0 18px 40px rgba(20,30,50,.14);
+    animation: drift linear infinite;
+    will-change: transform;
+  }
+  .cloud::before, .cloud::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: inherit;
+  }
+  .cloud::before { width: 118px; height: 118px; left: 45px; bottom: 13px; }
+  .cloud::after { width: 92px; height: 92px; right: 42px; bottom: 10px; }
+  .cloud.c1 { top: 18%; left: -310px; transform: scale(.72); animation-duration: 105s; }
+  .cloud.c2 { top: 35%; left: -360px; transform: scale(1.05); animation-duration: 142s; animation-delay: -54s; }
+  .cloud.c3 { top: 8%; left: -390px; transform: scale(.5); animation-duration: 185s; animation-delay: -101s; }
+  .cloud.c4 { top: 49%; left: -340px; transform: scale(.64); animation-duration: 128s; animation-delay: -77s; }
+  @keyframes drift {
+    from { translate: -10vw 0; }
+    to { translate: 145vw 0; }
+  }
+
+  .horizon-glow {
+    position: absolute;
+    z-index: 5;
+    left: 0; right: 0; bottom: 17%;
+    height: 30%;
+    opacity: .55;
+    background: radial-gradient(ellipse at 50% 100%, var(--haze) 0%, transparent 69%);
+    transition: background 1.4s linear;
+  }
+
+  .distant {
+    position: absolute;
+    z-index: 7;
+    left: -2%;
+    bottom: 21%;
+    width: 104%;
+    height: 19%;
+    opacity: .35;
+    filter: blur(.6px);
+  }
+
+  .city {
+    position: absolute;
+    z-index: 9;
+    left: 0;
+    bottom: 7%;
+    width: 100%;
+    height: 37%;
+    filter: drop-shadow(0 -10px 18px rgba(0,0,0,.14));
+  }
+
+  .water {
+    position: absolute;
+    z-index: 8;
+    left: 0; right: 0; bottom: 0;
+    height: 13%;
+    background:
+      linear-gradient(to bottom, rgba(255,255,255,.06), transparent 6%),
+      repeating-linear-gradient(176deg, rgba(255,255,255,.035) 0 1px, transparent 1px 10px),
+      linear-gradient(to bottom, rgba(8,17,29,.76), rgba(3,8,14,.98));
+  }
+
+  .water::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--sun-x) - 10%);
+    top: 0;
+    width: 20%;
+    height: 100%;
+    opacity: calc(var(--sun-opacity) * .55);
+    background: linear-gradient(to bottom, rgba(255,218,145,.45), transparent 75%);
+    clip-path: polygon(42% 0, 58% 0, 92% 100%, 8% 100%);
+    filter: blur(7px);
+    transition: left 1.4s linear, opacity 1.4s linear;
+  }
+
+  .clock-card {
+    position: absolute;
+    z-index: 30;
+    top: max(26px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 660px);
+    text-align: center;
+    padding: 20px 26px 18px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(8,17,30,.34), rgba(255,255,255,.07));
+    box-shadow: 0 16px 48px rgba(0,0,0,.16);
+    backdrop-filter: blur(16px) saturate(125%);
+    -webkit-backdrop-filter: blur(16px) saturate(125%);
+  }
+  #time {
+    font-size: clamp(3.2rem, 10vw, 6.6rem);
+    line-height: .95;
+    font-weight: 250;
+    letter-spacing: -.065em;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 3px 24px rgba(0,0,0,.25);
+  }
+  #seconds {
+    display: inline-block;
+    min-width: 1.4em;
+    margin-left: .28em;
+    font-size: .27em;
+    letter-spacing: 0;
+    opacity: .68;
+    vertical-align: .2em;
+  }
+  #date {
+    margin-top: 12px;
+    font-size: clamp(.82rem, 2.2vw, 1.02rem);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    opacity: .82;
+  }
+  .details {
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.1);
+    font-size: .76rem;
+    letter-spacing: .035em;
+    color: rgba(255,255,255,.82);
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 7px;
+    background: #b8c4d2;
+    box-shadow: 0 0 10px currentColor;
+  }
+  .dot.ok { background: #aee8c2; }
+  .dot.wait { background: #f5d48b; }
+  .dot.off { background: #c4cad2; }
+
+
+
+  .weather-panel {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    text-align: left;
+  }
+  .weather-metric {
+    min-width: 0;
+    padding: 9px 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.075);
+    border: 1px solid rgba(255,255,255,.09);
+  }
+  .weather-metric-label {
+    display: block;
+    font-size: .62rem;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.56);
+  }
+  .weather-metric-value {
+    display: block;
+    margin-top: 3px;
+    font-size: .92rem;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.94);
+    white-space: nowrap;
+  }
+  .week-rain {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+    margin-top: 1px;
+  }
+  .rain-day {
+    padding: 7px 3px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.055);
+    text-align: center;
+  }
+  .rain-day-name { display:block; font-size:.6rem; color:rgba(255,255,255,.58); text-transform:uppercase; }
+  .rain-day-chance { display:block; margin-top:2px; font-size:.78rem; font-variant-numeric:tabular-nums; }
+
+  #rainLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .raindrop {
+    position: absolute;
+    top: -18%;
+    width: 1px;
+    height: 12vh;
+    min-height: 34px;
+    background: linear-gradient(to bottom, transparent, rgba(218,235,255,.72));
+    transform: rotate(8deg);
+    animation: rainfall linear infinite;
+  }
+  @keyframes rainfall {
+    from { translate: 0 -12vh; }
+    to { translate: -7vw 125vh; }
+  }
+  @media (max-width: 560px) {
+    .weather-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .week-rain { grid-template-columns: repeat(7, minmax(32px, 1fr)); gap: 3px; }
+  }
+
+  .shift-progress {
+    display: none;
+    margin-top: 15px;
+    text-align: left;
+  }
+  .shift-progress.active {
+    display: block;
+  }
+  .shift-progress-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+    font-size: .75rem;
+    color: rgba(255,255,255,.78);
+  }
+  .shift-track {
+    position: relative;
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .shift-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgba(255,255,255,.62), rgba(255,255,255,.94));
+    box-shadow: 0 0 14px rgba(255,255,255,.18);
+    transition: width .8s linear;
+  }
+
+  .credit {
+    position: absolute;
+    z-index: 30;
+    right: 14px;
+    bottom: 10px;
+    font-size: .65rem;
+    color: rgba(255,255,255,.4);
+    text-decoration: none;
+  }
+
+  @media (max-height: 640px) {
+    .clock-card { top: 14px; padding: 14px 18px 13px; }
+    #time { font-size: clamp(2.7rem, 9vw, 4.8rem); }
+    #date { margin-top: 7px; }
+    .details { margin-top: 9px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cloud, .grain { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<main id="scene" aria-label="A living sky clock that changes with local time, season, and cloud cover">
+  <div id="stars"></div>
+  <div id="sun" aria-hidden="true"></div>
+  <div id="moon" aria-hidden="true">
+    <div class="moon-disc"></div>
+    <div class="moon-shadow" id="moonShadow"></div>
+  </div>
+  <div id="clouds" aria-hidden="true">
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="cloud c3"></div><div class="cloud c4"></div>
+  </div>
+  <div id="rainLayer" aria-hidden="true"></div>
+  <div class="horizon-glow"></div>
+
+  <svg class="distant" viewBox="0 0 1600 300" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#162232" d="M0,244 L0,199 L48,199 L48,169 L72,169 L72,203 L121,203 L121,143 L150,143 L150,196 L199,196 L199,160 L250,160 L250,214 L290,214 L290,119 L315,119 L315,190 L356,190 L356,176 L403,176 L403,214 L446,214 L446,153 L481,153 L481,208 L536,208 L536,136 L556,136 L556,84 L563,84 L569,136 L592,136 L592,193 L641,193 L641,156 L682,156 L682,211 L729,211 L729,130 L760,130 L760,192 L807,192 L807,169 L839,169 L839,217 L891,217 L891,145 L927,145 L927,205 L983,205 L983,173 L1030,173 L1030,212 L1082,212 L1082,122 L1114,122 L1114,186 L1152,186 L1152,152 L1194,152 L1194,208 L1244,208 L1244,171 L1288,171 L1288,219 L1341,219 L1341,147 L1377,147 L1377,193 L1425,193 L1425,165 L1472,165 L1472,210 L1527,210 L1527,139 L1553,139 L1553,196 L1600,196 L1600,300 L0,300 Z"/>
+  </svg>
+
+  <div class="water"></div>
+
+  <svg class="city" viewBox="0 0 1600 500" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="bldg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#111c29"/><stop offset="1" stop-color="#050a10"/>
+      </linearGradient>
+      <pattern id="windows" width="26" height="28" patternUnits="userSpaceOnUse">
+        <rect x="8" y="7" width="6" height="9" rx="1" fill="#ffd99a" opacity="var(--window-opacity)"/>
+      </pattern>
+    </defs>
+
+    <!-- detailed urban silhouette -->
+    <g fill="url(#bldg)">
+      <path d="M0 247h72v253H0z"/><path d="M64 205h87v295H64z"/>
+      <path d="M143 278h65v222h-65z"/><path d="M197 170h103v330H197z"/>
+      <path d="M289 231h77v269h-77z"/><path d="M352 123h106v377H352z"/>
+      <path d="M449 262h72v238h-72z"/><path d="M510 199h94v301h-94z"/>
+      <path d="M593 273h58v227h-58z"/>
+      <path d="M642 150h104v350H642z"/>
+      <path d="M735 226h74v274h-74z"/>
+      <path d="M798 98h119v402H798z"/>
+      <path d="M909 251h68v249h-68z"/>
+      <path d="M965 190h111v310H965z"/>
+      <path d="M1066 272h69v228h-69z"/>
+      <path d="M1124 138h105v362h-105z"/>
+      <path d="M1218 235h80v265h-80z"/>
+      <path d="M1287 177h116v323h-116z"/>
+      <path d="M1391 264h64v236h-64z"/>
+      <path d="M1443 212h96v288h-96z"/><path d="M1526 246h74v254h-74z"/>
+    </g>
+
+    <!-- roofline details -->
+    <g fill="#09111b">
+      <path d="M352 123l18-31h70l18 31z"/>
+      <rect x="382" y="64" width="45" height="30"/><rect x="399" y="31" width="11" height="34"/>
+      <path d="M404 31l5-23 5 23z"/>
+      <path d="M642 150l52-53 52 53z"/>
+      <rect x="821" y="72" width="73" height="27"/><rect x="850" y="23" width="15" height="50"/>
+      <path d="M857 23l7-23 7 23z"/>
+      <path d="M1124 138l23-35h60l22 35z"/>
+      <rect x="1307" y="147" width="77" height="31"/><rect x="1337" y="111" width="14" height="38"/>
+    </g>
+
+    <!-- windows -->
+    <g fill="url(#windows)" opacity=".85">
+      <path d="M72 224h79v276H72z"/><path d="M205 190h87v310h-87z"/>
+      <path d="M360 142h90v358h-90z"/><path d="M518 218h78v282h-78z"/>
+      <path d="M650 168h88v332h-88z"/><path d="M806 119h103v381H806z"/>
+      <path d="M973 210h95v290h-95z"/><path d="M1132 158h89v342h-89z"/>
+      <path d="M1295 197h100v303h-100z"/><path d="M1451 232h80v268h-80z"/>
+    </g>
+
+    <!-- bridge / rooftop texture -->
+    <g stroke="#101b27" stroke-width="7" fill="none">
+      <path d="M0 350 Q190 309 370 350 T740 350"/>
+      <path d="M1170 340 Q1380 294 1600 340"/>
+    </g>
+    <g fill="#0b141f">
+      <rect x="17" y="235" width="25" height="12"/><rect x="100" y="187" width="20" height="18"/>
+      <rect x="238" y="147" width="24" height="23"/><rect x="546" y="177" width="25" height="22"/>
+      <rect x="758" y="205" width="26" height="21"/><rect x="1010" y="169" width="27" height="21"/>
+      <rect x="1243" y="213" width="31" height="22"/><rect x="1480" y="190" width="24" height="22"/>
+    </g>
+
+    <!-- water tower -->
+    <g fill="#0a131d" stroke="#0a131d" stroke-width="5">
+      <ellipse cx="1030" cy="150" rx="32" ry="11"/>
+      <path d="M998 150h64l-8 39h-48z"/>
+      <path d="M1008 189l-22 61M1052 189l22 61M1015 189l-2 61M1045 189l2 61"/>
+    </g>
+  </svg>
+
+  <section class="clock-card" aria-live="polite">
+    <div id="time">--:--<span id="seconds">--</span></div>
+    <div id="date">Loading local time…</div>
+    <div class="details">
+      <span class="pill" id="sunStatus">Calculating daylight…</span>
+      <span class="pill" id="weatherStatus"><span class="dot wait"></span>Weather pending</span>
+      <span class="pill" id="moonStatus">Calculating moon…</span>
+      <span class="pill">Temple, Texas</span>
+    </div>
+    <div class="weather-panel" id="weatherPanel" aria-live="polite">
+      <div class="weather-metric"><span class="weather-metric-label">Today</span><span class="weather-metric-value" id="highLow">High --° · Low --°</span></div>
+      <div class="weather-metric"><span class="weather-metric-label">Barometer</span><span class="weather-metric-value" id="barometer">--.-- inHg</span></div>
+      <div class="weather-metric"><span class="weather-metric-label">Humidity</span><span class="weather-metric-value" id="humidity">--%</span></div>
+      <div class="weather-metric"><span class="weather-metric-label">Rain rest of day</span><span class="weather-metric-value" id="rainToday">--%</span></div>
+      <div class="week-rain" id="weekRain"></div>
+    </div>
+    <div class="shift-progress" id="shiftProgress" aria-live="polite">
+      <div class="shift-progress-row">
+        <span id="shiftLabel">Shift progress</span>
+        <span id="shiftRemaining">Ends at 8:00 AM</span>
+      </div>
+      <div class="shift-track" role="progressbar" aria-label="Shift progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="shift-fill" id="shiftFill"></div>
+      </div>
+    </div>
+  </section>
+
+  <a class="credit" href="https://open-meteo.com/" target="_blank" rel="noreferrer">Weather: Open-Meteo</a>
+  <div class="grain"></div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const root = document.documentElement;
+  const timeEl = document.getElementById("time");
+  const dateEl = document.getElementById("date");
+  const sunStatusEl = document.getElementById("sunStatus");
+  const weatherStatusEl = document.getElementById("weatherStatus");
+  const highLowEl = document.getElementById("highLow");
+  const barometerEl = document.getElementById("barometer");
+  const humidityEl = document.getElementById("humidity");
+  const rainTodayEl = document.getElementById("rainToday");
+  const weekRainEl = document.getElementById("weekRain");
+  const rainLayerEl = document.getElementById("rainLayer");
+  const moonEl = document.getElementById("moon");
+  const moonShadowEl = document.getElementById("moonShadow");
+  const moonStatusEl = document.getElementById("moonStatus");
+  const shiftProgressEl = document.getElementById("shiftProgress");
+  const shiftFillEl = document.getElementById("shiftFill");
+  const shiftLabelEl = document.getElementById("shiftLabel");
+  const shiftRemainingEl = document.getElementById("shiftRemaining");
+  const shiftTrackEl = shiftProgressEl.querySelector(".shift-track");
+
+  // Fallback coordinates only affect solar geometry until location permission is granted.
+  // Chicago is used because it gives a realistic mid-latitude seasonal arc.
+  const position = { lat: 31.0982, lon: -97.3428, source: "Temple, Texas" };
+  let cloudCover = null;
+  let lastWeatherFetch = 0;
+  let lastGoodWeather = null;
+
+  function buildRainLayer() {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < 90; i++) {
+      const drop = document.createElement("i");
+      drop.className = "raindrop";
+      drop.style.left = `${Math.random() * 112 - 6}%`;
+      drop.style.animationDelay = `${-Math.random() * 2.2}s`;
+      drop.style.animationDuration = `${0.48 + Math.random() * .55}s`;
+      drop.style.opacity = `${.28 + Math.random() * .68}`;
+      fragment.appendChild(drop);
+    }
+    rainLayerEl.appendChild(fragment);
+  }
+  buildRainLayer();
+
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const smoothstep = (a, b, x) => {
+    const t = clamp((x - a) / (b - a), 0, 1);
+    return t * t * (3 - 2 * t);
+  };
+  const mixRGB = (a, b, t) => a.map((v, i) => Math.round(lerp(v, b[i], t)));
+  const rgb = c => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+  const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
+  const deg = r => r * 180 / Math.PI;
+  const rad = d => d * Math.PI / 180;
+
+  function dayOfYear(date) {
+    const start = new Date(date.getFullYear(), 0, 0);
+    return Math.floor((date - start) / 86400000);
+  }
+
+  // NOAA-style solar position approximation. Accurate enough for a visual clock.
+  function solarPosition(date, lat, lon) {
+    const doy = dayOfYear(date);
+    const localMinutes = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
+    const timezoneOffsetHours = -date.getTimezoneOffset() / 60;
+    const gamma = 2 * Math.PI / 365 * (doy - 1 + (localMinutes / 60 - 12) / 24);
+
+    const eqtime = 229.18 * (
+      0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
+      - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma)
+    );
+    const decl =
+      0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
+      - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma)
+      - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+
+    let trueSolarMinutes = localMinutes + eqtime + 4 * lon - 60 * timezoneOffsetHours;
+    trueSolarMinutes = ((trueSolarMinutes % 1440) + 1440) % 1440;
+    let hourAngle = trueSolarMinutes / 4 - 180;
+    if (hourAngle < -180) hourAngle += 360;
+
+    const latRad = rad(lat);
+    const haRad = rad(hourAngle);
+    const cosZenith = clamp(
+      Math.sin(latRad) * Math.sin(decl) +
+      Math.cos(latRad) * Math.cos(decl) * Math.cos(haRad), -1, 1
+    );
+    const zenith = Math.acos(cosZenith);
+    const altitude = 90 - deg(zenith);
+
+    let azimuth = deg(Math.atan2(
+      Math.sin(haRad),
+      Math.cos(haRad) * Math.sin(latRad) - Math.tan(decl) * Math.cos(latRad)
+    )) + 180;
+    azimuth = (azimuth + 360) % 360;
+
+    const solarNoon = 720 - 4 * lon - eqtime + timezoneOffsetHours * 60;
+    const cosH = clamp(
+      (Math.cos(rad(90.833)) / (Math.cos(latRad) * Math.cos(decl))) -
+      Math.tan(latRad) * Math.tan(decl), -1, 1
+    );
+    const H = deg(Math.acos(cosH));
+    const sunrise = solarNoon - 4 * H;
+    const sunset = solarNoon + 4 * H;
+
+    return { altitude, azimuth, sunrise, sunset, declination: deg(decl) };
+  }
+
+  function minutesToClock(minutes) {
+    minutes = ((minutes % 1440) + 1440) % 1440;
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
+  function moonPhaseData(date) {
+    const synodicMonth = 29.530588853;
+    const reference = Date.UTC(2000, 0, 6, 18, 14, 0);
+    const days = (date.getTime() - reference) / 86400000;
+    const age = ((days % synodicMonth) + synodicMonth) % synodicMonth;
+    const phase = age / synodicMonth;
+    const illumination = (1 - Math.cos(2 * Math.PI * phase)) / 2;
+
+    let name;
+    if (phase < 0.03 || phase >= 0.97) name = "New Moon";
+    else if (phase < 0.22) name = "Waxing Crescent";
+    else if (phase < 0.28) name = "First Quarter";
+    else if (phase < 0.47) name = "Waxing Gibbous";
+    else if (phase < 0.53) name = "Full Moon";
+    else if (phase < 0.72) name = "Waning Gibbous";
+    else if (phase < 0.78) name = "Last Quarter";
+    else name = "Waning Crescent";
+
+    return { age, phase, illumination, name, waxing: phase < 0.5 };
+  }
+
+  function moonPositionApprox(date, lat, lon, phaseData) {
+    const phaseOffsetHours = phaseData.phase * 24;
+    const shifted = new Date(date.getTime() - phaseOffsetHours * 3600000);
+    const lunarLike = solarPosition(shifted, lat, lon);
+    return { altitude: lunarLike.altitude, azimuth: lunarLike.azimuth };
+  }
+
+  function updateMoon(now, solarAltitude) {
+    const phaseData = moonPhaseData(now);
+    const moonPos = moonPositionApprox(now, position.lat, position.lon, phaseData);
+    const x = clamp(50 + 44 * Math.sin(rad(moonPos.azimuth - 180)), 4, 96);
+    const y = clamp(79 - (moonPos.altitude / 90) * 67, 10, 93);
+    const aboveHorizon = smoothstep(-4, 1, moonPos.altitude);
+    const nightVisibility = 1 - smoothstep(-8, 3, solarAltitude);
+    moonEl.style.left = `${x}%`;
+    moonEl.style.top = `${y}%`;
+    moonEl.style.opacity = (aboveHorizon * (0.35 + 0.65 * nightVisibility)).toFixed(3);
+
+    const illum = phaseData.illumination;
+    const waxing = phaseData.waxing;
+    const scale = Math.max(0.03, Math.abs(1 - 2 * illum));
+    moonShadowEl.style.left = waxing ? "0" : "auto";
+    moonShadowEl.style.right = waxing ? "auto" : "0";
+    moonShadowEl.style.transform = `scaleX(${waxing ? scale : -scale})`;
+    moonShadowEl.style.background = illum >= 0.5 ? "rgba(5,10,18,.18)" : "rgba(5,10,18,.94)";
+    moonStatusEl.textContent = `${phaseData.name} · ${Math.round(illum * 100)}% lit`;
+  }
+
+  function paletteForAltitude(alt, season) {
+    // Seasonal bias: warmer summer haze, clearer/cooler winter daylight.
+    const summer = (Math.cos((season - 172) / 365 * Math.PI * 2) + 1) / 2;
+    const winter = 1 - summer;
+
+    const nightTop = mixRGB([3, 9, 20], [7, 16, 35], summer);
+    const nightMid = mixRGB([10, 18, 35], [20, 30, 54], summer);
+    const nightHor = mixRGB([25, 29, 47], [48, 43, 60], summer);
+
+    const dawnTop = mixRGB([20, 40, 77], [31, 55, 97], summer);
+    const dawnMid = mixRGB([91, 77, 111], [126, 90, 116], summer);
+    const dawnHor = mixRGB([239, 128, 91], [255, 151, 100], summer);
+
+    const lowTop = mixRGB([66, 116, 170], [72, 133, 190], summer);
+    const lowMid = mixRGB([132, 164, 193], [156, 187, 207], summer);
+    const lowHor = mixRGB([250, 191, 139], [255, 205, 150], summer);
+
+    const dayTop = mixRGB([43, 111, 184], [39, 125, 205], summer);
+    const dayMid = mixRGB([103, 166, 220], [91, 175, 230], summer);
+    const dayHor = mixRGB([190, 216, 231], [206, 229, 239], summer);
+
+    let top, mid, horizon, haze;
+    if (alt < -12) {
+      top = nightTop; mid = nightMid; horizon = nightHor;
+      haze = rgba(mixRGB([72,85,120], [98,78,110], summer), .12);
+    } else if (alt < -2) {
+      const t = smoothstep(-12, -2, alt);
+      top = mixRGB(nightTop, dawnTop, t);
+      mid = mixRGB(nightMid, dawnMid, t);
+      horizon = mixRGB(nightHor, dawnHor, t);
+      haze = rgba(mixRGB([233,106,87], [255,126,76], summer), .18 + .3 * t);
+    } else if (alt < 10) {
+      const t = smoothstep(-2, 10, alt);
+      top = mixRGB(dawnTop, lowTop, t);
+      mid = mixRGB(dawnMid, lowMid, t);
+      horizon = mixRGB(dawnHor, lowHor, t);
+      haze = rgba(mixRGB([255,136,79], [255,166,93], summer), .43 - .16 * t);
+    } else {
+      const t = smoothstep(10, 38, alt);
+      top = mixRGB(lowTop, dayTop, t);
+      mid = mixRGB(lowMid, dayMid, t);
+      horizon = mixRGB(lowHor, dayHor, t);
+      haze = rgba(mixRGB([255,185,119], [255,206,143], summer), .25 - .13 * t);
+    }
+
+    // Slight winter clarity / deeper blue at equal solar altitude.
+    top = mixRGB(top, [34, 84, 148], winter * smoothstep(5, 35, alt) * .12);
+    return { top, mid, horizon, haze };
+  }
+
+  function updateScene(now = new Date()) {
+    const solar = solarPosition(now, position.lat, position.lon);
+    const alt = solar.altitude;
+    const palette = paletteForAltitude(alt, dayOfYear(now));
+
+    root.style.setProperty("--sky-top", rgb(palette.top));
+    root.style.setProperty("--sky-mid", rgb(palette.mid));
+    root.style.setProperty("--sky-horizon", rgb(palette.horizon));
+    root.style.setProperty("--haze", palette.haze);
+
+    // Project east (90°) to left and west (270°) to right.
+    const x = clamp(50 + 44 * Math.sin(rad(solar.azimuth - 180)), 4, 96);
+    const y = clamp(79 - (alt / 90) * 67, 10, 93);
+    const visible = smoothstep(-3.5, .3, alt);
+    const sunSize = lerp(96, 60, smoothstep(0, 45, alt));
+
+    root.style.setProperty("--sun-x", `${x}%`);
+    root.style.setProperty("--sun-y", `${y}%`);
+    root.style.setProperty("--sun-opacity", visible.toFixed(3));
+    root.style.setProperty("--sun-size", `${sunSize}px`);
+    root.style.setProperty("--star-opacity", (1 - smoothstep(-10, -2, alt)).toFixed(3));
+    root.style.setProperty("--window-opacity", (0.12 + .78 * (1 - smoothstep(-7, 5, alt))).toFixed(3));
+
+    updateMoon(now, alt);
+
+    const light = smoothstep(-8, 22, alt);
+    root.style.setProperty("--cloud-brightness", (0.52 + light * .55).toFixed(2));
+
+    if (cloudCover !== null) {
+      const opacity = clamp((cloudCover - 8) / 74, 0, .9);
+      root.style.setProperty("--cloud-opacity", opacity.toFixed(2));
+    } else {
+      root.style.setProperty("--cloud-opacity", "0");
+    }
+
+    const phase =
+      alt >= 10 ? "Daylight" :
+      alt >= 0 ? (solar.azimuth < 180 ? "Sunrise glow" : "Sunset glow") :
+      alt >= -6 ? "Civil twilight" :
+      alt >= -12 ? "Nautical twilight" : "Night";
+
+    sunStatusEl.textContent =
+      `${phase} · sunrise ${minutesToClock(solar.sunrise)} · sunset ${minutesToClock(solar.sunset)}`;
+  }
+
+
+  function updateShiftProgress(now) {
+    const hour = now.getHours();
+    const inShift = hour >= 22 || hour < 8;
+
+    if (!inShift) {
+      shiftProgressEl.classList.remove("active");
+      return;
+    }
+
+    const shiftStart = new Date(now);
+    if (hour < 8) {
+      shiftStart.setDate(shiftStart.getDate() - 1);
+    }
+    shiftStart.setHours(22, 0, 0, 0);
+
+    const shiftEnd = new Date(shiftStart);
+    shiftEnd.setDate(shiftEnd.getDate() + 1);
+    shiftEnd.setHours(8, 0, 0, 0);
+
+    const totalMs = shiftEnd - shiftStart;
+    const elapsedMs = clamp(now - shiftStart, 0, totalMs);
+    const percent = elapsedMs / totalMs * 100;
+    const remainingMs = Math.max(0, shiftEnd - now);
+    const remainingMinutes = Math.ceil(remainingMs / 60000);
+    const hoursLeft = Math.floor(remainingMinutes / 60);
+    const minutesLeft = remainingMinutes % 60;
+
+    shiftProgressEl.classList.add("active");
+    shiftFillEl.style.width = `${percent.toFixed(2)}%`;
+    shiftTrackEl.setAttribute("aria-valuenow", percent.toFixed(0));
+    shiftLabelEl.textContent = `${percent.toFixed(0)}% of shift complete`;
+    shiftRemainingEl.textContent =
+      hoursLeft > 0
+        ? `${hoursLeft}h ${minutesLeft}m until 8:00 AM`
+        : `${minutesLeft}m until 8:00 AM`;
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const timeParts = new Intl.DateTimeFormat([], {
+      hour: "numeric", minute: "2-digit", second: "2-digit"
+    }).formatToParts(now);
+    const main = timeParts
+      .filter(p => p.type === "hour" || p.type === "minute" || p.type === "literal")
+      .map(p => p.value).join("").replace(/:\s*$/, "");
+    const seconds = timeParts.find(p => p.type === "second")?.value ?? "";
+    const dayPeriod = timeParts.find(p => p.type === "dayPeriod")?.value ?? "";
+
+    timeEl.innerHTML = `${main}<span id="seconds">${seconds}${dayPeriod ? " " + dayPeriod : ""}</span>`;
+    dateEl.textContent = now.toLocaleDateString([], {
+      weekday: "long", month: "long", day: "numeric", year: "numeric"
+    });
+
+    updateShiftProgress(now);
+    updateScene(now);
+  }
+
+
+  function pressureToInHg(hPa) {
+    return hPa * 0.0295299830714;
+  }
+
+  function renderRain(intensityMm, code) {
+    const rainingCode = [51,53,55,61,63,65,80,81,82,95,96,99].includes(code);
+    const amount = Math.max(0, Number(intensityMm) || 0);
+    if (!rainingCode && amount < 0.02) {
+      rainLayerEl.style.opacity = "0";
+      return;
+    }
+    // Open-Meteo current precipitation is mm for the current interval.
+    // Scale gently: drizzle remains sparse, heavy rain becomes visually dense.
+    const opacity = clamp(.18 + Math.sqrt(amount) * .34, .18, .92);
+    rainLayerEl.style.opacity = opacity.toFixed(2);
+    [...rainLayerEl.children].forEach((drop, i) => {
+      drop.style.display = i < Math.round(24 + opacity * 66) ? "block" : "none";
+      drop.style.animationDuration = `${clamp(1.0 - opacity * .55 + (i % 9) * .025, .38, 1.05)}s`;
+    });
+  }
+
+  function renderForecast(data) {
+    const current = data.current || {};
+    const daily = data.daily || {};
+    const hourly = data.hourly || {};
+
+    const high = Number(daily.temperature_2m_max?.[0]);
+    const low = Number(daily.temperature_2m_min?.[0]);
+    if (Number.isFinite(high) && Number.isFinite(low)) {
+      highLowEl.textContent = `High ${Math.round(high)}° · Low ${Math.round(low)}°`;
+    }
+
+    const pressure = Number(current.pressure_msl);
+    if (Number.isFinite(pressure)) barometerEl.textContent = `${pressureToInHg(pressure).toFixed(2)} inHg`;
+
+    const humidity = Number(current.relative_humidity_2m);
+    if (Number.isFinite(humidity)) humidityEl.textContent = `${Math.round(humidity)}%`;
+
+    const currentTime = new Date(current.time || Date.now()).getTime();
+    const today = new Date();
+    const endToday = new Date(today);
+    endToday.setHours(23, 59, 59, 999);
+    const remaining = (hourly.time || []).map((t, i) => ({
+      t: new Date(t).getTime(), p: Number(hourly.precipitation_probability?.[i])
+    })).filter(x => x.t >= currentTime && x.t <= endToday.getTime() && Number.isFinite(x.p));
+    const restChance = remaining.length ? Math.max(...remaining.map(x => x.p)) : Number(daily.precipitation_probability_max?.[0]);
+    if (Number.isFinite(restChance)) rainTodayEl.textContent = `${Math.round(restChance)}%`;
+
+    const names = daily.time || [];
+    const chances = daily.precipitation_probability_max || [];
+    weekRainEl.innerHTML = names.slice(0, 7).map((dateString, i) => {
+      const d = new Date(`${dateString}T12:00:00`);
+      const label = d.toLocaleDateString([], { weekday: "short" });
+      const chance = Number(chances[i]);
+      return `<div class="rain-day"><span class="rain-day-name">${label}</span><span class="rain-day-chance">${Number.isFinite(chance) ? Math.round(chance) + "%" : "--"}</span></div>`;
+    }).join("");
+
+    renderRain(current.precipitation, Number(current.weather_code));
+  }
+
+  function weatherLabel(code, cover) {
+    if ([95,96,99].includes(code)) return "Thunderstorms nearby";
+    if ([61,63,65,80,81,82].includes(code)) return "Rainy · clouds shown";
+    if ([71,73,75,77,85,86].includes(code)) return "Snowy · clouds shown";
+    if ([45,48].includes(code)) return "Foggy · cloud layer shown";
+    if (cover >= 82) return `Overcast · ${Math.round(cover)}%`;
+    if (cover >= 55) return `Mostly cloudy · ${Math.round(cover)}%`;
+    if (cover >= 25) return `Partly cloudy · ${Math.round(cover)}%`;
+    return `Mostly clear · ${Math.round(cover)}% cloud`;
+  }
+
+  async function fetchWeather(force = false) {
+    // Ten minutes is frequent enough for current conditions while staying very light:
+    // 144 calls/day if the page remains open continuously.
+    if (!force && Date.now() - lastWeatherFetch < 10 * 60 * 1000) return;
+    lastWeatherFetch = Date.now();
+
+    weatherStatusEl.innerHTML = '<span class="dot wait"></span>Updating weather';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7500);
+
+    try {
+      const url = new URL("https://api.open-meteo.com/v1/forecast");
+      url.searchParams.set("latitude", position.lat.toFixed(4));
+      url.searchParams.set("longitude", position.lon.toFixed(4));
+      url.searchParams.set("current", "cloud_cover,weather_code,relative_humidity_2m,pressure_msl,precipitation,rain");
+      url.searchParams.set("hourly", "precipitation_probability");
+      url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code");
+      url.searchParams.set("temperature_unit", "fahrenheit");
+      url.searchParams.set("timezone", "America/Chicago");
+      url.searchParams.set("forecast_days", "7");
+
+      const response = await fetch(url, { signal: controller.signal, cache: "no-store" });
+      if (!response.ok) throw new Error(`Weather HTTP ${response.status}`);
+      const data = await response.json();
+
+      const cover = Number(data?.current?.cloud_cover);
+      const code = Number(data?.current?.weather_code);
+      if (!Number.isFinite(cover)) throw new Error("Cloud cover unavailable");
+
+      cloudCover = clamp(cover, 0, 100);
+      lastGoodWeather = data;
+      renderForecast(data);
+      weatherStatusEl.innerHTML = `<span class="dot ok"></span>${weatherLabel(code, cloudCover)}`;
+      updateScene(new Date());
+    } catch (error) {
+      // Preserve the last successful readings. Only the live rain overlay is disabled.
+      rainLayerEl.style.opacity = "0";
+      if (lastGoodWeather) {
+        weatherStatusEl.innerHTML = '<span class="dot off"></span>Weather update delayed · showing last reading';
+      } else {
+        cloudCover = null;
+        weatherStatusEl.innerHTML = '<span class="dot off"></span>Weather unavailable · sky still active';
+        root.style.setProperty("--cloud-opacity", "0");
+      }
+      console.info("Optional weather update failed:", error.message);
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  updateClock();
+
+  // Fixed location: Temple, Texas. No browser location permission is requested.
+  // Weather is optional and never affects the clock or calculated sky.
+  fetchWeather(true);
+
+  // Clock and picture recalculate every minute; seconds remain live.
+  setInterval(updateClock, 1000);
+  setInterval(() => updateScene(new Date()), 60 * 1000);
+  setInterval(() => fetchWeather(false), 10 * 60 * 1000);
+})();
+</script>
+</body>
+</html>
