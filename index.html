@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHub Page Jumper</title>
+</head>
+<body>
+  <h1>Open My GitHub Page</h1>
+
+  <form id="pageForm">
+    <input
+      id="pageName"
+      type="text"
+      placeholder="dogs.html"
+      autocomplete="off"
+      autofocus
+    >
+    <button type="submit">Open</button>
+  </form>
+
+  <script>
+    const baseUrl = "https://coryryan269.github.io/";
+
+    document.getElementById("pageForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      let page = document.getElementById("pageName").value.trim();
+
+      if (!page) return;
+
+      // Prevent accidental leading slashes
+      page = page.replace(/^\/+/, "");
+
+      window.location.href = baseUrl + page;
+    });
+  </script>
+</body>
+</html>
